@@ -154,9 +154,12 @@ class full_analysis:
         ##############################
         # 2D data analysis functions #
         ##############################
-        # self.obs_cover_frac_vs_R("H1",17.2,200.,Nmax=20.3,minmass=10**11.8,maxmass=10**12.2,savename="LLS_postisaac",rudie_LLS=True)
-        # self.obs_cover_frac_vs_R("H1",20.3,200.,minmass=10**11.8,maxmass=10**12.2,savename="DLA_postisaac",rudie_DLA=True)
-        # add a column-density vs R function eventually
+        print "1"
+        self.grid_sightlines("H1",200.,coldens_min=17.2,coldens_max=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_LLS=True,savename="LLS_newfan")
+        print "2"
+        self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_newfan")
+        print "3"
+        self.grid_sightlines("H1",200.,minmass=10**11.8,maxmass=10**12.2,savename="coldens_newfan")
 
     ############################################################################################################
     ############################################################################################################
@@ -173,7 +176,7 @@ class full_analysis:
     # 2D data analysis functions #
     ##############################
 
-    def grid_sightlines(self,species,max_R,coldens_thresh=0,minmass=10**11.8,maxmass=10**12.2,savename=None,coldens_vs_R=False,coveringfrac_vs_R=False,rudie_LLS=False,rudie_DLA=False):
+    def grid_sightlines(self,species,max_R,coldens_min=0,coldens_max=1000,minmass=10**11.8,maxmass=10**12.2,savename=None,coldens_vs_R=False,coveringfrac_vs_R=False,coveringfrac_within_R=False,rudie_LLS=False,rudie_DLA=False):
         # Calculates covering fraction in similar way to observers.  Gather all halos within specified mass range, and treat 
         # all corresponding sightlines together.  
 
@@ -230,12 +233,15 @@ class full_analysis:
                     plt.xlabel('Radius [pkpc]')
                     plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
                     plt.legend()
-                    plt.savefig(savename+"_cd_v_R.pdf")
+                    if savename != None:
+                        plt.savefig(self.fig_base+savename+".pdf")
+                    else:
+                        plt.savefig(self.fig_base+"cd_v_R.pdf")
 
-                if coveringfrac_vs_R:
+                if coveringfrac_within_R:
                     for k in np.arange(n_Rbins):
-                        in_Rbin = np.logical_and(r<Rbins_min[k],r>Rbins_max[k])
-                        covered = np.logical_and(in_Rbin,N[in_Rbin]>coldens_thresh)
+                        in_Rbin = r<Rbins_max[k]
+                        covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
                         fc = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
 
                     plt.close('all')
@@ -244,16 +250,49 @@ class full_analysis:
                     plt.xlim([0.,max_R])
                     plt.xlabel('Radius [pkpc]')
                     plt.ylim([-0.05,1.1])
-                    plt.ylabel(r"$f_C$")
+                    plt.ylabel(r"$f_C (< R)$")
 
+                    # Rudie et al. 2012, cumulative covering fraction of LLS and DLA for M_halo ~ 10^12
                     if rudie_LLS:
-                        plt.plot()
+                        xdat = np.array([90.,180.])
+                        ydat = np.array([0.3,0.24])
+                        yerr = np.array([0.14,0.09])
+                        xerr = np.array([8.,16.])
+                        plt.ylim([0.,1.0])
+                        plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,label='Rudie+: LLS',fmt='.',color='purple')
                     elif rudie_DLA:
+                        xdat = np.array([90.,180.])
+                        ydat = np.array([0.,0.04])
+                        yerr = np.array([0.1,0.04])
+                        xerr = np.array([8.,16.])
+                        plt.ylim([0.,1.0])
+                        plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,label='Rudie+: DLA',fmt='.',color='purple')
+                    plt.legend()
+                    if savename != None:
+                        plt.savefig(self.fig_base+savename+".pdf")
+                    else:
+                        plt.savefig(self.fig_base+"fc_within_R.pdf")
+
+
+                if coveringfrac_vs_R:
+                    for k in np.arange(n_Rbins):
+                        in_Rbin = np.logical_and(r<Rbins_max[k],r>Rbins_min[k])
+                        covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
+                        fc = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
+
+                    plt.close('all')
+                    plt.figure()
+                    plt.plot(Rbins_min,fc,color=self.color_list[i],label=self.label_list)
+                    plt.xlim([0.,max_R])
+                    plt.xlabel('Radius [pkpc]')
+                    plt.ylim([-0.05,1.1])
+                    plt.ylabel(r"$f_C (R)$")
 
                     plt.legend()
-                    plt.savefig(savename+"_fc_v_R.pdf")
-
-
+                    if savename != None:
+                        plt.savefig(self.fig_base+savename+".pdf")
+                    else:
+                        plt.savefig(self.fig_base+"fc_vs_R.pdf")
 
 
 
