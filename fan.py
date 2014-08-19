@@ -180,13 +180,6 @@ class full_analysis:
     # self.get_gal_props
 
     def dat_prep(self,redshifts,c0_128=0,c0_256=0,c0_512=0,c0_fw_256=0,c0_sw_256=0,c2_256=0,c3_512=0,c4_512=0,c4_check=0,g0_BH=0,g10_BH=0,g20_BH=0,g30_BH=0,g40_BH=0,g50_BH=0,g25_BH=0,g75_BH=0,g95_BH=0,g0_noBH=0,g10_noBH=0,g20_noBH=0,g30_noBH=0,g40_noBH=0,g50_noBH=0,g25_noBH=0,g75_noBH=0,g95_noBH=0,g10_nothermal=0,g20_nothermal=0,g30_nothermal=0,g40_nothermal=0,g50_nothermal=0,g25_fixv=0,g50_fixv=0,g25_fixv_fixeta=0,g50_fixv_fixeta=0,g25_fixv_nothermal=0,g50_fixv_nothermal=0,c0_nometalwinds=0,c0_fullmetalwinds=0):
-        # self.run_list = []
-        # self.color_list = [] 
-        # self.label_list = [] 
-        # self.linestyle_list = []
-        # self.snapnum_list = [] 
-        # self.snapdir_list = []
-
         self.mv_base = "/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/"
         self.sb_base = "/n/hernquistfs1/spb/Cosmo/"
         self.js_base = "/n/hernquistfs1/jsuresh/Runs/"
@@ -214,8 +207,8 @@ class full_analysis:
         if c0_sw_256 == 1:
             for redshift in redshifts:
                 self.run_list.append('c0_sw_256')
-                self.color_list.append('blue')
-                self.label_list.append('Strong Winds')
+                self.color_list.append('green')
+                self.label_list.append('Higher Mass-Loading')
                 self.linestyle_list.append('solid')
                 self.snapdir_list.append(self.mv_base+"Cosmo0_V6/L25_n256")
                 if redshift == '4': self.snapnum_list.append(54)
@@ -244,7 +237,7 @@ class full_analysis:
         if c2_256 == 1:
             for redshift in redshifts:
                 self.run_list.append('c2_256')
-                self.color_list.append('blue')
+                self.color_list.append('cyan')
                 self.label_list.append('No AGN')
                 self.linestyle_list.append('solid')
                 self.snapdir_list.append(self.mv_base+"Cosmo2_V6/L25_n256")
@@ -266,33 +259,53 @@ class full_analysis:
         if g50_fixv_nothermal == 1:
             for redshift in redshifts:
                 self.run_list.append('g50_fixv_nothermal')
-                self.color_list.append('blue')
-                self.label_list.append('Fiducial')
+                self.color_list.append('chartreuse')
+                self.label_list.append('Faster Winds')
                 self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.mv_base+"Cosmo0_V6/L25_n256")
-                if redshift == '4': self.snapnum_list.append(54)
-                if redshift == '3': self.snapnum_list.append(60)
-                if redshift == '2': self.snapnum_list.append(68)
-
-        # self.dat_prep(redshifts,g0_BH=1)
-        # self.dat_prep(redshifts,c2_256=1)
-        # self.dat_prep(redshifts,c0_sw_256=1)
-        # self.dat_prep(redshifts,g50_fixv_nothermal=1)
-        # self.dat_prep(redshifts,g50_BH=1)
-        # self.dat_prep(redshifts,g50_fixv=1)
-        # self.dat_prep(redshifts,c0_nometalwinds=1)
-        # self.dat_prep(redshifts,c0_fullmetalwinds=1)
-
-
-
-
-
-
-
-
-
-
-
+                self.snapdir_list.append(self.js_base+"gam_50_fixv_nothermal/")
+                if redshift == '4': self.snapnum_list.append(1)
+                if redshift == '3': self.snapnum_list.append(3)
+                if redshift == '2': self.snapnum_list.append(5)
+        if g50_BH == 1:
+            for redshift in redshifts:
+                self.run_list.append('g50_BH')
+                self.color_list.append('brown')
+                self.label_list.append('Fixed-E Hot Winds')
+                self.linestyle_list.append('solid')
+                self.snapdir_list.append(self.js_base+"gam_50_BH/")
+                if redshift == '4': self.snapnum_list.append(1)
+                if redshift == '3': self.snapnum_list.append(3)
+                if redshift == '2': self.snapnum_list.append(5)
+        if g50_fixv == 1:
+            for redshift in redshifts:
+                self.run_list.append('g50_fixv')
+                self.color_list.append('magenta')
+                self.label_list.append('Fixed-v Hot Winds')
+                self.linestyle_list.append('solid')
+                self.snapdir_list.append(self.js_base+"gam_50_fixv/")
+                if redshift == '4': self.snapnum_list.append(1)
+                if redshift == '3': self.snapnum_list.append(3)
+                if redshift == '2': self.snapnum_list.append(5)
+        if c0_nometalwinds == 1:
+            for redshift in redshifts:
+                self.run_list.append('c0_nometalwinds')
+                self.color_list.append('gray')
+                self.label_list.append('Pristine Winds')
+                self.linestyle_list.append('solid')
+                self.snapdir_list.append(self.js_base+"c0_nometalwinds/")
+                if redshift == '4': self.snapnum_list.append(1)
+                if redshift == '3': self.snapnum_list.append(3)
+                if redshift == '2': self.snapnum_list.append(5)
+        if c0_fullmetalwinds == 1:
+            for redshift in redshifts:
+                self.run_list.append('c0_fullmetalwinds')
+                self.color_list.append('black')
+                self.label_list.append('Fully Enriched Winds')
+                self.linestyle_list.append('solid')
+                self.snapdir_list.append(self.js_base+"c0_fullmetalwinds/")
+                if redshift == '4': self.snapnum_list.append(1)
+                if redshift == '3': self.snapnum_list.append(3)
+                if redshift == '2': self.snapnum_list.append(5)
 
 
       
