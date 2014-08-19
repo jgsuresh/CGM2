@@ -60,70 +60,51 @@ class full_analysis:
 
 
 
-        # # Cosmo0_V6 (512^3 particles):
+        # # Cosmo0_V6 (Fiducial):
         # redshifts = ['2']
         # self.dat_prep(redshifts,c0_256=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,c0_512=1)
         
-        # # Cosmo3_V6 (512^3 particles):
+        # # Cosmo3_V6 (No feedback - 512^3 particles):
         # redshifts = ['4','3','2']
         # self.dat_prep(redshifts,c3_512=1)
 
-        # # Cosmo4_V6 (512^3 particles):
+        # # Cosmo4_V6 (Simeon's heated winds model - 512^3 particles):
         # redshifts = ['2.5']
         # self.dat_prep(redshifts,c4_512=1)
         # self.dat_prep(redshifts,c4_check=1)
 
-        # # # Cosmo2_V6 (256^3 particles):
+        # # Cosmo2_V6 (256^3 particles):
         # redshifts = ['2']
         # self.dat_prep(redshifts,c2_256=1)
 
-        # # Cosmo0_V6_fastWinds (256^3 particles):
-        # redshifts = ['4','3','2','1','0.3','0']
+        # # Cosmo0_V6_fastWinds, Cosmo0_V6_strongWinds (256^3 particles):
+        # redshifts = ['2']
         # self.dat_prep(redshifts,c0_fw_256=1)
-
+        # self.dat_prep(redshifts,c0_sw_256=1)
 
         # # Cosmo5_V6 (256^3 particles):
         # redshifts = ['4','3','2']
         # self.dat_prep(redshifts,c5_256=1)
 
         # Gamma boxes (256^3 particles):
-        # redshifts = ['2']
-        # self.dat_prep(redshifts,g0_BH=1)
-        # # Cosmo2_V6 (256^3 fparticles):
-        # redshifts = ['2']
-        # self.dat_prep(redshifts,c2_256=1)
-
-        # # # # Cosmo0_V6_strongWinds (256^3 particles):
-        # redshifts = ['2']
-        # self.dat_prep(redshifts,c0_sw_256=1)
 
         # redshifts = ['2']
-        # self.dat_prep(redshifts,g50_fixv_nothermal=1)
-
-        # redshifts = ['2']
+        # self.dat_prep(redshifts,g0_BH=1) #c2_256
         # self.dat_prep(redshifts,g10_BH=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g20_BH=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g30_BH=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g40_BH=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g50_BH=1)
-        # redshifts = ['0.3']
-        # # self.dat_prep(redshifts,g25_BH=1)
-        # # redshifts = ['2']
-        # # self.dat_prep(redshifts,g25_noBH=1)
-        # # redshifts = ['3']
-        # # self.dat_prep(redshifts,g75_BH=1)
-        # # redshifts = ['4','3','2']
-        # # self.dat_prep(redshifts,g75_noBH=1)
-        # # redshifts = ['3']
-        # # self.dat_prep(redshifts,g95_BH=1)
-        # # redshifts = ['4','3','2']
-        # # self.dat_prep(redshifts,g95_noBH=1)
+
+        # redshifts = ['2']
+        # self.dat_prep(redshifts,g25_BH=1)
+        # self.dat_prep(redshifts,g75_BH=1)
+        # self.dat_prep(redshifts,g95_BH=1)
+        # redshifts = ['2']
+        # self.dat_prep(redshifts,g25_noBH=1)
+        # self.dat_prep(redshifts,g75_noBH=1)
+        # self.dat_prep(redshifts,g95_noBH=1)
 
         # redshifts = ['2']
         # self.dat_prep(redshifts,g10_noBH=1)
@@ -134,29 +115,21 @@ class full_analysis:
 
         # redshifts = ['2']
         # self.dat_prep(redshifts,g10_nothermal=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g20_nothermal=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g30_nothermal=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g40_nothermal=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g50_nothermal=1)
-
 
         # redshifts = ['2']
         # self.dat_prep(redshifts,g25_fixv=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g50_fixv=1)
 
         # redshifts = ['2']
         # self.dat_prep(redshifts,g25_fixv_fixeta=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g50_fixv_fixeta=1)
 
         # redshifts = ['2']
         # self.dat_prep(redshifts,g25_fixv_nothermal=1)
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g50_fixv_nothermal=1)
         
         # redshifts = ['2']
