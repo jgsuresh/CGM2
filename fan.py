@@ -26,7 +26,6 @@ class full_analysis:
     def __init__(self):
         self.CGMsnap_base = '/n/home04/jsuresh/CGM_new/data/CGM_snaps/'
         self.grid_base = '/n/home04/jsuresh/CGM_new/data/grids/'
-
         self.fig_base = '/n/home04/jsuresh/CGM_new/data/figs/'
         self.npz_base = '/n/home04/jsuresh/CGM_new/data/npz/'
 
@@ -176,7 +175,7 @@ class full_analysis:
     # 2D data analysis functions #
     ##############################
 
-    def grid_sightlines(self,species,max_R,coldens_min=0,coldens_max=1000,minmass=10**11.8,maxmass=10**12.2,savename=None,coldens_vs_R=False,coveringfrac_vs_R=False,coveringfrac_within_R=False,rudie_LLS=False,rudie_DLA=False):
+    def grid_sightlines(self,species,max_R,coldens_min=0,coldens_max=1000,minmass=10**11.8,maxmass=10**12.2,savename=None,coldens_vs_R=False,coverfrac_vs_R=False,coverfrac_within_R=False,rudie_LLS=False,rudie_DLA=False):
         # Calculates covering fraction in similar way to observers.  Gather all halos within specified mass range, and treat 
         # all corresponding sightlines together.  
 
@@ -185,11 +184,12 @@ class full_analysis:
         [Rbins_min,Rbins_max] = AU._bin_setup(0.,max_R,n_Rbins)
 
         for i in np.arange(self.ndat):
+            print "Working on {}".format(self.run_list[i])
             # Check if npz for this data has been saved before:
-            foo = "{}kpc".format(kpc_thresh)
-            npz_fname = "fc_{}_s{}_{}_N{}_within{}_12minmass.npz".format(self.run_list[i],self.snapnum_list[i],species,Nmin,foo)
-            print self.npz_base+npz_fname
-            if os.path.isfile(self.npz_base+npz_fname):
+            # foo = "{}kpc".format(max_R)
+            # npz_fname = "fc_{}_s{}_{}_N{}_within{}_12minmass.npz".format(self.run_list[i],self.snapnum_list[i],species,Nmin,foo)
+            # print self.npz_base+npz_fname
+            if False: #os.path.isfile(self.npz_base+npz_fname):
                 print "Loaded from npz!"
                 f = np.load(self.npz_base+npz_fname)
                 m = f['m']
@@ -197,7 +197,7 @@ class full_analysis:
                 f.close()
             else:
                 pass 
-                grp_ids = self.find_desired_grpids(i,minmass=minmass,maxmass=maxmass)
+                grp_ids = self.find_desired_grpids_withoutsnap(i,minmass=minmass,maxmass=maxmass)
                 #gal_dict = self.get_gal_props(i,grp_ids)
 
                 r = np.zeros(0)
@@ -214,7 +214,7 @@ class full_analysis:
                     r_grid = np.sqrt((gridx-grid_cent)**2+(gridy-grid_cent)**2)
                     r_kpc = self._grid_to_kpc(r_grid,ngrid,grid_rad)
                     
-                    dist_thresh = kpc_thresh
+                    dist_thresh = max_R
                     if dist_thresh > grid_rad:
                         raise Exception('Desired radial threshold ({}) exceeded grid radius ({}) for covering fraction calculation.'.format(dist_thresh,grid_rad))
 
@@ -238,11 +238,12 @@ class full_analysis:
                     else:
                         plt.savefig(self.fig_base+"cd_v_R.pdf")
 
-                if coveringfrac_within_R:
+                if coverfrac_within_R:
+                    fc = np.zeros(n_Rbins)
                     for k in np.arange(n_Rbins):
                         in_Rbin = r<Rbins_max[k]
                         covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
-                        fc = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
+                        fc[k] = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
 
                     plt.close('all')
                     plt.figure()
@@ -274,11 +275,12 @@ class full_analysis:
                         plt.savefig(self.fig_base+"fc_within_R.pdf")
 
 
-                if coveringfrac_vs_R:
+                if coverfrac_vs_R:
+                    fc = np.zeros(n_Rbins)
                     for k in np.arange(n_Rbins):
                         in_Rbin = np.logical_and(r<Rbins_max[k],r>Rbins_min[k])
                         covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
-                        fc = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
+                        fc[k] = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
 
                     plt.close('all')
                     plt.figure()
@@ -312,8 +314,8 @@ class full_analysis:
         grp_ids = np.array([])
         for fn in glob.glob(self.CGMsnap_base+"{}/s{}/*.hdf5".format(self.run_list[i],self.snapnum_list[i])):
             f = h5py.File(fn,'r')
-            grp_id = f['Header'].attrs('grp_id')
-            grp_mass = AU.PhysicalMass(f['Header'].attrs('grp_mass'))
+            grp_id = f['Header'].attrs['grp_id']
+            grp_mass = AU.PhysicalMass(f['Header'].attrs['grp_mass'])
             f.close()
 
             if np.logical_and(grp_mass > minmass,grp_mass < maxmass):
@@ -323,7 +325,9 @@ class full_analysis:
     def load_grid_data(self,i,grp_id):
         # assume that i is singular
         grp_data = {}
-        for key in f['Header'].attrs: grp_data[key] = f['Header'].attrs(key)
+        # print self.grid_base+"{}/s{}/{}.hdf5".format(self.run_list[i],self.snapnum_list[i],str(int(grp_id)).zfill(5))
+        f = h5py.File(self.grid_base+"{}/s{}/{}.hdf5".format(self.run_list[i],self.snapnum_list[i],str(int(grp_id)).zfill(5)),'r')
+        for key in list(f['Header'].attrs): grp_data[key] = f['Header'].attrs[key]
         for key in f['grids'].keys(): grp_data[key] = np.array(f['grids'][key])
         return grp_data 
 
@@ -461,6 +465,7 @@ class full_analysis:
                 if redshift == '3': self.snapnum_list.append(3)
                 if redshift == '2': self.snapnum_list.append(5)
 
+        self.ndat = np.size(self.run_list)
 
 if __name__ == '__main__':
     full_analysis()
