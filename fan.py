@@ -173,23 +173,13 @@ class full_analysis:
         #########################################
         # Full-snapshot data analysis functions #
         #########################################
-        # self.enrichment_vs_volume()
 
         ##############################
         # 3D data analysis functions #
         ##############################
-        # self.los_profile("metal",mmin=10.**11.,mmax=10**11.5,profile_type=2,savename="avg_metal_z03_fixv")
-        # self.los_profile("T",mmin=10.**11.,mmax=10**11.5,profile_type=2,savename="avg_T_z03_fixv")
-        # self.los_profile("O",mmin=10.**11.,mmax=10**11.5,profile_type=2,savename="O_z03_fixv")
-        # self.galaxy_mass_hist()
-        # self.phase_diagram(mmin=10.**11,savename="phase_c0")
-        # self.phase_diagram_diff(savename="phasediff_c0_check")
         # self.phase_budget('m',savename='m_budget_lowmetal',minimal=False)
         # self.phase_budget('z',savename='z_budget_lowmetal',minimal=False)
-        # self.plot_individual_halos(grp_ids=np.array([24, 25, 28, 29, 35, 41, 46, 63, 64]),true_hsml=True) #c0_256
-        # self.plot_individual_halos(grp_ids=np.array([22, 28, 25, 26, 31, 52, 45, 61, 76]),true_hsml=True) #gam_50_BH
-        # self.plot_individual_halos(grp_ids=np.array([23, 36, 28, 29, 37, 53, 48, 71, 68]),true_hsml=True) #gam_50_fixv
-        # self.plot_individual_halos(grp_ids=np.array([23, 30, 26, 28, 35, 55, 50, 71, 63]),true_hsml=True) #gam_50_fixv_nothermal
+        # self.plot_individual_halos(grp_ids=np.array([24, 25, 28, 29, 35, 41, 46, 63, 64]),true_hsml=True)
         # self.CGM_and_gal_metallicity(savename="massmet_test")
         # self.radial_profile('T')
         # self.radial_profile('z')
@@ -203,24 +193,25 @@ class full_analysis:
         # self.cover_frac_vs_R("H1",20.3,200.,minmass=10**11.8,maxmass=10**12.2,plot_mode=1,savename="DLA_c0",rudie_DLA=True)
         # self.observational_cover_frac_vs_R("H1",17.2,200.,Nmax=20.3,minmass=10**11.8,maxmass=10**12.2,savename="LLS_postisaac",rudie_LLS=True)
         # self.observational_cover_frac_vs_R("H1",20.3,200.,minmass=10**11.8,maxmass=10**12.2,savename="DLA_postisaac",rudie_DLA=True)
-        # self.cover_frac_vs_R("Mg2",12.5,200.,minmass=10**12.0,plot_mode=1,savename="MgII_z03_gam_12")
-        # self.cover_frac_vs_R("Si3",12.75,200.,minmass=10**12.0,plot_mode=1,savename="SiIII_z03_gam_12")
-        # self.cover_frac_vs_R("O6",14,200.,minmass=10**11,maxmass=10**15,plot_mode=1,savename="O6_z2_gam_11")
-        # self.columndens_vs_R("O6",150.,minmass=10**11.8,maxmass=10**12.2,plot_mode=1,savename="O6_z3_150kpc_posti")
         # self.plot_grids("H1",minmass=10.**11.8,vmax=25.)
         # self.plot_grids("O6",minmass=10.**11.5,vmax=16.)
-        # self.COS_Halos_comparison("Mg2",savename="Mg2_Werk_fixv")
-        # self.COS_Halos_comparison("Si3",savename="Si3_Werk_fixv")
-        # self.COS_Halos_comparison("O6",savename="O6_Werk_fixv")
-
-        # OTHER:
-        # print "Virial Temperature: ",AU.HaloTvir(10.**12.,2.)
-
         
 
     ############################################################################################################
     ############################################################################################################
-    
+
+    #########################################
+    # Full-snapshot data analysis functions #
+    #########################################
+
+    ##############################
+    # 3D data analysis functions #
+    ##############################
+
+    ##############################
+    # 2D data analysis functions #
+    ##############################
+
     def cover_frac_within_R(self,species,N_thresh,Rvir_thresh=-1,kpc_thresh=-1,rud_pro=False,plot_mode=1,run_mode='save',savename=None):
         # Plots covering fraction within a set distance R.  
 
