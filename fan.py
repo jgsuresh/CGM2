@@ -173,6 +173,95 @@ class full_analysis:
     # 2D data analysis functions #
     ##############################
 
+    def grid_sightlines(self,species,max_R,coldens_thresh=0,minmass=10**11.8,maxmass=10**12.2,savename=None,coldens_vs_R=False,coveringfrac_vs_R=False,rudie_LLS=False,rudie_DLA=False):
+        # Calculates covering fraction in similar way to observers.  Gather all halos within specified mass range, and treat 
+        # all corresponding sightlines together.  
+
+        # Set up bins for radius:
+        n_Rbins = 50
+        [Rbins_min,Rbins_max] = AU._bin_setup(0.,max_R,n_Rbins)
+
+        for i in np.arange(self.ndat):
+            # Check if npz for this data has been saved before:
+            foo = "{}kpc".format(kpc_thresh)
+            npz_fname = "fc_{}_s{}_{}_N{}_within{}_12minmass.npz".format(self.run_list[i],self.snapnum_list[i],species,Nmin,foo)
+            print self.npz_base+npz_fname
+            if os.path.isfile(self.npz_base+npz_fname):
+                print "Loaded from npz!"
+                f = np.load(self.npz_base+npz_fname)
+                m = f['m']
+                fc_vs_R = f['fc_vs_R']
+                f.close()
+            else:
+                pass 
+                grp_ids = self.find_desired_grpids(i,minmass=minmass,maxmass=maxmass)
+                #gal_dict = self.get_gal_props(i,grp_ids)
+
+                r = np.zeros(0)
+                N = np.zeros(0)
+                for j in np.arange(np.size(grp_ids)):
+                    grp_id = grp_ids[j]
+                    grp_data = self.load_grid_data(i,grp_id)
+                    grid = grp_data[species]
+                    grid_rad = grp_data['grid_radius_pkpc']
+                    ngrid = grp_data['ngrid']
+
+                    [gridx,gridy] = np.meshgrid(np.arange(ngrid),np.arange(ngrid))
+                    grid_cent = (ngrid-1)/2. #assume square grid: grid_centx = grid_centy = grid_cent
+                    r_grid = np.sqrt((gridx-grid_cent)**2+(gridy-grid_cent)**2)
+                    r_kpc = self._grid_to_kpc(r_grid,ngrid,grid_rad)
+                    
+                    dist_thresh = kpc_thresh
+                    if dist_thresh > grid_rad:
+                        raise Exception('Desired radial threshold ({}) exceeded grid radius ({}) for covering fraction calculation.'.format(dist_thresh,grid_rad))
+
+                    r = np.append(r,r_kpc)
+                    N = np.append(N,grid)
+
+                if coldens_vs_R:
+                    # Calculates the median column density as a function of radius
+                    [Q1,med,Q3] = AU._calc_percentiles_v2(r,Rbins_min,Rbins_max,N)
+
+                    plt.close('all')
+                    plt.figure()
+                    plt.plot(Rbins_min,med,color=self.color_list[i],label=self.label_list)
+                    plt.fill_between(Rbins_min,Q1,Q3,color=self.color_list[i],alpha=0.3)
+                    plt.xlim([0.,max_R])
+                    plt.xlabel('Radius [pkpc]')
+                    plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
+                    plt.legend()
+                    plt.savefig(savename+"_cd_v_R.pdf")
+
+                if coveringfrac_vs_R:
+                    for k in np.arange(n_Rbins):
+                        in_Rbin = np.logical_and(r<Rbins_min[k],r>Rbins_max[k])
+                        covered = np.logical_and(in_Rbin,N[in_Rbin]>coldens_thresh)
+                        fc = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
+
+                    plt.close('all')
+                    plt.figure()
+                    plt.plot(Rbins_min,fc,color=self.color_list[i],label=self.label_list)
+                    plt.xlim([0.,max_R])
+                    plt.xlabel('Radius [pkpc]')
+                    plt.ylim([-0.05,1.1])
+                    plt.ylabel(r"$f_C$")
+
+                    if rudie_LLS:
+                        plt.plot()
+                    elif rudie_DLA:
+
+                    plt.legend()
+                    plt.savefig(savename+"_fc_v_R.pdf")
+
+
+
+
+
+
+
+
+
+
     #############
     # Utilities #
     #############
@@ -201,7 +290,8 @@ class full_analysis:
 
     def _grid_to_kpc(self,r_grid,ngrid,grid_rad):
         return r_grid * (2.*grid_rad)/(ngrid)
-        
+
+
     # self.get_gal_props
 
     def dat_prep(self,redshifts,c0_128=0,c0_256=0,c0_512=0,c0_fw_256=0,c0_sw_256=0,c2_256=0,c3_512=0,c4_512=0,c4_check=0,g0_BH=0,g10_BH=0,g20_BH=0,g30_BH=0,g40_BH=0,g50_BH=0,g25_BH=0,g75_BH=0,g95_BH=0,g0_noBH=0,g10_noBH=0,g20_noBH=0,g30_noBH=0,g40_noBH=0,g50_noBH=0,g25_noBH=0,g75_noBH=0,g95_noBH=0,g10_nothermal=0,g20_nothermal=0,g30_nothermal=0,g40_nothermal=0,g50_nothermal=0,g25_fixv=0,g50_fixv=0,g25_fixv_fixeta=0,g50_fixv_fixeta=0,g25_fixv_nothermal=0,g50_fixv_nothermal=0,c0_nometalwinds=0,c0_fullmetalwinds=0):
