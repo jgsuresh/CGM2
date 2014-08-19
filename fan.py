@@ -17,7 +17,9 @@ from units import AREPO_units
 AU = AREPO_units()
 import readsubfHDF5
 
-import SphMap as sm 
+# import SphMap as sm 
+
+import glob
 
 
 class full_analysis:
@@ -174,7 +176,23 @@ class full_analysis:
     #############
     # Utilities #
     #############
-    # self.find_desired_grpids
+    def find_desired_grpids_withoutsnap(self,i,minmass=0,maxmass=1e20):
+        # usually - read subfind, find desired grp masses, etc.
+        # BUT, looks like Mark deleted his snapshots.  In this case, we need to directly use the saved data.
+
+        # get list of snapshot saved data
+        grp_ids = np.array([])
+        for fn in glob.glob(self.CGMsnap_base+"{}/s{}/*.hdf5".format(self.run_list[i],self.snapnum_list[i])):
+            f = h5py.File(fn,'r')
+            grp_id = f['Header'].attrs('grp_id')
+            grp_mass = AU.PhysicalMass(f['Header'].attrs('grp_mass'))
+            f.close()
+
+            if np.logical_and(grp_mass > minmass,grp_mass < maxmass):
+                grp_ids = np.append(grp_ids,grp_id)
+        return grp_ids
+
+
     # self.load_grid_data
     # self._grid_to_kpc
     # self.get_gal_props
