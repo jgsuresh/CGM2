@@ -192,8 +192,13 @@ class full_analysis:
                 grp_ids = np.append(grp_ids,grp_id)
         return grp_ids
 
+    def load_grid_data(self,i,grp_id):
+        # assume that i is singular
+        grp_data = {}
+        for key in f['Header'].attrs: grp_data[key] = f['Header'].attrs(key)
+        for key in f['grids'].keys(): grp_data[key] = np.array(f['grids'][key])
+        return grp_data 
 
-    # self.load_grid_data
     # self._grid_to_kpc
     # self.get_gal_props
 
