@@ -462,4 +462,6 @@ class full_analysis:
                 if redshift == '2': self.snapnum_list.append(5)
 
 
-      
+if __name__ == '__main__':
+    full_analysis()
+
