@@ -64,6 +64,15 @@ class full_analysis:
         # redshifts = ['2']
         # self.dat_prep(redshifts,c0_256=1)
         # self.dat_prep(redshifts,c0_512=1)
+
+        # # Cosmo0_V6_fastWinds, Cosmo0_V6_strongWinds (256^3 particles):
+        # redshifts = ['2']
+        # self.dat_prep(redshifts,c0_fw_256=1)
+        # self.dat_prep(redshifts,c0_sw_256=1)
+
+        # # Cosmo2_V6 (256^3 particles):
+        # redshifts = ['2']
+        # self.dat_prep(redshifts,c2_256=1)
         
         # # Cosmo3_V6 (No feedback - 512^3 particles):
         # redshifts = ['4','3','2']
@@ -74,21 +83,8 @@ class full_analysis:
         # self.dat_prep(redshifts,c4_512=1)
         # self.dat_prep(redshifts,c4_check=1)
 
-        # # Cosmo2_V6 (256^3 particles):
-        # redshifts = ['2']
-        # self.dat_prep(redshifts,c2_256=1)
-
-        # # Cosmo0_V6_fastWinds, Cosmo0_V6_strongWinds (256^3 particles):
-        # redshifts = ['2']
-        # self.dat_prep(redshifts,c0_fw_256=1)
-        # self.dat_prep(redshifts,c0_sw_256=1)
-
-        # # Cosmo5_V6 (256^3 particles):
-        # redshifts = ['4','3','2']
-        # self.dat_prep(redshifts,c5_256=1)
 
         # Gamma boxes (256^3 particles):
-
         # redshifts = ['2']
         # self.dat_prep(redshifts,g0_BH=1) #c2_256
         # self.dat_prep(redshifts,g10_BH=1)
@@ -96,22 +92,19 @@ class full_analysis:
         # self.dat_prep(redshifts,g30_BH=1)
         # self.dat_prep(redshifts,g40_BH=1)
         # self.dat_prep(redshifts,g50_BH=1)
-
-        # redshifts = ['2']
-        # self.dat_prep(redshifts,g25_BH=1)
-        # self.dat_prep(redshifts,g75_BH=1)
-        # self.dat_prep(redshifts,g95_BH=1)
-        # redshifts = ['2']
-        # self.dat_prep(redshifts,g25_noBH=1)
-        # self.dat_prep(redshifts,g75_noBH=1)
-        # self.dat_prep(redshifts,g95_noBH=1)
-
-        # redshifts = ['2']
         # self.dat_prep(redshifts,g10_noBH=1)
         # self.dat_prep(redshifts,g20_noBH=1)
         # self.dat_prep(redshifts,g30_noBH=1)
         # self.dat_prep(redshifts,g40_noBH=1)
         # self.dat_prep(redshifts,g50_noBH=1)
+
+        # redshifts = ['2']
+        # self.dat_prep(redshifts,g25_BH=1)
+        # self.dat_prep(redshifts,g75_BH=1)
+        # self.dat_prep(redshifts,g95_BH=1)
+        # self.dat_prep(redshifts,g25_noBH=1)
+        # self.dat_prep(redshifts,g75_noBH=1)
+        # self.dat_prep(redshifts,g95_noBH=1)
 
         # redshifts = ['2']
         # self.dat_prep(redshifts,g10_nothermal=1)
@@ -177,5 +170,40 @@ class full_analysis:
     ##############################
     # 2D data analysis functions #
     ##############################
+
+    ####################
+    # Data Preparation #
+    ####################
+    def dat_prep(self,redshifts,c0_128=0,c0_256=0,c0_512=0,c0_fw_256=0,c0_sw_256=0,c2_256=0,c3_512=0,c4_512=0,c4_check=0,g0_BH=0,g10_BH=0,g20_BH=0,g30_BH=0,g40_BH=0,g50_BH=0,g25_BH=0,g75_BH=0,g95_BH=0,g0_noBH=0,g10_noBH=0,g20_noBH=0,g30_noBH=0,g40_noBH=0,g50_noBH=0,g25_noBH=0,g75_noBH=0,g95_noBH=0,g10_nothermal=0,g20_nothermal=0,g30_nothermal=0,g40_nothermal=0,g50_nothermal=0,g25_fixv=0,g50_fixv=0,g25_fixv_fixeta=0,g50_fixv_fixeta=0,g25_fixv_nothermal=0,g50_fixv_nothermal=0,c0_nometalwinds=0,c0_fullmetalwinds=0):
+        # self.run_list = []
+        # self.color_list = [] 
+        # self.label_list = [] 
+        # self.linestyle_list = []
+        # self.snapnum_list = [] 
+        # self.snapdir_list = []
+
+        if c0_128 == 1:
+            for redshift in redshifts:
+                self.run_list.append('c0_128')
+                self.color_list.append('blue')
+                self.label_list.append('Cosmo0 (128)')
+                self.linestyle_list.append('solid')
+                if 
+                self.snapnum_list
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       
