@@ -39,18 +39,21 @@ class full_analysis:
 
 
         # Feedback paper runs:
-        redshifts = ['2']
-        self.dat_prep(redshifts,g0_BH=1)
-        self.dat_prep(redshifts,c2_256=1)
-        self.dat_prep(redshifts,c0_sw_256=1)
-        self.dat_prep(redshifts,g50_fixv_nothermal=1)
-        self.dat_prep(redshifts,g50_BH=1)
-        self.dat_prep(redshifts,g50_fixv=1)
-        self.dat_prep(redshifts,c0_nometalwinds=1)
-        self.dat_prep(redshifts,c0_fullmetalwinds=1)
+        # redshifts = ['2']
+        # self.dat_prep(redshifts,g0_BH=1)
+        # self.dat_prep(redshifts,c2_256=1)
+        # self.dat_prep(redshifts,c0_sw_256=1)
+        # self.dat_prep(redshifts,g50_fixv_nothermal=1)
+        # self.dat_prep(redshifts,g50_BH=1)
+        # self.dat_prep(redshifts,g50_fixv=1)
+        # self.dat_prep(redshifts,c0_nometalwinds=1)
+        # self.dat_prep(redshifts,c0_fullmetalwinds=1)
 
 
         # Check runs:
+        redshifts = ['2']
+        self.dat_prep(redshifts,g0_BH=1)
+        self.dat_prep(redshifts,c2_256=1)
         # self.dat_prep(redshifts,c0_128=1)
         # self.dat_prep(redshifts,c0_512=1)
         # self.dat_prep(redshifts,g0_BH=1)
@@ -179,6 +182,9 @@ class full_analysis:
         # Calculates covering fraction in similar way to observers.  Gather all halos within specified mass range, and treat 
         # all corresponding sightlines together.  
 
+        plt.close('all')
+        plt.figure()
+
         # Set up bins for radius:
         n_Rbins = 50
         [Rbins_min,Rbins_max] = AU._bin_setup(0.,max_R,n_Rbins)
@@ -225,81 +231,77 @@ class full_analysis:
                     # Calculates the median column density as a function of radius
                     [Q1,med,Q3] = AU._calc_percentiles_v2(r,Rbins_min,Rbins_max,N)
 
-                    plt.close('all')
-                    plt.figure()
-                    plt.plot(Rbins_min,med,color=self.color_list[i],label=self.label_list)
+                    plt.plot(Rbins_min,med,color=self.color_list[i],label=self.label_list[i])
                     plt.fill_between(Rbins_min,Q1,Q3,color=self.color_list[i],alpha=0.3)
-                    plt.xlim([0.,max_R])
-                    plt.xlabel('Radius [pkpc]')
-                    plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
-                    plt.legend()
-                    if savename != None:
-                        plt.savefig(self.fig_base+savename+".pdf")
-                    else:
-                        plt.savefig(self.fig_base+"cd_v_R.pdf")
-
-                if coverfrac_within_R:
+                    
+                elif coverfrac_within_R:
                     fc = np.zeros(n_Rbins)
                     for k in np.arange(n_Rbins):
                         in_Rbin = r<Rbins_max[k]
                         covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
                         fc[k] = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
 
-                    plt.close('all')
-                    plt.figure()
-                    plt.plot(Rbins_min,fc,color=self.color_list[i],label=self.label_list)
-                    plt.xlim([0.,max_R])
-                    plt.xlabel('Radius [pkpc]')
-                    plt.ylim([-0.05,1.1])
-                    plt.ylabel(r"$f_C (< R)$")
-
-                    # Rudie et al. 2012, cumulative covering fraction of LLS and DLA for M_halo ~ 10^12
-                    if rudie_LLS:
-                        xdat = np.array([90.,180.])
-                        ydat = np.array([0.3,0.24])
-                        yerr = np.array([0.14,0.09])
-                        xerr = np.array([8.,16.])
-                        plt.ylim([0.,1.0])
-                        plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,label='Rudie+: LLS',fmt='.',color='purple')
-                    elif rudie_DLA:
-                        xdat = np.array([90.,180.])
-                        ydat = np.array([0.,0.04])
-                        yerr = np.array([0.1,0.04])
-                        xerr = np.array([8.,16.])
-                        plt.ylim([0.,1.0])
-                        plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,label='Rudie+: DLA',fmt='.',color='purple')
-                    plt.legend()
-                    if savename != None:
-                        plt.savefig(self.fig_base+savename+".pdf")
-                    else:
-                        plt.savefig(self.fig_base+"fc_within_R.pdf")
-
-
-                if coverfrac_vs_R:
+                    plt.plot(Rbins_min,fc,color=self.color_list[i],label=self.label_list[i])
+                    
+                elif coverfrac_vs_R:
                     fc = np.zeros(n_Rbins)
                     for k in np.arange(n_Rbins):
                         in_Rbin = np.logical_and(r<Rbins_max[k],r>Rbins_min[k])
                         covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
                         fc[k] = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
 
-                    plt.close('all')
-                    plt.figure()
-                    plt.plot(Rbins_min,fc,color=self.color_list[i],label=self.label_list)
-                    plt.xlim([0.,max_R])
-                    plt.xlabel('Radius [pkpc]')
-                    plt.ylim([-0.05,1.1])
-                    plt.ylabel(r"$f_C (R)$")
-
-                    plt.legend()
-                    if savename != None:
-                        plt.savefig(self.fig_base+savename+".pdf")
-                    else:
-                        plt.savefig(self.fig_base+"fc_vs_R.pdf")
+                    plt.plot(Rbins_min,fc,color=self.color_list[i],label=self.label_list[i])
 
 
+            # Rudie et al. 2012, cumulative covering fraction of LLS and DLA for M_halo ~ 10^12
+            if rudie_LLS:
+                xdat = np.array([90.,180.])
+                ydat = np.array([0.3,0.24])
+                yerr = np.array([0.14,0.09])
+                xerr = np.array([8.,16.])
+                plt.ylim([0.,1.0])
+                plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,label='Rudie+: LLS',fmt='.',color='purple')
+            elif rudie_DLA:
+                xdat = np.array([90.,180.])
+                ydat = np.array([0.,0.04])
+                yerr = np.array([0.1,0.04])
+                xerr = np.array([8.,16.])
+                plt.ylim([0.,1.0])
+                plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,label='Rudie+: DLA',fmt='.',color='purple')
 
 
+                
+            if coldens_vs_R:
+                plt.xlim([0.,max_R])
+                plt.xlabel('Radius [pkpc]')
+                plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
+                plt.legend()
+                if savename != None:
+                    plt.savefig(self.fig_base+savename+".pdf")
+                else:
+                    plt.savefig(self.fig_base+"cd_v_R.pdf")
+            elif coverfrac_vs_R:
+                plt.xlim([0.,max_R])
+                plt.xlabel('Radius [pkpc]')
+                plt.ylim([-0.05,1.1])
+                plt.ylabel(r"$f_C (R)$")
+                plt.legend()
+                if savename != None:
+                    plt.savefig(self.fig_base+savename+".pdf")
+                else:
+                    plt.savefig(self.fig_base+"fc_vs_R.pdf")
+            elif coverfrac_within_R:
+                plt.xlim([0.,max_R])
+                plt.xlabel('Radius [pkpc]')
+                plt.ylim([-0.05,1.1])
+                plt.ylabel(r"$f_C (< R)$")
+                plt.legend()
+                if savename != None:
+                    plt.savefig(self.fig_base+savename+".pdf")
+                else:
+                    plt.savefig(self.fig_base+"fc_within_R.pdf")
 
+                
 
 
 
@@ -379,16 +381,6 @@ class full_analysis:
                 self.label_list.append('Fast Winds')
                 self.linestyle_list.append('solid')
                 self.snapdir_list.append(self.mv_base+"Cosmo0_V6/L25_n256")
-                if redshift == '4': self.snapnum_list.append(54)
-                if redshift == '3': self.snapnum_list.append(60)
-                if redshift == '2': self.snapnum_list.append(68)
-        if c2_256 == 1:
-            for redshift in redshifts:
-                self.run_list.append('c2_256')
-                self.color_list.append('blue')
-                self.label_list.append('No AGN')
-                self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.mv_base+"Cosmo2_V6/L25_n256")
                 if redshift == '4': self.snapnum_list.append(54)
                 if redshift == '3': self.snapnum_list.append(60)
                 if redshift == '2': self.snapnum_list.append(68)
