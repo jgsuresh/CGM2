@@ -39,21 +39,21 @@ class full_analysis:
 
 
         # Feedback paper runs:
-        # redshifts = ['2']
-        # self.dat_prep(redshifts,g0_BH=1)
-        # self.dat_prep(redshifts,c2_256=1)
-        # self.dat_prep(redshifts,c0_sw_256=1)
-        # self.dat_prep(redshifts,g50_fixv_nothermal=1)
-        # self.dat_prep(redshifts,g50_BH=1)
-        # self.dat_prep(redshifts,g50_fixv=1)
-        # self.dat_prep(redshifts,c0_nometalwinds=1)
-        # self.dat_prep(redshifts,c0_fullmetalwinds=1)
-
-
-        # Check runs:
         redshifts = ['2']
         self.dat_prep(redshifts,g0_BH=1)
         self.dat_prep(redshifts,c2_256=1)
+        self.dat_prep(redshifts,c0_sw_256=1)
+        self.dat_prep(redshifts,g50_fixv_nothermal=1)
+        self.dat_prep(redshifts,g50_BH=1)
+        self.dat_prep(redshifts,g50_fixv=1)
+        self.dat_prep(redshifts,c0_nometalwinds=1)
+        self.dat_prep(redshifts,c0_fullmetalwinds=1)
+
+
+        # Check runs:
+        # redshifts = ['2']
+        # self.dat_prep(redshifts,g0_BH=1)
+        # self.dat_prep(redshifts,c2_256=1)
         # self.dat_prep(redshifts,c0_128=1)
         # self.dat_prep(redshifts,c0_512=1)
         # self.dat_prep(redshifts,g0_BH=1)
@@ -161,7 +161,7 @@ class full_analysis:
         print "2"
         self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_newfan")
         print "3"
-        self.grid_sightlines("H1",200.,minmass=10**11.8,maxmass=10**12.2,savename="coldens_newfan")
+        self.grid_sightlines("H1",200.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="coldens_newfan")
 
     ############################################################################################################
     ############################################################################################################
@@ -191,115 +191,113 @@ class full_analysis:
 
         for i in np.arange(self.ndat):
             print "Working on {}".format(self.run_list[i])
-            # Check if npz for this data has been saved before:
-            # foo = "{}kpc".format(max_R)
-            # npz_fname = "fc_{}_s{}_{}_N{}_within{}_12minmass.npz".format(self.run_list[i],self.snapnum_list[i],species,Nmin,foo)
-            # print self.npz_base+npz_fname
-            if False: #os.path.isfile(self.npz_base+npz_fname):
-                print "Loaded from npz!"
-                f = np.load(self.npz_base+npz_fname)
-                m = f['m']
-                fc_vs_R = f['fc_vs_R']
-                f.close()
-            else:
-                pass 
-                grp_ids = self.find_desired_grpids_withoutsnap(i,minmass=minmass,maxmass=maxmass)
-                #gal_dict = self.get_gal_props(i,grp_ids)
+            
+            grp_ids = self.find_desired_grpids_withoutsnap(i,minmass=minmass,maxmass=maxmass)
+            #gal_dict = self.get_gal_props(i,grp_ids)
 
-                r = np.zeros(0)
-                N = np.zeros(0)
-                for j in np.arange(np.size(grp_ids)):
-                    grp_id = grp_ids[j]
-                    grp_data = self.load_grid_data(i,grp_id)
-                    grid = grp_data[species]
-                    grid_rad = grp_data['grid_radius_pkpc']
-                    ngrid = grp_data['ngrid']
+            r = np.zeros(0)
+            N = np.zeros(0)
+            print "grp_ids ",grp_ids
+            for j in np.arange(np.size(grp_ids)):
+                grp_id = grp_ids[j]
+                grp_data = self.load_grid_data(i,grp_id)
+                grid = grp_data[species]
+                grid_rad = grp_data['grid_radius_pkpc']
+                ngrid = grp_data['ngrid']
 
-                    [gridx,gridy] = np.meshgrid(np.arange(ngrid),np.arange(ngrid))
-                    grid_cent = (ngrid-1)/2. #assume square grid: grid_centx = grid_centy = grid_cent
-                    r_grid = np.sqrt((gridx-grid_cent)**2+(gridy-grid_cent)**2)
-                    r_kpc = self._grid_to_kpc(r_grid,ngrid,grid_rad)
-                    
-                    dist_thresh = max_R
-                    if dist_thresh > grid_rad:
-                        raise Exception('Desired radial threshold ({}) exceeded grid radius ({}) for covering fraction calculation.'.format(dist_thresh,grid_rad))
-
-                    r = np.append(r,r_kpc)
-                    N = np.append(N,grid)
-
-                if coldens_vs_R:
-                    # Calculates the median column density as a function of radius
-                    [Q1,med,Q3] = AU._calc_percentiles_v2(r,Rbins_min,Rbins_max,N)
-
-                    plt.plot(Rbins_min,med,color=self.color_list[i],label=self.label_list[i])
-                    plt.fill_between(Rbins_min,Q1,Q3,color=self.color_list[i],alpha=0.3)
-                    
-                elif coverfrac_within_R:
-                    fc = np.zeros(n_Rbins)
-                    for k in np.arange(n_Rbins):
-                        in_Rbin = r<Rbins_max[k]
-                        covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
-                        fc[k] = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
-
-                    plt.plot(Rbins_min,fc,color=self.color_list[i],label=self.label_list[i])
-                    
-                elif coverfrac_vs_R:
-                    fc = np.zeros(n_Rbins)
-                    for k in np.arange(n_Rbins):
-                        in_Rbin = np.logical_and(r<Rbins_max[k],r>Rbins_min[k])
-                        covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
-                        fc[k] = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
-
-                    plt.plot(Rbins_min,fc,color=self.color_list[i],label=self.label_list[i])
-
-
-            # Rudie et al. 2012, cumulative covering fraction of LLS and DLA for M_halo ~ 10^12
-            if rudie_LLS:
-                xdat = np.array([90.,180.])
-                ydat = np.array([0.3,0.24])
-                yerr = np.array([0.14,0.09])
-                xerr = np.array([8.,16.])
-                plt.ylim([0.,1.0])
-                plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,label='Rudie+: LLS',fmt='.',color='purple')
-            elif rudie_DLA:
-                xdat = np.array([90.,180.])
-                ydat = np.array([0.,0.04])
-                yerr = np.array([0.1,0.04])
-                xerr = np.array([8.,16.])
-                plt.ylim([0.,1.0])
-                plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,label='Rudie+: DLA',fmt='.',color='purple')
-
-
+                [gridx,gridy] = np.meshgrid(np.arange(ngrid),np.arange(ngrid))
+                grid_cent = (ngrid-1)/2. #assume square grid: grid_centx = grid_centy = grid_cent
+                r_grid = np.sqrt((gridx-grid_cent)**2+(gridy-grid_cent)**2)
+                r_kpc = self._grid_to_kpc(r_grid,ngrid,grid_rad)
                 
+                dist_thresh = max_R
+                if dist_thresh > grid_rad:
+                    raise Exception('Desired radial threshold ({}) exceeded grid radius ({}) for covering fraction calculation.'.format(dist_thresh,grid_rad))
+
+                r = np.append(r,r_kpc)
+                N = np.append(N,grid)
+
             if coldens_vs_R:
-                plt.xlim([0.,max_R])
-                plt.xlabel('Radius [pkpc]')
-                plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
-                plt.legend()
-                if savename != None:
-                    plt.savefig(self.fig_base+savename+".pdf")
-                else:
-                    plt.savefig(self.fig_base+"cd_v_R.pdf")
+                # Calculates the median column density as a function of radius
+                [Q1,med,Q3] = AU._calc_percentiles_v2(r,Rbins_min,Rbins_max,N)
+
+                plt.plot(Rbins_min,med,color=self.color_list[i],label=self.label_list[i])
+                plt.fill_between(Rbins_min,Q1,Q3,color=self.color_list[i],alpha=0.3)
+
             elif coverfrac_vs_R:
-                plt.xlim([0.,max_R])
-                plt.xlabel('Radius [pkpc]')
-                plt.ylim([-0.05,1.1])
-                plt.ylabel(r"$f_C (R)$")
-                plt.legend()
-                if savename != None:
-                    plt.savefig(self.fig_base+savename+".pdf")
-                else:
-                    plt.savefig(self.fig_base+"fc_vs_R.pdf")
+                fc = np.zeros(n_Rbins)
+                for k in np.arange(n_Rbins):
+                    in_Rbin = np.logical_and(r<Rbins_max[k],r>Rbins_min[k])
+                    # print "np.sum(in_Rbin) ",np.sum(in_Rbin)
+                    # print "Rbins_min[k] ",Rbins_min[k]
+                    # print "Rbins_max[k] ",Rbins_max[k]
+                    # print "grid_rad ",grid_rad
+                    covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
+                    fc[k] = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
+
+                plt.plot(Rbins_min,fc,color=self.color_list[i],label=self.label_list[i])
+                
             elif coverfrac_within_R:
-                plt.xlim([0.,max_R])
-                plt.xlabel('Radius [pkpc]')
-                plt.ylim([-0.05,1.1])
-                plt.ylabel(r"$f_C (< R)$")
-                plt.legend()
-                if savename != None:
-                    plt.savefig(self.fig_base+savename+".pdf")
-                else:
-                    plt.savefig(self.fig_base+"fc_within_R.pdf")
+                fc = np.zeros(n_Rbins)
+                for k in np.arange(n_Rbins):
+                    in_Rbin = r<Rbins_max[k]
+                    # print "np.sum(in_Rbin) ",np.sum(in_Rbin)
+                    # print "Rbins_min[k] ",Rbins_min[k]
+                    # print "Rbins_max[k] ",Rbins_max[k]
+                    # print "grid_rad ", grid_rad
+                    covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
+                    fc[k] = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
+
+                plt.plot(Rbins_min,fc,color=self.color_list[i],label=self.label_list[i])
+
+
+        # Rudie et al. 2012, cumulative covering fraction of LLS and DLA for M_halo ~ 10^12
+        if rudie_LLS:
+            xdat = np.array([90.,180.])
+            ydat = np.array([0.3,0.24])
+            yerr = np.array([0.14,0.09])
+            xerr = np.array([8.,16.])
+            plt.ylim([0.,1.0])
+            plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,label='Rudie+: LLS',fmt='.',color='purple')
+        elif rudie_DLA:
+            xdat = np.array([90.,180.])
+            ydat = np.array([0.,0.04])
+            yerr = np.array([0.1,0.04])
+            xerr = np.array([8.,16.])
+            plt.ylim([0.,1.0])
+            plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,label='Rudie+: DLA',fmt='.',color='purple')
+
+
+            
+        if coldens_vs_R:
+            plt.xlim([0.,max_R])
+            plt.xlabel('Radius [pkpc]')
+            plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
+            plt.legend()
+            if savename != None:
+                plt.savefig(self.fig_base+savename+".pdf")
+            else:
+                plt.savefig(self.fig_base+"cd_v_R.pdf")
+        elif coverfrac_vs_R:
+            plt.xlim([0.,max_R])
+            plt.xlabel('Radius [pkpc]')
+            plt.ylim([-0.05,1.1])
+            plt.ylabel(r"$f_C (R)$")
+            plt.legend()
+            if savename != None:
+                plt.savefig(self.fig_base+savename+".pdf")
+            else:
+                plt.savefig(self.fig_base+"fc_vs_R.pdf")
+        elif coverfrac_within_R:
+            plt.xlim([0.,max_R])
+            plt.xlabel('Radius [pkpc]')
+            plt.ylim([-0.05,1.1])
+            plt.ylabel(r"$f_C (< R)$")
+            plt.legend()
+            if savename != None:
+                plt.savefig(self.fig_base+savename+".pdf")
+            else:
+                plt.savefig(self.fig_base+"fc_within_R.pdf")
 
                 
 
@@ -408,7 +406,7 @@ class full_analysis:
 
         if g50_fixv_nothermal == 1:
             for redshift in redshifts:
-                self.run_list.append('g50_fixv_nothermal')
+                self.run_list.append('gam_50_fixv_nothermal')
                 self.color_list.append('chartreuse')
                 self.label_list.append('Faster Winds')
                 self.linestyle_list.append('solid')
@@ -418,7 +416,7 @@ class full_analysis:
                 if redshift == '2': self.snapnum_list.append(5)
         if g50_BH == 1:
             for redshift in redshifts:
-                self.run_list.append('g50_BH')
+                self.run_list.append('gam_50_BH')
                 self.color_list.append('brown')
                 self.label_list.append('Fixed-E Hot Winds')
                 self.linestyle_list.append('solid')
@@ -428,7 +426,7 @@ class full_analysis:
                 if redshift == '2': self.snapnum_list.append(5)
         if g50_fixv == 1:
             for redshift in redshifts:
-                self.run_list.append('g50_fixv')
+                self.run_list.append('gam_50_fixv')
                 self.color_list.append('magenta')
                 self.label_list.append('Fixed-v Hot Winds')
                 self.linestyle_list.append('solid')
