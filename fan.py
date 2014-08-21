@@ -150,8 +150,8 @@ class full_analysis:
         ##############################
         # self.phase_budget('m',savename='m_budget_lowmetal',minimal=False)
         # self.phase_budget('z',savename='z_budget_lowmetal',minimal=False)
-        self.CGM_and_gal_metallicity(savename="massmet_newfan")
-        # self.radial_profile('T')
+        # self.CGM_and_gal_metallicity(savename="massmet_newfan")
+        self.radial_profile('T')
         # self.radial_profile('z')
 
         ##############################
@@ -312,6 +312,89 @@ class full_analysis:
             plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
         else:
             plt.savefig(self.fig_base+"mass_budget.pdf", bbox_inches='tight')
+
+
+
+
+    def radial_profile(self,data_type,mmin=10**11.8,mmax=10**12.2,savename=None):
+        plt.close('all')
+        plt.figure(figsize=(3.54331,3.14))
+
+        # Set up bins for radius:
+        n_Rbins = 50
+        [Rbins_min,Rbins_max] = AU._bin_setup(0.,3.,n_Rbins)
+        Rbins_med = (Rbins_min+Rbins_max)/2.
+
+        for i in np.arange(self.ndat):
+            npz_fname = "radialprofile_{}_s{}_1012halo.npz".format(self.run_list[i],self.snapnum_list[i])
+            if os.path.isfile(self.npz_base+npz_fname):
+                print "Loaded from npz!: {}".format(self.npz_base+npz_fname)
+                f = np.load(self.npz_base+npz_fname)
+                z_profile_gal = f['z_profile_gal']
+                T_profile_gal = f['T_profile_gal']
+                rho_profile_gal = f['rho_profile_gal']
+                f.close()
+            else:
+                grp_ids = self.find_desired_grpids(i,minmass=mmin,maxmass=mmax)
+                # gal_dict = self.get_gal_props(i,grp_ids)
+                # gal_mass = gal_dict['gal_mass']
+                n_grps = np.size(grp_ids)
+
+                z_profile_gal = np.zeros([n_grps,n_Rbins])
+                T_profile_gal = np.zeros([n_grps,n_Rbins])
+                rho_profile_gal = np.zeros([n_grps,n_Rbins])
+                for j in np.arange(n_grps):
+                    print "{} of {}".format(j,n_grps)
+                    grp_id = grp_ids[j]
+                    grp_data = self.load_CGMsnap_data(i,grp_id,data_entry='all')
+                    redshift = grp_data['redshift']
+                    r = self._calc_radii(grp_data)
+                    m = AU.PhysicalMass(np.array(grp_data['Masses']))
+                    z = np.array(grp_data['GFM_Metallicity'])
+                    u = np.array(grp_data['InternalEnergy'])
+                    nelec = np.array(grp_data["ElectronAbundance"])
+                    T = AU.GetTemp(u, nelec, gamma = 5.0/3.0)
+                    rho = AU.PhysicalDensity(np.array(grp_data['Density']),redshift)
+                    vol = AU.PhysicalVolume(grp_data['Volume'],redshift)
+
+                    grp_Rvir = grp_data['grp_Rvir']
+                    r /= grp_Rvir
+                    rho /= AU.ProtonMass
+
+                    for k in np.arange(n_Rbins):
+                        in_Rbin = np.logical_and(r > Rbins_min[k], r < Rbins_max[k])
+                        z_profile_gal[j,k] = np.sum(m[in_Rbin]*z[in_Rbin])/np.sum(m[in_Rbin])
+                        T_profile_gal[j,k] = np.sum(m[in_Rbin]*T[in_Rbin])/np.sum(m[in_Rbin])
+                        rho_profile_gal[j,k] = np.sum(m[in_Rbin]*rho[in_Rbin])/np.sum(m[in_Rbin])
+
+                np.savez(self.npz_base+npz_fname,mmin=mmin,mmax=mmax,z_profile_gal=z_profile_gal,T_profile_gal=T_profile_gal,rho_profile_gal=rho_profile_gal)
+
+            if data_type == 'z':
+                [Q1,med,Q3] = AU._calc_percentiles(z_profile_gal)
+                plt.ylabel(r'Log$_{10}\left[\frac{Z}{Z_\odot}\right]$')
+                med /= AU.SolarMetallicity
+            if data_type == 'T':
+                [Q1,med,Q3] = AU._calc_percentiles(T_profile_gal)
+                plt.ylabel(r'Temperature [K]')
+            if data_type == 'rho':
+                [Q1,med,Q3] = AU._calc_percentiles(rho_profile_gal)
+                plt.ylabel(r'Density [cm$^{-3}$]')
+
+            plt.plot(Rbins_min,np.log10(med),label=self.label_list[i],color=self.color_list[i],linestyle=self.linestyle_list[i])
+
+        if data_type == 'z':
+            plt.legend(prop={'size':6})
+        if data_type == 'T':
+            plt.legend(prop={'size':5.5},loc=4,ncol=2,columnspacing=0.3,borderpad=0.2)
+
+        plt.xlabel(r'3D Radius [R$_{200}$]')
+        plt.subplots_adjust(left=0.25,bottom=0.18)
+
+        if savename != None:
+            plt.savefig(self.fig_base+savename+".pdf")
+        else:
+            plt.savefig(self.fig_base+"{}_radprof.pdf".format(data_type))
+
 
 
 
