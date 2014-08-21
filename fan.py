@@ -42,12 +42,12 @@ class full_analysis:
         redshifts = ['2']
         self.dat_prep(redshifts,g0_BH=1)
         self.dat_prep(redshifts,c2_256=1)
-        # self.dat_prep(redshifts,c0_sw_256=1)
-        # self.dat_prep(redshifts,g50_fixv_nothermal=1)
-        # self.dat_prep(redshifts,g50_BH=1)
-        # self.dat_prep(redshifts,g50_fixv=1)
-        # self.dat_prep(redshifts,c0_nometalwinds=1)
-        # self.dat_prep(redshifts,c0_fullmetalwinds=1)
+        self.dat_prep(redshifts,c0_sw_256=1)
+        self.dat_prep(redshifts,g50_fixv_nothermal=1)
+        self.dat_prep(redshifts,g50_BH=1)
+        self.dat_prep(redshifts,g50_fixv=1)
+        self.dat_prep(redshifts,c0_nometalwinds=1)
+        self.dat_prep(redshifts,c0_fullmetalwinds=1)
 
 
         # Check runs:
@@ -509,8 +509,8 @@ class full_analysis:
     # self.get_gal_props
 
 
-    def dat_prep(self,redshifts,c0_256=0,c0_512=0,c3_512=0,c4_512=0,c4_check=0,c2_256=0,c0_fw_256=0,c0_sw_256=0,c5_256=0,g0_BH=0,g10_BH=0,g20_BH=0,g25_BH=0,g30_BH=0,g40_BH=0,g25_noBH=0,g50_BH=0,g75_BH=0,g75_noBH=0,g95_BH=0,g95_noBH=0,g10_noBH=0,g20_noBH=0,g30_noBH=0,g40_noBH=0,g50_noBH=0,g10_nothermal=0,g20_nothermal=0,g30_nothermal=0,g40_nothermal=0,g50_nothermal=0,g25_fixv=0,g50_fixv=0,g25_fixv_nothermal=0,g50_fixv_nothermal=0,g25_fixv_fixeta=0,g50_fixv_fixeta=0):
-        mv_base = "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/" 
+    def dat_prep(self,redshifts,c0_256=0,c0_512=0,c3_512=0,c4_512=0,c4_check=0,c2_256=0,c0_fw_256=0,c0_sw_256=0,c5_256=0,g0_BH=0,g10_BH=0,g20_BH=0,g25_BH=0,g30_BH=0,g40_BH=0,g25_noBH=0,g50_BH=0,g75_BH=0,g75_noBH=0,g95_BH=0,g95_noBH=0,g10_noBH=0,g20_noBH=0,g30_noBH=0,g40_noBH=0,g50_noBH=0,g10_nothermal=0,g20_nothermal=0,g30_nothermal=0,g40_nothermal=0,g50_nothermal=0,g25_fixv=0,g50_fixv=0,g25_fixv_nothermal=0,g50_fixv_nothermal=0,g25_fixv_fixeta=0,g50_fixv_fixeta=0,c0_nometalwinds=0,c0_fullmetalwinds=0):
+        mv_snapbase = "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/" 
         sb_snapbase = "/n/hernquistfs1/spb/Cosmo/"
         js_snapbase = "/n/home04/jsuresh/runs/Cosmo5_V6/output"
         gam_snapbase = "/n/hernquistfs1/jsuresh/Runs/"
@@ -1140,6 +1140,45 @@ class full_analysis:
                     self.snapnum_list.append(4)
                 elif redshift == '2':
                     self.label_list.append("Gamma=0.5-fixv_fixeta (z=2)")
+                    self.snapnum_list.append(5)
+
+        # Wind Enrichment:
+        if c0_nometalwinds:
+            for redshift in redshifts:
+                self.run_list.append("c0_nometalwinds")
+                self.color_list.append("gray")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append(gam_snapbase+"c0_nometalwinds/output/")
+                if redshift == '4':
+                    self.label_list.append("Pristine Winds")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Pristine Winds")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Pristine Winds")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("Pristine Winds")
+                    self.snapnum_list.append(5)
+
+        if c0_fullmetalwinds:
+            for redshift in redshifts:
+                self.run_list.append("c0_fullmetalwinds")
+                self.color_list.append("black")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append(gam_snapbase+"c0_fullmetalwinds/output/")
+                if redshift == '4':
+                    self.label_list.append("Fully Enriched Winds")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Fully Enriched Winds")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Fully Enriched Winds")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("Fully Enriched Winds")
                     self.snapnum_list.append(5)
 
         self.ndat = len(self.run_list)
