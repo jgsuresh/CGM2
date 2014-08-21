@@ -262,10 +262,10 @@ class full_analysis:
                         Q3[mbin_ind,j] = np.percentile(full_dat[j][m_select],90)
 
             if i==0:
-                p_gal,=p1.semilogy(np.log10(mbins_med),med[:,0]/((0.0456/0.27)*mbins_med),color=self.color_list[i],linestyle='dashed')
-                p_CGM,=p1.semilogy(np.log10(mbins_med),med[:,1]/((0.0456/0.27)*mbins_med),color=self.color_list[i],label=self.label_list[i])
-                legend1 = p1.legend([p_gal,p_CGM], ["Stars+ISM","CGM"], prop={'size':6})
-                plt.gca().add_artist(legend1)
+                p1.semilogy(np.log10(mbins_med),med[:,0]/((0.0456/0.27)*mbins_med),color=self.color_list[i],linestyle='dashed')
+                p1.semilogy(np.log10(mbins_med),med[:,1]/((0.0456/0.27)*mbins_med),color=self.color_list[i],label=self.label_list[i])
+                # legend1 = p1.legend([p_gal,p_CGM], ["Stars+ISM","CGM"], prop={'size':6})
+                # plt.gca().add_artist(legend1)
             else:
                 # p1.plot(np.log10(mbins_med),np.log10(med[:,0]/((0.0456/0.27)*mbins_med)),color=self.color_list[i],linestyle='dotted')
                 # p1.plot(np.log10(mbins_med),np.log10(med[:,1]/((0.0456/0.27)*mbins_med)),color=self.color_list[i],label=self.label_list[i])
@@ -287,7 +287,17 @@ class full_analysis:
         p1.set_xlabel(r"$\log_{10}\left[M_{\rm Halo}\right]$")
         # p1.set_ylabel(r"$\log_{10}\left[ \frac{M_{\rm baryons}}{M_{\rm Halo} \times \Omega_b} \right]$")
         p1.set_ylabel(r"$\frac{M_{\rm baryons}}{M_{\rm Halo} \times f_b}$")
-        p1.legend(loc=2,prop={'size':6})
+        p1.legend(loc=2,prop={'size':5.5},ncol=2,columnspacing=0.3,borderpad=0.2)
+
+        font = {'family' : 'serif',
+        'color'  : 'darkred',
+        'weight' : 'normal',
+        'size'   : 14,
+        }
+        p1.text(11.05,2.4,"CGM",fontdict=font)
+        p1.text(11.05,0.3,"ISM+Stars",fontdict=font)
+        p2.text(12.,0.02,"CGM",fontdict=font)
+        p2.text(11.05,0.6,"ISM+Stars",fontdict=font)
         # plt.gca().add_artist(legend1)
 
         p2.xaxis.set_ticks(np.arange(11.0,12.6,0.5))
