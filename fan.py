@@ -39,7 +39,7 @@ class full_analysis:
 
 
         # Feedback paper runs:
-        redshifts = ['2.5']
+        redshifts = ['2']
         self.dat_prep(redshifts,g0_BH=1)
         self.dat_prep(redshifts,c2_256=1)
         self.dat_prep(redshifts,c0_sw_256=1)
@@ -158,10 +158,10 @@ class full_analysis:
         # 2D data analysis functions #
         ##############################
         print "1"
-        self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_LLS=True,savename="rudie_155",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_LLS=True,savename="rudie_172",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_LLS=True,savename="rudie_19",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_LLS=True,savename="rudie_203",show_Fumagalli=True)
+        self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_test",show_Fumagalli=True)
+        self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_z2",show_Fumagalli=True)
+        self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_z2",show_Fumagalli=True)
+        self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_z2",show_Fumagalli=True)
         # print "2"
         # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_newfan2")
         # print "3"
@@ -178,11 +178,139 @@ class full_analysis:
     # 3D data analysis functions #
     ##############################
 
+    def CGM_and_gal_metallicity(self,savename=None,plot_mode=1):
+        # Compute the mass and metal content of the CGM:
+        
+        plt.close('all')    
+        plt.figure(figsize=(3.54331*2,3.14))
+
+        p1 = plt.subplot(1,2,1)
+        p2 = plt.subplot(1,2,2)
+        subplot_list = [p1,p2]
+
+        lines = []
+
+        # Bin halos by mass
+        mbins_min = 10.**(10.+np.array([1.0,1.1,1.2,1.3,1.4,1.5,1.7,1.9,2.1,2.4]))
+        mbins_max = 10.**(10.+np.array([1.1,1.2,1.3,1.4,1.5,1.7,1.9,2.1,2.4,2.7]))
+        mbins_med = 10.**((np.log10(mbins_min) + np.log10(mbins_max))/2.)
+        n_mbins = np.size(mbins_min)
+
+        for i in np.arange(self.ndat):
+            print "Working on {}".format(self.run_list[i]) 
+
+            npz_fname = "CGMmassmet_{}_s{}.npz".format(self.run_list[i],self.snapnum_list[i])
+
+            if os.path.isfile(self.npz_base+npz_fname):
+                print "Loaded from npz!: {}".format(self.npz_base+npz_fname)
+                f = np.load(self.npz_base+npz_fname)
+                grp_m = f['grp_m']
+                full_dat = f['full_dat']
+                f.close()
+            else: 
+                cat = readsubfHDF5.subfind_catalog(self.snapdir_list[i],self.snapnum_list[i],long_ids=True)
+                grp_ids = self.find_desired_grpids(i,minmass=1e11)
+
+                m_CGM = np.zeros(0)
+                m_ISM = np.zeros(0)
+                m_stars = np.zeros(0)
+                zm_CGM = np.zeros(0)
+                zm_ISM = np.zeros(0)
+                zm_stars = np.zeros(0)
+                grp_m = np.zeros(0)
+                for j in np.arange(np.size(grp_ids)):
+                    grp_id = grp_ids[j]
+                    grp_data = self.load_CGMsnap_data(i,grp_id)
+                    grp_m = np.append(grp_m,AU.PhysicalMass(grp_data['grp_mass']))
+                    gas_m = AU.PhysicalMass(np.array(grp_data['Masses']))
+                    z = np.array(grp_data['GFM_Metallicity'])
+                    r = AU.PhysicalPosition(self._calc_radii(grp_data),grp_data['redshift'])
+                    grp_Rvir = AU.PhysicalPosition(grp_data['grp_Rvir'],grp_data['redshift'])
+
+                    print "(Max particle radius)/(3 Rvir) = {}".format(np.max(r)/(3*grp_Rvir))
+                    r_ind = r <= 3.*grp_Rvir
+
+                    # Find ISM gas (i.e. gas that is star-forming)
+                    SF = self._find_ISM_gas(grp_data)
+                    ISM = np.logical_and(r_ind,SF)
+                    CGM = np.logical_and(r_ind,np.logical_not(SF))
+
+                    m_ISM = np.append(m_ISM,np.sum(gas_m[ISM]))
+                    m_CGM = np.append(m_CGM,np.sum(gas_m[CGM]))
+                    m_stars = np.append(m_stars,AU.PhysicalMass(cat.GroupMassType[grp_id,4]))
+                    zm_ISM = np.append(zm_ISM,np.sum(gas_m[ISM]*z[ISM]))
+                    zm_CGM = np.append(zm_CGM,np.sum(gas_m[CGM]*z[CGM]))
+                    zm_stars = np.append(zm_stars,AU.PhysicalMass(cat.GroupMassType[grp_id,4])*cat.GroupStarMetallicity[grp_id])
+
+                full_dat = [m_ISM+m_stars,m_CGM,zm_ISM+zm_stars,zm_CGM]
+
+                np.savez(self.npz_base+npz_fname,full_dat=full_dat,grp_m=grp_m)
+
+
+            med = np.zeros([n_mbins,4])
+            if plot_mode == 2:
+                Q1 = np.zeros([n_mbins,4])
+                Q3 = np.zeros([n_mbins,4])
+
+            for mbin_ind in np.arange(n_mbins):
+                mmin = mbins_min[mbin_ind]
+                mmax = mbins_max[mbin_ind]
+                m_select = np.logical_and(grp_m > mmin, grp_m <= mmax)
+                for j in np.arange(4):
+                    med[mbin_ind,j] = np.median(full_dat[j][m_select])
+                    if plot_mode == 2:
+                        Q1[mbin_ind,j] = np.percentile(full_dat[j][m_select],10)
+                        Q3[mbin_ind,j] = np.percentile(full_dat[j][m_select],90)
+
+            if i==0:
+                p_gal,=p1.semilogy(np.log10(mbins_med),med[:,0]/((0.0456/0.27)*mbins_med),color=self.color_list[i],linestyle='dashed')
+                p_CGM,=p1.semilogy(np.log10(mbins_med),med[:,1]/((0.0456/0.27)*mbins_med),color=self.color_list[i],label=self.label_list[i])
+                legend1 = p1.legend([p_gal,p_CGM], ["Stars+ISM","CGM"], prop={'size':6})
+                plt.gca().add_artist(legend1)
+            else:
+                # p1.plot(np.log10(mbins_med),np.log10(med[:,0]/((0.0456/0.27)*mbins_med)),color=self.color_list[i],linestyle='dotted')
+                # p1.plot(np.log10(mbins_med),np.log10(med[:,1]/((0.0456/0.27)*mbins_med)),color=self.color_list[i],label=self.label_list[i])
+                p1.semilogy(np.log10(mbins_med),med[:,0]/((0.0456/0.27)*mbins_med),color=self.color_list[i],linestyle='dashed')
+                p = p1.semilogy(np.log10(mbins_med),med[:,1]/((0.0456/0.27)*mbins_med),color=self.color_list[i],label=self.label_list[i])
+                lines.append(p)
+
+            xdat1 = (med[:,2]/med[:,0])/AU.SolarMetallicity
+            xdat2 = (med[:,3]/med[:,1])/AU.SolarMetallicity
+            # p2.plot(np.log10(mbins_med),np.log10(xdat1),color=self.color_list[i],linestyle='dotted')
+            # p2.plot(np.log10(mbins_med),np.log10(xdat2),color=self.color_list[i],label=self.label_list[i])
+            p2.semilogy(np.log10(mbins_med),xdat1,color=self.color_list[i],linestyle='dashed')
+            p2.semilogy(np.log10(mbins_med),xdat2,color=self.color_list[i],label=self.label_list[i])
+
+        #p1.set_ylim([-1.,1.])
+        p1.set_ylim([0.1,10.])
+        p1.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+        p1.xaxis.set_ticks(np.arange(11.0,12.6,0.5))
+        p1.set_xlabel(r"$\log_{10}\left[M_{\rm Halo}\right]$")
+        # p1.set_ylabel(r"$\log_{10}\left[ \frac{M_{\rm baryons}}{M_{\rm Halo} \times \Omega_b} \right]$")
+        p1.set_ylabel(r"$\frac{M_{\rm baryons}}{M_{\rm Halo} \times f_b}$")
+        p1.legend(loc=2,prop={'size':6})
+        # plt.gca().add_artist(legend1)
+
+        p2.xaxis.set_ticks(np.arange(11.0,12.6,0.5))
+        # p2.set_ylabel(r"$\log_{10}\left[ \frac{Z_{\rm baryons}}{Z_\odot} \right]$")
+        p2.set_ylabel(r"$\frac{Z_{\rm baryons}}{Z_\odot}$")
+        p2.set_xlabel(r"$\log_{10}\left[M_{\rm Halo}\right]$")
+        #p2.legend(loc=2,prop={'size':5})
+
+        plt.subplots_adjust(wspace=0.4)
+
+        if savename != None: 
+            plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
+        else:
+            plt.savefig(self.fig_base+"mass_budget.pdf", bbox_inches='tight')
+
+
+
     ##############################
     # 2D data analysis functions #
     ##############################
 
-    def grid_sightlines(self,species,max_R,coldens_min=0,coldens_max=1000,minmass=10**11.9,maxmass=10**12.1,savename=None,coldens_vs_R=False,coverfrac_vs_R=False,coverfrac_within_R=False,rudie_LLS=False,rudie_DLA=False,show_Fumagalli=False):
+    def grid_sightlines(self,species,max_R,coldens_min=0,coldens_max=1000,minmass=10**11.9,maxmass=10**12.1,savename=None,coldens_vs_R=False,coverfrac_vs_R=False,coverfrac_within_R=False,rudie_155=False,rudie_172=False,rudie_19=False,rudie_203=False,show_Fumagalli=False):
         # Calculates covering fraction in similar way to observers.  Gather all halos within specified mass range, and treat 
         # all corresponding sightlines together.  
 
@@ -256,10 +384,10 @@ class full_analysis:
             ydat = np.array([0.9,0.6])
             yerr = np.array([0.09,0.1])
             xerr = np.array([8.,16.])
-            plt.ylim([0.,1.0])
+            plt.ylim([0.,1.6])
             plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple')
             if show_Fumagalli:
-                plt.plot(np.array([90.,180.],np.array([0.38,0.22]),fmt='X',color='gray'))
+                plt.scatter(np.array([90.,180.]),np.array([0.38,0.22]),marker='D',color='gray')
         if rudie_172:
             xdat = np.array([90.,180.])
             ydat = np.array([0.3,0.28])
@@ -268,7 +396,7 @@ class full_analysis:
             plt.ylim([0.,1.0])
             plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple')
             if show_Fumagalli:
-                plt.plot(np.array([90.,180.],np.array([0.16,0.07]),fmt='X',color='gray'))
+                plt.scatter(np.array([90.,180.]),np.array([0.16,0.07]),marker='D',color='gray')
         elif rudie_19:
             xdat = np.array([90.,180.])
             ydat = np.array([0.1,0.08])
@@ -277,7 +405,7 @@ class full_analysis:
             plt.ylim([0.,0.4])
             plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple')
             if show_Fumagalli:
-                plt.plot(np.array([90.,180.],np.array([0.06,0.03]),fmt='X',color='gray'))
+                plt.scatter(np.array([90.,180.]),np.array([0.06,0.03]),marker='D',color='gray')
         elif rudie_203:
             xdat = np.array([90.,180.])
             ydat = np.array([0.,0.04])
@@ -286,7 +414,7 @@ class full_analysis:
             plt.ylim([0.,0.4])
             plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple')
             if show_Fumagalli:
-                plt.plot(np.array([90.,180.],np.array([0.03,0.01]),fmt='X',color='gray'))
+                plt.scatter(np.array([90.,180.]),np.array([0.03,0.01]),marker='D',color='gray')
 
 
             
@@ -294,34 +422,33 @@ class full_analysis:
             plt.xlim([0.,max_R])
             plt.xlabel('Radius [pkpc]')
             plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
-            plt.legend(prop={'size':6},ncol=2)
-            plt.subplots_adjust(left=0.25,bottom=0.18)
+            plt.legend(prop={'size':5},ncol=2)
+            plt.subplots_adjust(left=0.2,bottom=0.18)
             if savename != None:
-                plt.savefig(self.fig_base+savename+".pdf")
+                plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
             else:
-                plt.savefig(self.fig_base+"cd_v_R.pdf")
+                plt.savefig(self.fig_base+"cd_v_R.pdf", bbox_inches='tight')
         elif coverfrac_vs_R:
             plt.xlim([0.,max_R])
             plt.xlabel('Radius [pkpc]')
             plt.ylim([-0.05,1.1])
             plt.ylabel(r"$f_C (R)$")
-            plt.legend(prop={'size':6},ncol=2)
-            plt.subplots_adjust(left=0.25,bottom=0.18)
+            plt.legend(prop={'size':5},ncol=2)
+            plt.subplots_adjust(left=0.2,bottom=0.18)
             if savename != None:
-                plt.savefig(self.fig_base+savename+".pdf")
+                plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
             else:
-                plt.savefig(self.fig_base+"fc_vs_R.pdf")
+                plt.savefig(self.fig_base+"fc_vs_R.pdf", bbox_inches='tight')
         elif coverfrac_within_R:
             plt.xlim([0.,max_R])
             plt.xlabel('Radius [pkpc]')
-            plt.ylim([-0.05,1.1])
             plt.ylabel(r"$f_C (< R)$")
-            plt.legend(prop={'size':6},ncol=2)
-            plt.subplots_adjust(left=0.25,bottom=0.18)
+            plt.legend(prop={'size':5},ncol=2)
+            plt.subplots_adjust(left=0.2,bottom=0.18)
             if savename != None:
-                plt.savefig(self.fig_base+savename+".pdf")
+                plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
             else:
-                plt.savefig(self.fig_base+"fc_within_R.pdf")
+                plt.savefig(self.fig_base+"fc_within_R.pdf", bbox_inches='tight')
 
                 
 
