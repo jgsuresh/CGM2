@@ -42,12 +42,12 @@ class full_analysis:
         redshifts = ['2']
         self.dat_prep(redshifts,g0_BH=1)
         self.dat_prep(redshifts,c2_256=1)
-        self.dat_prep(redshifts,c0_sw_256=1)
-        self.dat_prep(redshifts,g50_fixv_nothermal=1)
-        self.dat_prep(redshifts,g50_BH=1)
-        self.dat_prep(redshifts,g50_fixv=1)
-        self.dat_prep(redshifts,c0_nometalwinds=1)
-        self.dat_prep(redshifts,c0_fullmetalwinds=1)
+        # self.dat_prep(redshifts,c0_sw_256=1)
+        # self.dat_prep(redshifts,g50_fixv_nothermal=1)
+        # self.dat_prep(redshifts,g50_BH=1)
+        # self.dat_prep(redshifts,g50_fixv=1)
+        # self.dat_prep(redshifts,c0_nometalwinds=1)
+        # self.dat_prep(redshifts,c0_fullmetalwinds=1)
 
 
         # Check runs:
@@ -150,18 +150,17 @@ class full_analysis:
         ##############################
         # self.phase_budget('m',savename='m_budget_lowmetal',minimal=False)
         # self.phase_budget('z',savename='z_budget_lowmetal',minimal=False)
-        # self.CGM_and_gal_metallicity(savename="massmet_test")
+        self.CGM_and_gal_metallicity(savename="massmet_newfan")
         # self.radial_profile('T')
         # self.radial_profile('z')
 
         ##############################
         # 2D data analysis functions #
         ##############################
-        print "1"
-        self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_test",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_z2",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_z2",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_z2",show_Fumagalli=True)
+        # self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_test",show_Fumagalli=True)
+        # self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_z2",show_Fumagalli=True)
+        # self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_z2",show_Fumagalli=True)
+        # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_z2",show_Fumagalli=True)
         # print "2"
         # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_newfan2")
         # print "3"
@@ -180,7 +179,7 @@ class full_analysis:
 
     def CGM_and_gal_metallicity(self,savename=None,plot_mode=1):
         # Compute the mass and metal content of the CGM:
-        
+
         plt.close('all')    
         plt.figure(figsize=(3.54331*2,3.14))
 
@@ -506,127 +505,644 @@ class full_analysis:
         return r_grid * (2.*grid_rad)/(ngrid)
 
 
+        
     # self.get_gal_props
 
-    def dat_prep(self,redshifts,c0_128=0,c0_256=0,c0_512=0,c0_fw_256=0,c0_sw_256=0,c2_256=0,c3_512=0,c4_512=0,c4_check=0,g0_BH=0,g10_BH=0,g20_BH=0,g30_BH=0,g40_BH=0,g50_BH=0,g25_BH=0,g75_BH=0,g95_BH=0,g0_noBH=0,g10_noBH=0,g20_noBH=0,g30_noBH=0,g40_noBH=0,g50_noBH=0,g25_noBH=0,g75_noBH=0,g95_noBH=0,g10_nothermal=0,g20_nothermal=0,g30_nothermal=0,g40_nothermal=0,g50_nothermal=0,g25_fixv=0,g50_fixv=0,g25_fixv_fixeta=0,g50_fixv_fixeta=0,g25_fixv_nothermal=0,g50_fixv_nothermal=0,c0_nometalwinds=0,c0_fullmetalwinds=0):
-        self.mv_base = "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/" 
-        self.sb_base = "/n/hernquistfs1/spb/Cosmo/"
-        self.js_base = "/n/hernquistfs1/jsuresh/Runs/"
 
-        if c0_256 == 1:
+    def dat_prep(self,redshifts,c0_256=0,c0_512=0,c3_512=0,c4_512=0,c4_check=0,c2_256=0,c0_fw_256=0,c0_sw_256=0,c5_256=0,g0_BH=0,g10_BH=0,g20_BH=0,g25_BH=0,g30_BH=0,g40_BH=0,g25_noBH=0,g50_BH=0,g75_BH=0,g75_noBH=0,g95_BH=0,g95_noBH=0,g10_noBH=0,g20_noBH=0,g30_noBH=0,g40_noBH=0,g50_noBH=0,g10_nothermal=0,g20_nothermal=0,g30_nothermal=0,g40_nothermal=0,g50_nothermal=0,g25_fixv=0,g50_fixv=0,g25_fixv_nothermal=0,g50_fixv_nothermal=0,g25_fixv_fixeta=0,g50_fixv_fixeta=0):
+        mv_base = "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/" 
+        sb_snapbase = "/n/hernquistfs1/spb/Cosmo/"
+        js_snapbase = "/n/home04/jsuresh/runs/Cosmo5_V6/output"
+        gam_snapbase = "/n/hernquistfs1/jsuresh/Runs/"
+
+        bmap = brewer2mpl.get_map('Spectral','Diverging',9, reverse=True)
+        cmap = bmap.mpl_colormap
+
+        # Cosmo0_V6 (512^3 particles):
+        if c0_256:
             for redshift in redshifts:
-                self.run_list.append('c0_256')
+                self.run_list.append("c0_256")
+                self.color_list.append(cmap(0.))
+                self.snapdir_list.append(mv_snapbase+"Cosmo0_V6/L25n256/output/")
+                if redshift == '4':
+                    self.label_list.append("Cold Winds+BHs-256 (z=4)")
+                    self.snapnum_list.append(54)
+                elif redshift == '3':
+                    self.label_list.append("Cold Winds+BHs-256 (z=3)")
+                    self.snapnum_list.append(60)
+                elif redshift == '2.5':
+                    self.label_list.append("Cold Winds+BHs-256 (z=2.5)")
+                    self.snapnum_list.append(63)
+                elif redshift == '2':
+                    # self.label_list.append("Cold Winds+BHs-256 (z=2)")
+                    self.label_list.append("Fiducial")
+                    self.snapnum_list.append(68)
+                elif redshift == '1':
+                    raise Exception('z=1 not implemented')
+                    self.label_list.append("Cold Winds+BHs-256 (z=1)")
+                    self.snapnum_list.append()
+                elif redshift == '0.3':
+                    self.label_list.append("Cold Winds+BHs-256 (z=0.3)")
+                    self.snapnum_list.append(114)
+                elif redshift == '0':
+                    self.label_list.append("Cold Winds+BHs-256 (z=0)")
+                    self.snapnum_list.append(135)
+        if c0_512:
+            for redshift in redshifts:
+                self.run_list.append("c0_512")
+                self.color_list.append("black")
+                self.snapdir_list.append(mv_snapbase+"Cosmo0_V6/L25n512/output/")
+                if redshift == '4':
+                    self.label_list.append("Cold Winds+BHs (z=4)")
+                    self.snapnum_list.append(54)
+                elif redshift == '3':
+                    self.label_list.append("Cold Winds+BHs (z=3)")
+                    self.snapnum_list.append(60)
+                elif redshift == '2':
+                    self.label_list.append("Cold Winds+BHs (z=2)")
+                    self.snapnum_list.append(68)
+                elif redshift == '1':
+                    raise Exception('z=1 not implemented')
+                    self.label_list.append("Cold Winds+BHs (z=1)")
+                    self.snapnum_list.append()
+                elif redshift == '0.3':
+                    self.label_list.append("Cold Winds+BHs (z=0.3)")
+                    self.snapnum_list.append(114)
+                elif redshift == '0':
+                    self.label_list.append("Cold Winds+BHs (z=0)")
+                    self.snapnum_list.append(135)
+
+
+        # Cosmo2_V6 (256^3 particles):
+        if c2_256:
+            for redshift in redshifts:
+                self.run_list.append("c2_256")
+                self.color_list.append("cyan")
+                self.snapdir_list.append(mv_snapbase+"Cosmo2_V6/L25n256/output/")
+                self.linestyle_list.append("solid")
+                if redshift == '4':
+                    self.label_list.append("Cold Winds only (z=4)")
+                    self.snapnum_list.append(54)
+                elif redshift == '3':
+                    self.label_list.append("Cold Winds only (z=3)")
+                    self.snapnum_list.append(60)
+                elif redshift == '2':
+                    # self.label_list.append("Cold Winds only (z=2)")
+                    self.label_list.append("No AGN")
+                    self.snapnum_list.append(68)
+                elif redshift == '0.3':
+                    self.label_list.append("Cold Winds only (z=0.3)")
+                    self.snapnum_list.append(114)
+                elif redshift == '0':
+                    self.label_list.append("Cold Winds only (z=0)")
+                    self.snapnum_list.append(135)
+                
+
+        # Cosmo3_V6 (512^3 particles):
+        if c3_512:
+            for redshift in redshifts:
+                self.run_list.append("c3_512")
+                self.color_list.append("black")
+                self.snapdir_list.append(sb_snapbase+"Cosmo3_V6/L25n512/output/")
+                if redshift == '4':
+                    self.label_list.append("No Feedback (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("No Feedback (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2':
+                    self.label_list.append("No Feedback (z=2)")
+                    self.snapnum_list.append(5)
+
+
+        # Cosmo4_V6 (512^3 particles):
+        if c4_512:
+            for redshift in redshifts:
+                self.run_list.append("c4_512")
+                self.color_list.append("green")
+                self.linestyle_list.append('solid')
+                self.snapdir_list.append(sb_snapbase+"Cosmo4_V6/L25n512/output/")
+                if redshift == '4':
+                    self.label_list.append("Hot Winds Only (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Hot Winds Only (z=4)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Hot Winds Only (z=2.5)")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("Hot Winds Only (z=4)")
+                    self.snapnum_list.append(5)
+                elif redshift == '0.3':
+                    self.label_list.append("Hot Winds Only (z=4)")
+                    self.snapnum_list.append(9)
+
+        if c4_check:
+            for redshift in redshifts:
+                self.run_list.append("c4_check")
+                self.color_list.append("red")
+                self.linestyle_list.append('solid')
+                self.snapdir_list.append(gam_snapbase+"c4_check/output/")
+                if redshift == '2.5':
+                    self.label_list.append("c4_check")
+                    self.snapnum_list.append(4)
+
+
+        # Cosmo0_V6_fastWinds (256^3 particles):
+        if c0_fw_256:
+            for redshift in redshifts:
+                self.run_list.append("c0_fw_256")
+                self.color_list.append("orange")
+                self.snapdir_list.append(mv_snapbase+"Cosmo0_V6_fastWinds/L25n256/output/")
+                if redshift == '4':
+                    self.label_list.append("Fast Winds+BHs (z=4)")
+                    self.snapnum_list.append(54)
+                elif redshift == '3':
+                    self.label_list.append("Fast Winds+BHs (z=3)")
+                    self.snapnum_list.append(60)
+                elif redshift == '2':
+                    self.label_list.append("Fast Winds+BHs (z=2)")
+                    self.snapnum_list.append(68)
+                elif redshift == '0.3':
+                    self.label_list.append("Fast Winds+BHs (z=0.3)")
+                    self.snapnum_list.append(114)
+
+        # Cosmo0_V6_strongWinds (256^3 particles):
+        if c0_sw_256:
+            for redshift in redshifts:
+                self.run_list.append("c0_sw_256")
+                self.color_list.append("chartreuse")
+                self.snapdir_list.append(mv_snapbase+"Cosmo0_V6_strongWinds/L25n256/output/")
+                self.linestyle_list.append("solid")
+                if redshift == '4':
+                    self.label_list.append("Strong Winds+BHs (z=4)")
+                    self.snapnum_list.append(54)
+                elif redshift == '3':
+                    self.label_list.append("Strong Winds+BHs (z=4)")
+                    self.snapnum_list.append(60)
+                elif redshift == '2':
+                    self.label_list.append("Higher Mass-loading")
+                    self.snapnum_list.append(68)
+                elif redshift == '0.3':
+                    self.label_list.append("Strong Winds+BHs (z=4)")
+                    self.snapnum_list.append(114)
+
+        # Cosmo5_V6 (256^3 particles):
+        if c5_256:
+            for redshift in redshifts:
+                self.run_list.append("c5_256")
+                self.color_list.append("magenta")
+                self.snapdir_list.append(js_snapbase)
+                if redshift == '4':
+                    self.label_list.append("Intermediate-speed Winds Only (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Intermediate-speed Winds Only (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2':
+                    self.label_list.append("Intermediate-speed Winds Only (z=2)")
+                    self.snapnum_list.append(5)
+            
+        # gamma boxes (256^3 particles): 
+        if g0_BH:
+            for redshift in redshifts:
+                self.run_list.append("c0_256")
+                #self.color_list.append(cmap(0.))
                 self.color_list.append('blue')
-                self.label_list.append('Fiducial')
                 self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.mv_base+"Cosmo0_V6/L25n256/output/")
-                if redshift == '4': self.snapnum_list.append(54)
-                if redshift == '3': self.snapnum_list.append(60)
-                if redshift == '2.5': self.snapnum_list.append(63)
-                if redshift == '2': self.snapnum_list.append(68)
-        if c0_sw_256 == 1:
-            for redshift in redshifts:
-                self.run_list.append('c0_sw_256')
-                self.color_list.append('green')
-                self.label_list.append('Higher Mass-Loading')
-                self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.mv_base+"Cosmo0_V6_strongWinds/L25n256/output/")
-                if redshift == '4': self.snapnum_list.append(54)
-                if redshift == '3': self.snapnum_list.append(60)
-                if redshift == '2.5': self.snapnum_list.append(63)
-                if redshift == '2': self.snapnum_list.append(68)
-        if c0_fw_256 == 1:
-            for redshift in redshifts:
-                self.run_list.append('c0_fw_256')
-                self.color_list.append('blue')
-                self.label_list.append('Fast Winds')
-                self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.mv_base+"Cosmo0_V6_fastWinds/L25n256/output/")
-                if redshift == '4': self.snapnum_list.append(54)
-                if redshift == '3': self.snapnum_list.append(60)
-                if redshift == '2.5': self.snapnum_list.append(63)
-                if redshift == '2': self.snapnum_list.append(68)
-        if c2_256 == 1:
-            for redshift in redshifts:
-                self.run_list.append('c2_256')
-                self.color_list.append('cyan')
-                self.label_list.append('No AGN')
-                self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.mv_base+"Cosmo2_V6/L25n256/output/")
-                if redshift == '4': self.snapnum_list.append(54)
-                if redshift == '3': self.snapnum_list.append(60)
-                if redshift == '2.5': self.snapnum_list.append(63)
-                if redshift == '2': self.snapnum_list.append(68)
+                self.snapdir_list.append(mv_snapbase+"Cosmo0_V6/L25n256/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0+BHs (z=4)")
+                    self.snapnum_list.append(54)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0+BHs (z=3)")
+                    self.snapnum_list.append(60)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0+BHs (z=2.5)")
+                    self.snapnum_list.append(63)
+                elif redshift == '2':
+                    # self.label_list.append("Gamma=0+BHs (z=2)")
+                    self.label_list.append("Fiducial")
+                    self.snapnum_list.append(68)
+                elif redshift == '1':
+                    raise Exception('z=1 not implemented')
+                    self.label_list.append("Gamma=0+BHs (z=1)")
+                    self.snapnum_list.append()
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0+BHs (z=0.3)")
+                    self.snapnum_list.append(114)
+                elif redshift == '0':
+                    self.label_list.append("Gamma=0+BHs (z=0)")
+                    self.snapnum_list.append(135)
 
-        if g0_BH == 1:
+        if g10_BH:
             for redshift in redshifts:
-                self.run_list.append('c0_256')
-                self.color_list.append('blue')
-                self.label_list.append('Fiducial')
+                self.run_list.append("gam_10_BH")
+                self.color_list.append(cmap(0.2))
                 self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.mv_base+"Cosmo0_V6/L25n256/output/")
-                if redshift == '4': self.snapnum_list.append(54)
-                if redshift == '3': self.snapnum_list.append(60)
-                if redshift == '2.5': self.snapnum_list.append(63)
-                if redshift == '2': self.snapnum_list.append(68)
+                self.snapdir_list.append(gam_snapbase+"gam_10_BH/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.1 + BHs (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.1 + BHs (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0.1 + BHs (z=2.5)")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("Gamma=0.1 + BHs (z=2)")
+                    self.snapnum_list.append(5)
+                elif redshift == '1':
+                    self.label_list.append("Gamma=0.1 + BHs (z=1)")
+                    self.snapnum_list.append(7)
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0.1 + BHs (z=0.3)")
+                    self.snapnum_list.append(9)
 
-        if g50_fixv_nothermal == 1:
+        if g20_BH:
             for redshift in redshifts:
-                self.run_list.append('gam_50_fixv_nothermal')
-                self.color_list.append('chartreuse')
-                self.label_list.append('Faster Winds')
+                self.run_list.append("gam_20_BH")
                 self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.js_base+"gam_50_fixv_nothermal/output/")
-                if redshift == '4': self.snapnum_list.append(1)
-                if redshift == '3': self.snapnum_list.append(3)
-                if redshift == '2.5': self.snapnum_list.append(4)
-                if redshift == '2': self.snapnum_list.append(5)
-        if g50_BH == 1:
-            for redshift in redshifts:
-                self.run_list.append('gam_50_BH')
-                self.color_list.append('brown')
-                self.label_list.append('Fixed-E Hot Winds')
-                self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.js_base+"gam_50_BH/output/")
-                if redshift == '4': self.snapnum_list.append(1)
-                if redshift == '3': self.snapnum_list.append(3)
-                if redshift == '2.5': self.snapnum_list.append(4)
-                if redshift == '2': self.snapnum_list.append(5)
-        if g50_fixv == 1:
-            for redshift in redshifts:
-                self.run_list.append('gam_50_fixv')
-                self.color_list.append('magenta')
-                self.label_list.append('Fixed-v Hot Winds')
-                self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.js_base+"gam_50_fixv/output/")
-                if redshift == '4': self.snapnum_list.append(1)
-                if redshift == '3': self.snapnum_list.append(3)
-                if redshift == '2.5': self.snapnum_list.append(4)
-                if redshift == '2': self.snapnum_list.append(5)
-        if c0_nometalwinds == 1:
-            for redshift in redshifts:
-                self.run_list.append('c0_nometalwinds')
-                self.color_list.append('gray')
-                self.label_list.append('Pristine Winds')
-                self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.js_base+"c0_nometalwinds/output/")
-                if redshift == '4': self.snapnum_list.append(1)
-                if redshift == '3': self.snapnum_list.append(3)
-                if redshift == '2.5': self.snapnum_list.append(4)
-                if redshift == '2': self.snapnum_list.append(5)
-        if c0_fullmetalwinds == 1:
-            for redshift in redshifts:
-                self.run_list.append('c0_fullmetalwinds')
-                self.color_list.append('black')
-                self.label_list.append('Fully Enriched Winds')
-                self.linestyle_list.append('solid')
-                self.snapdir_list.append(self.js_base+"c0_fullmetalwinds/output/")
-                if redshift == '4': self.snapnum_list.append(1)
-                if redshift == '3': self.snapnum_list.append(3)
-                if redshift == '2.5': self.snapnum_list.append(4)
-                if redshift == '2': self.snapnum_list.append(5)
+                self.color_list.append(cmap(0.4))
+                self.snapdir_list.append(gam_snapbase+"gam_20_BH/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.2 + BHs (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.2 + BHs (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0.2 + BHs (z=2.5)")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("Gamma=0.2 + BHs (z=2)")
+                    self.snapnum_list.append(5)
+                elif redshift == '1':
+                    self.label_list.append("Gamma=0.2 + BHs (z=1)")
+                    self.snapnum_list.append(7)
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0.2 + BHs (z=0.3)")
+                    self.snapnum_list.append(9)
 
-        self.ndat = np.size(self.run_list)
+        if g25_BH:
+            for redshift in redshifts:
+                self.run_list.append("gam_25_BH")
+                self.linestyle_list.append('solid')
+                self.color_list.append("blue")
+                self.snapdir_list.append(gam_snapbase+"gam_25_BH/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.25 + BHs (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.25 + BHs (z=1)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2':
+                    self.label_list.append("Gamma=0.25 + BHs (z=0.3)")
+                    self.snapnum_list.append(5)
+
+        if g30_BH:
+            for redshift in redshifts:
+                self.run_list.append("gam_30_BH")
+                self.linestyle_list.append('solid')
+                self.color_list.append(cmap(0.6))
+                self.snapdir_list.append(gam_snapbase+"gam_30_BH/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.3 + BHs (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.3 + BHs (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0.3 + BHs (z=2.5)")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("Gamma=0.3 + BHs (z=2)")
+                    self.snapnum_list.append(5)
+                elif redshift == '1':
+                    self.label_list.append("Gamma=0.3 + BHs (z=1)")
+                    self.snapnum_list.append(7)
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0.3 + BHs (z=0.3)")
+                    self.snapnum_list.append(9)
+
+        if g40_BH:
+            for redshift in redshifts:
+                self.run_list.append("gam_40_BH")
+                self.linestyle_list.append('solid')
+                self.color_list.append(cmap(0.8))
+                self.snapdir_list.append(gam_snapbase+"gam_40_BH/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.4 + BHs (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.4 + BHs (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0.4 + BHs (z=2.5)")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("Gamma=0.4 + BHs (z=2)")
+                    self.snapnum_list.append(5)
+                elif redshift == '1':
+                    self.label_list.append("Gamma=0.4 + BHs (z=1)")
+                    self.snapnum_list.append(7)
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0.4 + BHs (z=0.3)")
+                    self.snapnum_list.append(9)
+
+        if g50_BH:
+            for redshift in redshifts:
+                self.run_list.append("gam_50_BH")
+                self.linestyle_list.append('solid')
+                # self.color_list.append(cmap(1.0))
+                self.color_list.append('saddlebrown')
+                self.snapdir_list.append(gam_snapbase+"gam_50_BH/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.5 + BHs (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.5 + BHs (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0.5 + BHs (z=2.5)")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    # self.label_list.append("Gamma=0.5 + BHs (z=2)")
+                    self.label_list.append("Fixed-E Hot Winds")
+                    self.snapnum_list.append(5)
+                elif redshift == '1':
+                    self.label_list.append("Gamma=0.5 + BHs (z=1)")
+                    self.snapnum_list.append(7)
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0.5 + BHs (z=0.3)")
+                    self.snapnum_list.append(9)
+
+        if g75_BH:
+            for redshift in redshifts:
+                self.run_list.append("gam_75_BH")
+                self.linestyle_list.append('solid')
+                self.color_list.append("orange")
+                self.snapdir_list.append(gam_snapbase+"gam_75_BH/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.75 + BHs (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.75 + BHs (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2':
+                    self.label_list.append("Gamma=0.75 + BHs (z=2)")
+                    self.snapnum_list.append(5)
+
+        if g95_BH:
+            for redshift in redshifts:
+                self.run_list.append("gam_95_BH")
+                self.linestyle_list.append('solid')
+                self.color_list.append("red")
+                self.snapdir_list.append(gam_snapbase+"gam_95_BH/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.95 + BHs (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.95 + BHs (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2':
+                    self.label_list.append("Gamma=0.95 + BHs (z=2)")
+                    self.snapnum_list.append(5)
+
+        # No black hole runs:
+        if g10_noBH:
+            for redshift in redshifts:
+                self.run_list.append("gam_10_noBH")
+                self.linestyle_list.append('dashed')
+                self.color_list.append(cmap(0.2))
+                self.snapdir_list.append(gam_snapbase+"gam_10_noBH/output/")
+                if redshift == '2.5':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(4)
+                if redshift == '2':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(5)
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0.1-noBH (z=0.3)")
+                    self.snapnum_list.append(9)
+
+        if g20_noBH:
+            for redshift in redshifts:
+                self.run_list.append("gam_20_noBH")
+                self.linestyle_list.append('dashed')
+                self.color_list.append(cmap(0.4))
+                self.snapdir_list.append(gam_snapbase+"gam_20_noBH/output/")
+                if redshift == '2':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(5)
+
+        if g30_noBH:
+            for redshift in redshifts:
+                self.run_list.append("gam_30_noBH")
+                self.linestyle_list.append('dashed')
+                self.color_list.append(cmap(0.6))
+                self.snapdir_list.append(gam_snapbase+"gam_30_noBH/output/")
+                if redshift == '2':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(5)
+
+        if g40_noBH:
+            for redshift in redshifts:
+                self.run_list.append("gam_40_noBH")
+                self.linestyle_list.append('dashed')
+                self.color_list.append(cmap(0.8))
+                self.snapdir_list.append(gam_snapbase+"gam_40_noBH/output/")
+                if redshift == '2':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(5)
+
+
+        if g50_noBH:
+            for redshift in redshifts:
+                self.run_list.append("gam_50_noBH")
+                self.linestyle_list.append('dashed')
+                self.color_list.append(cmap(1.0))
+                self.snapdir_list.append(gam_snapbase+"gam_50_noBH/output/")
+                if redshift == '2.5':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(4)
+                if redshift == '2':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(5)
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0.5-noBH (z=0.3)")
+                    self.snapnum_list.append(9)
+
+        # No thermal component runs:
+        if g10_nothermal:
+            for redshift in redshifts:
+                self.run_list.append("gam_10_BH_nothermal")
+                self.linestyle_list.append('dashed')
+                self.color_list.append(cmap(0.2))
+                self.snapdir_list.append(gam_snapbase+"gam_10_BH_nothermal/output/")
+                if redshift == '2.5':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(4)
+                if redshift == '2':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(5)
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0.1+BHs-thermal (z=0.3)")
+                    self.snapnum_list.append(9)
+
+        if g20_nothermal:
+            for redshift in redshifts:
+                self.run_list.append("gam_20_BH_nothermal")
+                self.linestyle_list.append('dashed')
+                self.color_list.append(cmap(0.4))
+                self.snapdir_list.append(gam_snapbase+"gam_20_BH_nothermal/output/")
+                if redshift == '2':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(5)
+
+        if g30_nothermal:
+            for redshift in redshifts:
+                self.run_list.append("gam_30_BH_nothermal")
+                self.linestyle_list.append('dashed')
+                self.color_list.append(cmap(0.6))
+                self.snapdir_list.append(gam_snapbase+"gam_30_BH_nothermal/output/")
+                if redshift == '2':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(5)
+
+        if g40_nothermal:
+            for redshift in redshifts:
+                self.run_list.append("gam_40_BH_nothermal")
+                self.linestyle_list.append('dashed')
+                self.color_list.append(cmap(0.8))
+                self.snapdir_list.append(gam_snapbase+"gam_40_BH_nothermal/output/")
+                if redshift == '2':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(5)
+
+        if g50_nothermal:
+            for redshift in redshifts:
+                self.run_list.append("gam_50_BH_nothermal")
+                self.linestyle_list.append('dashed')
+                self.color_list.append(cmap(1.0))
+                self.snapdir_list.append(gam_snapbase+"gam_50_BH_nothermal/output/")
+                if redshift == '2.5':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(4)
+                if redshift == '2':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(5)
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0.5+BHs-thermal (z=0.3)")
+                    self.snapnum_list.append(9)
+
+
+        # Class I wind runs (fixv):
+        if g25_fixv:
+            for redshift in redshifts:
+                self.run_list.append("gam_25_fixv")
+                self.color_list.append("orange")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append(gam_snapbase+"gam_25_fixv/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.25-fixv (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.25-fixv (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0.25-fixv (z=2.5)")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("Gamma=0.25-fixv (z=2)")
+                    self.snapnum_list.append(5)
+
+        if g50_fixv:
+            for redshift in redshifts:
+                self.run_list.append("gam_50_fixv")
+                self.color_list.append("magenta")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append(gam_snapbase+"gam_50_fixv/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.5-fixv (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.5-fixv (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0.5-fixv (z=2.5)")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    # self.label_list.append("Gamma=0.5-fixv (z=2)")
+                    self.label_list.append("Fixed-v Hot Winds")
+                    self.snapnum_list.append(5)
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0.5-fixv (z=0.3)")
+                    self.snapnum_list.append(9)
+
+        if g25_fixv_nothermal:
+            for redshift in redshifts:
+                self.run_list.append("gam_25_fixv_nothermal")
+                self.color_list.append("orange")
+                self.linestyle_list.append("dashed")
+                self.snapdir_list.append(gam_snapbase+"gam_25_fixv_nothermal/output/")
+                if redshift == '2':
+                    self.label_list.append(None)
+                    self.snapnum_list.append(5)
+
+        if g50_fixv_nothermal:
+            for redshift in redshifts:
+                self.run_list.append("gam_50_fixv_nothermal")
+                self.color_list.append("gold")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append(gam_snapbase+"gam_50_fixv_nothermal/output/")
+                if redshift == '2':
+                    self.label_list.append("Faster Winds")
+                    self.snapnum_list.append(5)
+
+
+        # Class III wind runs (fixv):
+        if g25_fixv_fixeta:
+            for redshift in redshifts:
+                self.run_list.append("gam_25_fixv_fixeta")
+                self.color_list.append("orange")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append(gam_snapbase+"gam_25_fixv_fixeta/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.25-fixv_fixeta (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.25-fixv_fixeta (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0.25-fixv_fixeta (z=2.5)")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("Gamma=0.25-fixv_fixeta (z=2)")
+                    self.snapnum_list.append(5)
+
+        if g50_fixv_fixeta:
+            for redshift in redshifts:
+                self.run_list.append("gam_50_fixv_fixeta")
+                self.color_list.append("red")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append(gam_snapbase+"gam_50_fixv_fixeta/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0.5-fixv_fixeta (z=4)")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("Gamma=0.5-fixv_fixeta (z=3)")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0.5-fixv_fixeta (z=2.5)")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("Gamma=0.5-fixv_fixeta (z=2)")
+                    self.snapnum_list.append(5)
+
+        self.ndat = len(self.run_list)
 
 if __name__ == '__main__':
     full_analysis()
