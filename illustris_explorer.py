@@ -8,10 +8,13 @@ base = "/n/ghernquist/Illustris/Runs/L75n1820FP/"
 
 # Playing around with group catalog
 # note the following code only works when logged in on dev
-cat=readsubfHDF5.subfind_catalog("/scratch/sims.illustris/L75n1820FP",135)
+# cat=readsubfHDF5.subfind_catalog("/scratch/sims.illustris/L75n1820FP",135)
+cat = readsubfHDF5.subfind_catalog(base,120)
+#135 - z=0
+#120 - z=0.19728
 
 # Playing around with galaxy properties catalog
-galf = h5py.File(base+"/postprocessing/galprop/galprop_135.hdf5",'r')
+galf = h5py.File(base+"/postprocessing/galprop/galprop_120.hdf5",'r')
 galf.keys()
 gal_sm = np.array(galf['stellar_totmass'])
 n_gal = np.size(gal_sm)
@@ -27,8 +30,7 @@ for gal_id in gal_ids:
 	grnr = cat.SubhaloGrNr[gal_id]
 	if cat.GroupFirstSub[grnr] ==  gal_id: 
 		primary_gal_ids = np.append(primary_gal_ids,gal_id)
-print "np.size(primary_gal_ids) ",np.size(primary_gal_ids) #3527
-
+print "np.size(primary_gal_ids) ",np.size(primary_gal_ids) #3527 for z=0, 3287 for z=0.2
 
 # Sanity check: ensure there are no duplicates in the group number associated with the primary_gal_ids
 primary_gal_ids = np.int32(primary_gal_ids)
