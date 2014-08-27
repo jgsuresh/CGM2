@@ -18,16 +18,18 @@ class sfr_plot:
 
         bmap_o = brewer2mpl.get_map('Spectral','Diverging',9, reverse=True)
         bmap = bmap_o.mpl_colormap
-        #bmap = 
+        
+        mv_base = "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/" 
+        # mv_base = mv_base+""
 
-        c0_512_base = "/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6/L25n512/output/"
-        c0_256_base = "/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6/L25n256/output/"
-        c2_base = "/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo2_V6/L25n256/output/"
+        c0_512_base = mv_base+"Cosmo0_V6/L25n512/output/"
+        c0_256_base = mv_base+"Cosmo0_V6/L25n256/output/"
+        c2_base = mv_base+"Cosmo2_V6/L25n256/output/"
         c4_512_base = "/n/hernquistfs1/spb/Cosmo/Cosmo4_V6/L25n512/output/"
         c3_512_base = "/n/hernquistfs1/spb/Cosmo/Cosmo3_V6/L25n512/output/"
         c5_256_base = "/n/home04/jsuresh/runs/Cosmo5_V6/output/"
-        c0_fw_256_base = "/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6_fastWinds/L25n256/output/"
-        c0_sw_256_base = "/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6_strongWinds/L25n256/output/"
+        c0_fw_256_base = mv_base+"Cosmo0_V6_fastWinds/L25n256/output/"
+        c0_sw_256_base = mv_base+"Cosmo0_V6_strongWinds/L25n256/output/"
 
         gam_10_BH_base = "/n/hernquistfs1/jsuresh/Runs/gam_10_BH/output/"
         gam_20_BH_base = "/n/hernquistfs1/jsuresh/Runs/gam_20_BH/output/"
@@ -126,16 +128,17 @@ class sfr_plot:
             #x = self.ss_dat(np.log10(1+z),n=50)
             #y = self.ss_dat(np.log10(sfr),n=50)
             x = self.ss_dat(np.log10(1+z),n=50)
+            y = self.ss_dat(sfr/(25/0.7)**3,n=50)
             # y = self.ss_dat(AU.PhysicalSFRD(sfr,z),n=50) #AU.PhysicalVolume(25**3.,z)
-            y = self.ss_dat(AU.PhysicalMdot(sfr)*0.7**3./25**3.,n=50)
+            # y = self.ss_dat(AU.PhysicalMdot(sfr)*0.7**3./25**3.,n=50)
             # y = self.ss_dat(sfr,n=50)
             print "y ",y
             plt.semilogy(x,y,label=self.label_list[i],color=self.color_list[i],linestyle=self.ls_list[i])
-        plt.legend(loc=3,prop={'size':5.7},ncol=2)
+        plt.legend(prop={'size':5.7},ncol=2)
         plt.xlim([0.45,1.0])
         plt.ylim([10.**-3.,1.0])
         #plt.ylabel(r' SFRD $\left[M_\odot$ yr$^{-1}$ Mpc$^{-3} \right]$')
-        plt.ylabel(r'SFRD $[$'+'M'+'$_\odot$'+' yr'+r'$^{-1}$'+' Mpc'+r'$^{-3}]$')
+        plt.ylabel(r'SFRD $[$'+'M'+'$_\odot$'+' yr'+r'$^{-1}$'+' cMpc'+r'$^{-3}]$')
         plt.xlabel(r'Log$_{10} [1+z]$')
         plt.subplots_adjust(left=0.2,bottom=0.18,top=0.85)
 
@@ -155,7 +158,7 @@ class sfr_plot:
         ax2.set_xlabel(r"$z$")
         plt.show()
 
-
+        # print "saving to {}".format(self.fig_base+"sfr_plot.pdf")
         plt.savefig(self.fig_base+"sfr_plot.pdf")
 
     def ss_dat(self,dat,n=2):
