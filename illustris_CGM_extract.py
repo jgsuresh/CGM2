@@ -27,7 +27,7 @@ class illustris_CGM_extract:
         gal_min_stellar_mass = 10.**10.
         gal_max_stellar_mass = 10.**11.6
         dat_str_list = ["Masses","Coordinates","GFM_Metals","GFM_Metallicity","Velocities","Density","Volume","InternalEnergy","ElectronAbundance","NeutralHydrogenAbundance","SmoothingLength"]
-        self.block_list = ["MASS","POS ","GMET","GZ  ","VEL ","RHO ","VOL ","U   ","NE  ","HSML"]
+        self.block_list = ["MASS","POS ","GMET","GZ  ","VEL ","RHO ","VOL ","U   ","NE  ","NH  ","HSML"]
         self.savebase = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
 
         if run == 'ill3': self.snapbase="/n/ghernquist/Illustris/Runs/Illustris-3/output/"
