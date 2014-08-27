@@ -39,28 +39,28 @@ class full_analysis:
 
 
         # Feedback paper runs:
-        # redshifts = ['3']
-        # self.dat_prep(redshifts,g0_BH=1)
-        # self.dat_prep(redshifts,c2_256=1)
-        # self.dat_prep(redshifts,c0_sw_256=1)
-        # self.dat_prep(redshifts,g50_fixv_nothermal=1)
-        # self.dat_prep(redshifts,g50_BH=1)
-        # self.dat_prep(redshifts,g50_fixv=1)
-        # self.dat_prep(redshifts,c0_nometalwinds=1)
-        # self.dat_prep(redshifts,c0_fullmetalwinds=1)
-
-        # Check runs:
         redshifts = ['2']
         self.dat_prep(redshifts,g0_BH=1)
+        self.dat_prep(redshifts,c2_256=1)
+        self.dat_prep(redshifts,c0_sw_256=1)
+        self.dat_prep(redshifts,g50_fixv_nothermal=1)
+        self.dat_prep(redshifts,g50_BH=1)
+        self.dat_prep(redshifts,g50_fixv=1)
+        self.dat_prep(redshifts,c0_nometalwinds=1)
+        self.dat_prep(redshifts,c0_fullmetalwinds=1)
+
+        # Check runs:
+        # redshifts = ['2']
+        # self.dat_prep(redshifts,g0_BH=1)
         # self.dat_prep(redshifts,c2_256=1)
         # self.dat_prep(redshifts,c0_128=1)
         # self.dat_prep(redshifts,c0_512=1)
         # self.dat_prep(redshifts,g0_BH=1)
         # self.dat_prep(redshifts,c0_check=1)
-        self.dat_prep(redshifts,c0_nometalwinds=1)
-        self.dat_prep(redshifts,c0_fullmetalwinds=1)
-        self.dat_prep(redshifts,c0_dumpfactor95=1)
-        self.dat_prep(redshifts,no_metal_cooling=1)
+        # self.dat_prep(redshifts,c0_nometalwinds=1)
+        # self.dat_prep(redshifts,c0_fullmetalwinds=1)
+        # self.dat_prep(redshifts,c0_dumpfactor95=1)
+        # self.dat_prep(redshifts,no_metal_cooling=1)
 
 
 
@@ -157,10 +157,10 @@ class full_analysis:
         ##############################
         # 2D data analysis functions #
         ##############################
-        self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_nmc_z2",show_Fumagalli=False)
-        self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_nmc_z2",show_Fumagalli=False)
-        self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_nmc_z2",show_Fumagalli=False)
-        self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_nmc_z2",show_Fumagalli=False)
+        self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_z2",show_Fumagalli=True)
+        self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_z2",show_Fumagalli=True)
+        self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_z2",show_Fumagalli=True)
+        self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_z2",show_Fumagalli=True)
         # print "2"
         # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_newfan2")
         # print "3"
@@ -449,8 +449,8 @@ class full_analysis:
                 # Calculates the median column density as a function of radius
                 [Q1,med,Q3] = AU._calc_percentiles_v2(r,Rbins_min,Rbins_max,N)
 
-                plt.plot(Rbins_min,med,color=self.color_list[i],label=self.label_list[i])
-                plt.fill_between(Rbins_med,Q1,Q3,color=self.color_list[i],alpha=0.3)
+                plt.plot(Rbins_min,med,color=self.color_list[i],label=self.label_list[i],zorder=1)
+                plt.fill_between(Rbins_med,Q1,Q3,color=self.color_list[i],alpha=0.3,zorder=2)
 
             elif coverfrac_vs_R:
                 fc = np.zeros(n_Rbins)
@@ -459,7 +459,7 @@ class full_analysis:
                     covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
                     fc[k] = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
 
-                plt.plot(Rbins_med,fc,color=self.color_list[i],label=self.label_list[i])
+                plt.plot(Rbins_med,fc,color=self.color_list[i],label=self.label_list[i],zorder=1)
                 
             elif coverfrac_within_R:
                 fc = np.zeros(n_Rbins)
@@ -468,7 +468,7 @@ class full_analysis:
                     covered = np.logical_and(N[in_Rbin]>=coldens_min,N[in_Rbin]<coldens_max)
                     fc[k] = np.float(np.sum(covered))/np.float(np.sum(in_Rbin))
 
-                plt.plot(Rbins_med,fc,color=self.color_list[i],label=self.label_list[i])
+                plt.plot(Rbins_med,fc,color=self.color_list[i],label=self.label_list[i],zorder=1)
 
 
         # Rudie et al. 2012, cumulative covering fraction for different values of N_HI for M_halo ~ 10^12
@@ -478,36 +478,36 @@ class full_analysis:
             yerr = np.array([0.09,0.1])
             xerr = np.array([8.,16.])
             plt.ylim([0.,1.6])
-            plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple')
+            plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple',zorder=9)
             if show_Fumagalli:
-                plt.scatter(np.array([90.,180.]),np.array([0.38,0.22]),marker='D',color='gray')
+                plt.scatter(np.array([90.,180.]),np.array([0.38,0.22]),marker='D',color='gray',zorder=10)
         if rudie_172:
             xdat = np.array([90.,180.])
             ydat = np.array([0.3,0.28])
             yerr = np.array([0.14,0.09])
             xerr = np.array([8.,16.])
             plt.ylim([0.,1.0])
-            plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple')
+            plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple',zorder=9)
             if show_Fumagalli:
-                plt.scatter(np.array([90.,180.]),np.array([0.16,0.07]),marker='D',color='gray')
+                plt.scatter(np.array([90.,180.]),np.array([0.16,0.07]),marker='D',color='gray',zorder=10)
         elif rudie_19:
             xdat = np.array([90.,180.])
             ydat = np.array([0.1,0.08])
             yerr = np.array([0.09,0.05])
             xerr = np.array([8.,16.])
             plt.ylim([0.,0.4])
-            plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple')
+            plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple',zorder=9)
             if show_Fumagalli:
-                plt.scatter(np.array([90.,180.]),np.array([0.06,0.03]),marker='D',color='gray')
+                plt.scatter(np.array([90.,180.]),np.array([0.06,0.03]),marker='D',color='gray',zorder=10)
         elif rudie_203:
             xdat = np.array([90.,180.])
             ydat = np.array([0.,0.04])
             yerr = np.array([0.1,0.04])
             xerr = np.array([8.,16.])
             plt.ylim([0.,0.4])
-            plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple')
+            plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple',zorder=9)
             if show_Fumagalli:
-                plt.scatter(np.array([90.,180.]),np.array([0.03,0.01]),marker='D',color='gray')
+                plt.scatter(np.array([90.,180.]),np.array([0.03,0.01]),marker='D',color='gray',zorder=10)
 
 
             
