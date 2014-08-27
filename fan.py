@@ -39,28 +39,28 @@ class full_analysis:
 
 
         # Feedback paper runs:
-        redshifts = ['2']
-        self.dat_prep(redshifts,g0_BH=1)
-        self.dat_prep(redshifts,c2_256=1)
-        self.dat_prep(redshifts,c0_sw_256=1)
-        self.dat_prep(redshifts,g50_fixv_nothermal=1)
-        self.dat_prep(redshifts,g50_BH=1)
-        self.dat_prep(redshifts,g50_fixv=1)
-        self.dat_prep(redshifts,c0_nometalwinds=1)
-        self.dat_prep(redshifts,c0_fullmetalwinds=1)
-
+        # redshifts = ['3']
+        # self.dat_prep(redshifts,g0_BH=1)
+        # self.dat_prep(redshifts,c2_256=1)
+        # self.dat_prep(redshifts,c0_sw_256=1)
+        # self.dat_prep(redshifts,g50_fixv_nothermal=1)
+        # self.dat_prep(redshifts,g50_BH=1)
+        # self.dat_prep(redshifts,g50_fixv=1)
+        # self.dat_prep(redshifts,c0_nometalwinds=1)
+        # self.dat_prep(redshifts,c0_fullmetalwinds=1)
 
         # Check runs:
-        # redshifts = ['2']
-        # self.dat_prep(redshifts,g0_BH=1)
+        redshifts = ['2']
+        self.dat_prep(redshifts,g0_BH=1)
         # self.dat_prep(redshifts,c2_256=1)
         # self.dat_prep(redshifts,c0_128=1)
         # self.dat_prep(redshifts,c0_512=1)
         # self.dat_prep(redshifts,g0_BH=1)
         # self.dat_prep(redshifts,c0_check=1)
-        # self.dat_prep(redshifts,c0_nometalwinds=1)
-        # self.dat_prep(redshifts,c0_fullmetalwinds=1)
-        # self.dat_prep(redshifts,c0_dumpfactor95=1)
+        self.dat_prep(redshifts,c0_nometalwinds=1)
+        self.dat_prep(redshifts,c0_fullmetalwinds=1)
+        self.dat_prep(redshifts,c0_dumpfactor95=1)
+        self.dat_prep(redshifts,no_metal_cooling=1)
 
 
 
@@ -151,16 +151,16 @@ class full_analysis:
         # self.phase_budget('m',savename='m_budget_lowmetal',minimal=False)
         # self.phase_budget('z',savename='z_budget_lowmetal',minimal=False)
         # self.CGM_and_gal_metallicity(savename="massmet_newfan")
-        self.radial_profile('T')
+        # self.radial_profile('T')
         # self.radial_profile('z')
 
         ##############################
         # 2D data analysis functions #
         ##############################
-        # self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_test",show_Fumagalli=True)
-        # self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_z2",show_Fumagalli=True)
-        # self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_z2",show_Fumagalli=True)
-        # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_z2",show_Fumagalli=True)
+        self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_nmc_z2",show_Fumagalli=False)
+        self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_nmc_z2",show_Fumagalli=False)
+        self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_nmc_z2",show_Fumagalli=False)
+        self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_nmc_z2",show_Fumagalli=False)
         # print "2"
         # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_newfan2")
         # print "3"
@@ -428,6 +428,7 @@ class full_analysis:
             for j in np.arange(np.size(grp_ids)):
                 grp_id = grp_ids[j]
                 grp_data = self.load_grid_data(i,grp_id)
+                # print list(grp_data.keys())
                 grid = grp_data[species]
                 grid_rad = grp_data['grid_radius_pkpc']
                 ngrid = grp_data['ngrid']
@@ -602,7 +603,7 @@ class full_analysis:
     # self.get_gal_props
 
 
-    def dat_prep(self,redshifts,c0_256=0,c0_512=0,c3_512=0,c4_512=0,c4_check=0,c2_256=0,c0_fw_256=0,c0_sw_256=0,c5_256=0,g0_BH=0,g10_BH=0,g20_BH=0,g25_BH=0,g30_BH=0,g40_BH=0,g25_noBH=0,g50_BH=0,g75_BH=0,g75_noBH=0,g95_BH=0,g95_noBH=0,g10_noBH=0,g20_noBH=0,g30_noBH=0,g40_noBH=0,g50_noBH=0,g10_nothermal=0,g20_nothermal=0,g30_nothermal=0,g40_nothermal=0,g50_nothermal=0,g25_fixv=0,g50_fixv=0,g25_fixv_nothermal=0,g50_fixv_nothermal=0,g25_fixv_fixeta=0,g50_fixv_fixeta=0,c0_nometalwinds=0,c0_fullmetalwinds=0):
+    def dat_prep(self,redshifts,c0_256=0,c0_512=0,c3_512=0,c4_512=0,c4_check=0,c2_256=0,c0_fw_256=0,c0_sw_256=0,c5_256=0,g0_BH=0,g10_BH=0,g20_BH=0,g25_BH=0,g30_BH=0,g40_BH=0,g25_noBH=0,g50_BH=0,g75_BH=0,g75_noBH=0,g95_BH=0,g95_noBH=0,g10_noBH=0,g20_noBH=0,g30_noBH=0,g40_noBH=0,g50_noBH=0,g10_nothermal=0,g20_nothermal=0,g30_nothermal=0,g40_nothermal=0,g50_nothermal=0,g25_fixv=0,g50_fixv=0,g25_fixv_nothermal=0,g50_fixv_nothermal=0,g25_fixv_fixeta=0,g50_fixv_fixeta=0,c0_nometalwinds=0,c0_fullmetalwinds=0,c0_dumpfactor95=0,no_metal_cooling=0):
         mv_snapbase = "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/" 
         sb_snapbase = "/n/hernquistfs1/spb/Cosmo/"
         js_snapbase = "/n/home04/jsuresh/runs/Cosmo5_V6/output"
@@ -1272,6 +1273,44 @@ class full_analysis:
                     self.snapnum_list.append(4)
                 elif redshift == '2':
                     self.label_list.append("Fully Enriched Winds")
+                    self.snapnum_list.append(5)
+
+        if c0_dumpfactor95:
+            for redshift in redshifts:
+                self.run_list.append("c0_dumpfactor95")
+                self.color_list.append("green")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append(gam_snapbase+"c0_dumpfactor95/output/")
+                if redshift == '4':
+                    self.label_list.append("95\% Dump Factor")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("95\% Dump Factor")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("95\% Dump Factor")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("95\% Dump Factor")
+                    self.snapnum_list.append(5)
+
+        if no_metal_cooling:
+            for redshift in redshifts:
+                self.run_list.append("no_metal_cooling")
+                self.color_list.append("indigo")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append(gam_snapbase+"no_metal_cooling/output/")
+                if redshift == '4':
+                    self.label_list.append("No Metal Cooling")
+                    self.snapnum_list.append(1)
+                elif redshift == '3':
+                    self.label_list.append("No Metal Cooling")
+                    self.snapnum_list.append(3)
+                elif redshift == '2.5':
+                    self.label_list.append("No Metal Cooling")
+                    self.snapnum_list.append(4)
+                elif redshift == '2':
+                    self.label_list.append("No Metal Cooling")
                     self.snapnum_list.append(5)
 
         self.ndat = len(self.run_list)

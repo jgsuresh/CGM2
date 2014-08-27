@@ -26,19 +26,19 @@ class grid_mass:
 
     def __init__(self):
         # self.run_list = ['']
-        self.run = 'c0_fullmetalwinds'
+        self.run = 'no_metal_cooling'
         self.base = "/n/hernquistfs1/jsuresh/Runs/{}/output/".format(self.run)
         self.res=256
         # self.snapnum_arr = np.array([60])
         #self.snapnum_arr = np.array([54,60,68,85,114,135])
-        self.snapnum_arr = np.array([3])
-        self.group_min_mass = 10.**11.7 #11 CAREFUL
+        self.snapnum_arr = np.array([5])
+        self.group_min_mass = 10.**11.8 #11 CAREFUL
         self.grid_radius_pkpc = 200
-        self.elem_list = ["O"]
-        self.ion_list = [6]
+        self.elem_list = ["H"]
+        self.ion_list = [1]
         self.cloudy_type = "ion_out_fancy_atten"
-        self.loadbase = './data/CGM_snaps/'
-        self.savebase = './data/grids/'
+        self.loadbase = '/n/home04/jsuresh/CGM_new/data/CGM_snaps/'
+        self.savebase = '/n/home04/jsuresh/CGM_new/data/grids/'
 
         if self.run == "c0_128":
             self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6/L25n128/output/"

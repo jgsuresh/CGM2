@@ -13,19 +13,19 @@ AU = AREPO_units()
 
 
 def main(run=None,base=None):
-    # run = "c0_sw_256"
-    run = "c0_fullmetalwinds"
+    # run = "ill1"
+    run = "no_metal_cooling"
     base="/n/hernquistfs1/jsuresh/Runs/{}/output/".format(run)
     fnummax=8
     #snapnum_arr = np.array([54,60,68,85,114,135])
     #snapnum_arr = np.array([1,3,5,7])
-    snapnum_arr = np.array([3])
+    snapnum_arr = np.array([5])
     # snapnum_arr = np.array([60])
     group_min_mass = 10.**11.8 #10.**12.2
     group_max_mass = 10.**12.2
     #dat_str_list = ["Masses","Coordinates","GFM_Metals","GFM_Metallicity","Velocities","Density","Volume","InternalEnergy","ElectronAbundance","Radius","NeutralHydrogenAbundance"]
     dat_str_list = ["Masses","Coordinates","GFM_Metals","GFM_Metallicity","Velocities","Density","Volume","InternalEnergy","ElectronAbundance","NeutralHydrogenAbundance","SmoothingLength"]
-    savebase = './data/CGM_snaps/'
+    savebase = '/n/home04/jsuresh/CGM_new/data/CGM_snaps/'
 
 
     if run == "gam_25_BH":

@@ -36,14 +36,18 @@ class illustris_CGM_extract:
 
         self.setup_tables(verbose=verbose)
 
-        # grnr_arr = self.get_grnr_array(gal_min_stellar_mass,gal_max_stellar_mass)
-        grnr_arr = np.array([79])
+        grnr_arr = self.get_grnr_array(gal_min_stellar_mass,gal_max_stellar_mass)
+        # grnr_arr = np.array([79])
 
         for grnr in grnr_arr:
             ts = time.time()
-            data_dict = self.read_data(grnr,verbose=verbose)
-            self.save_data(grnr,data_dict,verbose=verbose)
-            print "Time for group {}: {}".format(grnr,time.time()-ts)
+            filepath = self.savebase+"s{}/{}.hdf5".format(self.snapnum,str(int(grnr)).zfill(5))
+            if os.path.isfile(filepath):
+                print "File {} already exists!  Skipping...".format(filepath)
+            else:
+                data_dict = self.read_data(grnr,verbose=verbose)
+                self.save_data(grnr,data_dict,verbose=verbose)
+                print "Time for group {}: {}".format(grnr,time.time()-ts)
 
 
 
