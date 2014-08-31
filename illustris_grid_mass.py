@@ -19,71 +19,25 @@ AU = AREPO_units()
 
 from mpi4py import MPI
 import os.path
-import readsubfHDF5
+# import readsubfHDF5
+
+import glob
 
 
 class grid_mass:
 
     def __init__(self):
-        # self.run_list = ['']
-        self.run = 'no_metal_cooling'
-        self.base = "/n/hernquistfs1/jsuresh/Runs/{}/output/".format(self.run)
-        self.res=256
-        # self.snapnum_arr = np.array([60])
-        #self.snapnum_arr = np.array([54,60,68,85,114,135])
-        self.snapnum_arr = np.array([5])
-        self.group_min_mass = 10.**11.8 #11 CAREFUL
+        self.base = "/n/ghernquist/Illustris/Runs/Illustris-1/output/"
+        self.res=1820
+        self.snapnum_arr = np.array([120])
+        # self.redshift = 0.19728
         self.grid_radius_pkpc = 200
-        self.elem_list = ["H"]
-        self.ion_list = [1]
+        self.elem_list = ["H","Mg","Si","O"]
+        self.ion_list = [1,2,3,6]
         self.cloudy_type = "ion_out_fancy_atten"
-        self.loadbase = '/n/home04/jsuresh/CGM_new/data/CGM_snaps/'
-        self.savebase = '/n/home04/jsuresh/CGM_new/data/grids/'
+        self.loadbase = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
+        self.savebase = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
 
-        if self.run == "c0_128":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6/L25n128/output/"
-            self.res=128
-            #boxsize = 25000
-        elif self.run == "c0_256":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6/L25n256/output/"
-            self.res=256
-            #boxsize = 25000
-        elif self.run == "c0_512":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6/L25n512/output/"
-            self.res=512
-            #boxsize = 75000
-        elif self.run == "c0_fw_256":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6_fastWinds/L25n256/output/"
-            self.res=256
-        elif self.run == "c0_sw_256":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6_strongWinds/L25n256/output/"
-            self.res=256
-        elif self.run == "c2_256":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo2_V6/L25n256/output/"
-            self.res=256
-        elif self.run == "c4_512":
-            self.base="/n/hernquistfs1/spb/Cosmo/Cosmo4_V6/L25n512/output/"
-            self.res=512
-            #boxsize = 75000
-        elif self.run == "c5_256":
-            self.base="/n/home04/jsuresh/runs/Cosmo5_V6/output/"
-            self.res=256
-        elif self.run == "c3_512":
-            self.base="/n/hernquistfs1/spb/Cosmo/Cosmo3_V6/L25n512/output/"
-            self.res=512
-            #boxsize = 75000
-        if self.run == 'ill3':
-            self.base="/n/ghernquist/Illustris/Runs/Illustris-3/output/"
-            self.res=455
-            #boxsize = 75000
-        elif self.run == 'ill2':
-            self.base="/n/ghernquist/Illustris/Runs/Illustris-2/output/"
-            self.res=910
-            #boxsize = 75000
-        elif self.run == 'ill1':
-            self.base="/n/ghernquist/Illustris/Runs/Illustris-1/output/"
-            self.res=1820
-            #boxsize = 75000
 
         # Here's where the magic happens
         comm = MPI.COMM_WORLD
@@ -96,7 +50,7 @@ class grid_mass:
         for snapnum in self.snapnum_arr:
             if rank == 0:
                 # Create necessary folder if it does not exist:
-                grid_dir = self.savebase+"{}/s{}/".format(self.run,snapnum)
+                grid_dir = self.savebase+"s{}/".format(snapnum)
                 if not os.path.isdir(grid_dir):
                     print "Trying to create {}".format(grid_dir)
                     os.mkdir(grid_dir)
@@ -112,24 +66,32 @@ class grid_mass:
                 print "redshift: ", self.redshift
                 f.close()
 
+                self.grp_ids = np.zeros(0)
+                self.grp_mass = np.zeros(0)
+                self.grp_pos = np.zeros([0,3])
+                self.grp_Rvir = np.zeros(0)
+                for fn in glob.glob(self.loadbase+"s{}/*.hdf5".format(snapnum)):
+                    print "fn ",fn
+                    f = h5py.File(fn,'r')
+                    grp_id = f['Header'].attrs['grp_id']
+                    m = AU.PhysicalMass(f['Header'].attrs['grp_mass'])
+                    x = f['Header'].attrs['grp_pos']
+                    R = f['Header'].attrs['grp_Rvir']
+                    f.close()
 
-                cat=readsubfHDF5.subfind_catalog(self.base,snapnum,subcat=False)
-                #cat=readsubfHDF5.subfind_catalog(base,135,keysel=["GroupMass","GroupPos","Group_R_Crit200"])
+                    x = np.array([x])
+                    self.grp_ids = np.append(self.grp_ids,grp_id)
+                    self.grp_mass = np.append(self.grp_mass,m)
+                    self.grp_pos = np.append(self.grp_pos,x,axis=0)
+                    self.grp_Rvir = np.append(self.grp_Rvir,R)
 
-                # Select by minimum group mass threshold:
-                self.grp_mass = np.array(cat.Group_M_Crit200) #check what hubble is
-                self.m = AU.PhysicalMass(self.grp_mass)
-                mass_select = (self.m > self.group_min_mass)
-
-                self.grp_mass = self.grp_mass[mass_select]
-                self.grp_ids = np.arange(np.float64(cat.ngroups))
-                self.grp_ids = self.grp_ids[mass_select]
-                self.grp_pos = np.array(cat.GroupPos)[mass_select]
-                self.grp_Rvir = np.array(cat.Group_R_Crit200)[mass_select]
-                #grp_BHmass = np.array(cat.GroupBHMass)[mass_select]
-                #grp_BHMdot = np.array(cat.GroupBHMdot)[mass_select]
+                foo = np.argsort(self.grp_ids)
+                self.grp_ids = self.grp_ids[foo]
+                self.grp_mass = self.grp_mass[foo]
+                self.grp_pos = self.grp_pos[foo]
+                self.grp_Rvir = self.grp_Rvir[foo]
                 self.n_selected_groups = np.float32(np.size(self.grp_mass))
-                del cat
+
             else:
                 self.redshift = None
                 self.hubble = None
@@ -137,7 +99,6 @@ class grid_mass:
                 self.omegam = None
                 self.omegal = None
                 self.grp_mass = None
-                self.m = None
                 self.grp_ids = None
                 self.grp_pos = None
                 self.grp_Rvir = None
@@ -151,7 +112,6 @@ class grid_mass:
             self.omegal = comm.bcast(self.omegal,root=0)
             self.grp_mass = comm.bcast(self.grp_mass,root=0)
             self.grp_pos = comm.bcast(self.grp_pos,root=0)
-            self.m = comm.bcast(self.m,root=0)
             self.grp_ids = comm.bcast(self.grp_ids,root=0)
             self.grp_pos = comm.bcast(self.grp_pos,root=0)
             self.grp_Rvir = comm.bcast(self.grp_Rvir,root=0)
@@ -175,8 +135,8 @@ class grid_mass:
                     self.grid = np.zeros([self.n_species,self.ngrid,self.ngrid])
                     #grid = np.zeros([ngrid,ngrid])
 
-                    CGMsnap_file_path = self.loadbase+ "{}/s{}/{}.hdf5".format(self.run,snapnum,str(int(grp_id)).zfill(5))
-                    outputpath = self.savebase+ "{}/s{}/".format(self.run,snapnum)
+                    CGMsnap_file_path = self.loadbase+ "s{}/{}.hdf5".format(snapnum,str(int(grp_id)).zfill(5))
+                    outputpath = self.savebase+ "s{}/".format(snapnum)
                     savename = outputpath+str(int(grp_id)).zfill(5)+'.hdf5'
 
                     if not os.path.isfile(CGMsnap_file_path):
@@ -226,22 +186,32 @@ class grid_mass:
 
 
 
-    def load_CGM_file(self,CGMsnap_file_path,i,use_block_name=False):
+    def load_CGM_file(self,CGMsnap_file_path,i,use_block_name=True):
         f=h5py.File(CGMsnap_file_path,'r')
         bar = f['PartType0']
 
-        #print list(bar)
-        #dat_str_list = ["Masses","Coordinates","GFM_Metals","GFM_Metallicity","Velocities","Density","Volume","InternalEnergy","ElectronAbundance","Radius"]
-        m = np.array(bar["Masses"])
-        pos = np.array(bar["Coordinates"])
-        metals = np.array(bar["GFM_Metals"])
-        rho = np.array(bar["Density"])
-        # hsml = np.array(bar["SmoothingLength"])
-        u = np.array(bar["InternalEnergy"])
-        nelec = np.array(bar["ElectronAbundance"])
-        neut_frac = np.array(bar["NeutralHydrogenAbundance"])
+        # dat_str_list = ["Masses","Coordinates","GFM_Metals","GFM_Metallicity","Velocities","Density","Volume","InternalEnergy","ElectronAbundance","NeutralHydrogenAbundance","SmoothingLength"]
+        # self.block_list = ["MASS","POS ","GMET","GZ  ","VEL ","RHO ","VOL ","U   ","NE  ","NH  ","HSML"]
+        if use_block_name:
+            m = np.array(bar["MASS"])
+            pos = np.array(bar["POS "])
+            metals = np.array(bar["GMET"])
+            rho = np.array(bar["RHO "])
+            u = np.array(bar["U   "])
+            nelec = np.array(bar["NE  "])
+            neut_frac = np.array(bar["NH  "])
+            vol = np.array(bar["VOL "])
+        else:
+            m = np.array(bar["Masses"])
+            pos = np.array(bar["Coordinates"])
+            metals = np.array(bar["GFM_Metals"])
+            rho = np.array(bar["Density"])
+            # hsml = np.array(bar["SmoothingLength"])
+            u = np.array(bar["InternalEnergy"])
+            nelec = np.array(bar["ElectronAbundance"])
+            neut_frac = np.array(bar["NeutralHydrogenAbundance"])
+            vol = np.array(bar["Volume"])
 
-        vol = np.array(bar["Volume"])
         hsml = (3.*vol/4./np.pi)**(0.33333333)
         del vol
         T = AU.GetTemp(u, nelec, gamma = 5.0/3.0)
