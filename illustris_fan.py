@@ -35,7 +35,9 @@ class illustris_fan:
         # self.plot_grids("H1",vmax=25.)
         # self.plot_grids("SiIII",vmax=16.)
         # self.plot_grids("O6",vmax=16.)
-        self.galprop_vs_CGMprop('sm','CGM_ISM_metal_ratio')
+        # self.galprop_vs_CGMprop('sm','CGM_ISM_metal_ratio')
+        # self.gal_mass_vs_Rvir()
+        self.coldens_plot('O6',kpc_mode=True)
 
 
     def gal_mass_vs_sSFR(self,include_COS=True,savename=None):
@@ -62,6 +64,30 @@ class illustris_fan:
         else:
             plt.savefig(self.fig_base+"sm_vs_ssfr.pdf", bbox_inches='tight')
 
+
+    def gal_mass_vs_Rvir(self,savename=None):
+        plt.figure()
+
+        self.load_CGMsnap_ids()
+        print "about to get cat "
+        cat = readsubfHDF5.subfind_catalog('/n/ghernquist/Illustris/Runs/Illustris-1/',self.snapnum,keysel=['Group_R_Crit200','GroupFirstSub'],subcat=False)
+        print "got cat"
+
+        self.sub_ids = cat.GroupFirstSub[np.int32(self.grp_ids)]
+        galf = h5py.File(self.snapbase+"/postprocessing/galprop/galprop_{}.hdf5".format(self.snapnum),'r')
+        gal_sm = AU.PhysicalMass(np.array(galf['stellar_totmass']))
+        x = gal_sm[self.sub_ids]
+
+        Rvir = AU.PhysicalPosition(cat.Group_R_Crit200[np.int32(self.grp_ids)],0.19728)
+        plt.scatter(np.log10(x),Rvir,marker='.',s=10,alpha=0.3,zorder=1)
+        # plt.vline(150.)
+
+        # ax.set_xscale('log')
+        # ax.set_yscale('log')
+        if savename != None: 
+            plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
+        else:
+            plt.savefig(self.fig_base+"sm_vs_Rvir.pdf", bbox_inches='tight')
 
     def galprop_vs_CGMprop(self,galprop,CGMprop,savename=None):
         # galprops: stellar mass, SFR, environment
@@ -219,6 +245,55 @@ class illustris_fan:
                 self.snapnum
 
 
+
+    def coldens_plot(self,species,kpc_mode=False,Rvir_mode=False):
+        # Load all grid files.
+        # Calculate radii for each one.
+        # hexbin the full radius vs column density spread, by kpc or Rvir.
+
+    
+        f_npz = self.npz_base + "allgridcells_{}.npz".format(species)
+        if os.path.isfile(f_npz):
+            dat = np.load(f_npz)
+            print list(dat)
+            N = dat['N']
+            r_kpc = dat['r_kpc']
+            r_Rvir = dat['r_Rvir']
+        else:
+            i = 0
+            N = np.zeros(0)
+            r = np.zeros(0)
+            for fn in glob.glob(self.grid_base+"s{}/*.hdf5".format(self.snapnum)):
+                print "fn ",fn
+                print "i ",i
+                f = h5py.File(fn,'r')
+                grp_id = f['Header'].attrs['grp_id']
+                grp_Rvir = f['Header'].attrs['grp_Rvir']
+                grid = f['grids'][species]
+                grid_rad = f['Header'].attrs['grid_radius_pkpc']
+                ngrid = f['Header'].attrs['ngrid']
+                grid = np.array(f['grids'][species])
+                f.close()
+
+                [gridx,gridy] = np.meshgrid(np.arange(ngrid),np.arange(ngrid))
+                grid_cent = (ngrid-1)/2. #assume square grid: grid_centx = grid_centy = grid_cent
+                r_grid = np.sqrt((gridx-grid_cent)**2+(gridy-grid_cent)**2)
+                r_kpc = self._grid_to_kpc(r_grid,ngrid,grid_rad)
+                r_Rvir = r_kpc/AU.PhysicalPosition(grp_Rvir,0.19728)
+                if Rvir_mode:
+                    r = np.append(r,r_Rvir)
+                elif kpc_mode:
+                    r = np.append(r,r_kpc)
+                N = np.append(N,grid)
+                i+=1
+
+            np.savez(f_npz,N=N,r_kpc=r_kpc,r_Rvir=r_Rvir)
+
+
+        plt.hexbin(r_kpc,N,cmap=plt.cm.cubehelix,mincnt=1)
+        plt.savefig("OVI_coldens_test.pdf")
+
+
     def plot_grids(self,species,vmin=10.,vmax=25.):
 
         for fn in glob.glob(self.grid_base+"s{}/*.hdf5".format(self.snapnum)):
@@ -292,6 +367,9 @@ class illustris_fan:
         SF = rho/m_typ > 0.13
         return SF
 
+    def _grid_to_kpc(self,grid_dist,ngrid,grid_radius):
+        kpc_dist = grid_dist * (2*grid_radius)/ngrid
+        return kpc_dist
 
 if __name__ == '__main__':
     illustris_fan()
