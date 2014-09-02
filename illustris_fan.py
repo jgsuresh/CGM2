@@ -27,17 +27,23 @@ class illustris_fan:
 
         self.snapnum = 120
 
-        #read in catalog
+        #read in catalog + galprop file
+        # self.cat = readsubfHDF5.subfind_catalog('/n/ghernquist/Illustris/Runs/Illustris-1/',self.snapnum,keysel=['GroupFirstSub'],subcat=False)
+        self.galf = h5py.File(self.snapbase+"/postprocessing/galprop/galprop_{}.hdf5".format(self.snapnum),'r')
+
         # self.cat = readsubfHDF5.subfind_catalog(self.snapbase, self.snapnum, long_ids=True, double_output=True, keysel=["GroupFirstSub","SubhaloGrNr"])
         # self.load_gal_props()
         # self.gal_mass_vs_sSFR()
 
         # self.plot_grids("H1",vmax=25.)
-        # self.plot_grids("SiIII",vmax=16.)
+        # self.plot_grids("Si3",vmax=18.)
         # self.plot_grids("O6",vmax=16.)
         # self.galprop_vs_CGMprop('sm','CGM_ISM_metal_ratio')
         # self.gal_mass_vs_Rvir()
-        self.coldens_plot('O6',kpc_mode=True)
+        # self.coldens_plot('Si3',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.)
+        self.mass_metal_budget()
+
+        self.galf.close()
 
 
     def gal_mass_vs_sSFR(self,include_COS=True,savename=None):
@@ -70,7 +76,7 @@ class illustris_fan:
 
         self.load_CGMsnap_ids()
         print "about to get cat "
-        cat = readsubfHDF5.subfind_catalog('/n/ghernquist/Illustris/Runs/Illustris-1/',self.snapnum,keysel=['Group_R_Crit200','GroupFirstSub'],subcat=False)
+        cat = readsubfHDF5.subfind_catalog('/n/ghernquist/Illustris/Runs/Illustris-1/',self.snapnum,keysel=['Group_M_Crit200','Group_R_Crit200','GroupFirstSub'],subcat=False)
         print "got cat"
 
         self.sub_ids = cat.GroupFirstSub[np.int32(self.grp_ids)]
@@ -78,8 +84,9 @@ class illustris_fan:
         gal_sm = AU.PhysicalMass(np.array(galf['stellar_totmass']))
         x = gal_sm[self.sub_ids]
 
-        Rvir = AU.PhysicalPosition(cat.Group_R_Crit200[np.int32(self.grp_ids)],0.19728)
-        plt.scatter(np.log10(x),Rvir,marker='.',s=10,alpha=0.3,zorder=1)
+        Rvir = AU.PhysicalPosition(cat.Group_M_Crit200[np.int32(self.grp_ids)],0.19728)
+        # plt.scatter(np.log10(x),Rvir,marker='.',s=10,alpha=0.3,zorder=1)
+        plt.scatter(np.log10(x),np.log10(AU.PhysicalMass(cat.Group_M_Crit200[np.int32(self.grp_ids)])),marker='.',s=10,alpha=0.3,zorder=1)
         # plt.vline(150.)
 
         # ax.set_xscale('log')
@@ -87,7 +94,203 @@ class illustris_fan:
         if savename != None: 
             plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
         else:
-            plt.savefig(self.fig_base+"sm_vs_Rvir.pdf", bbox_inches='tight')
+            plt.savefig(self.fig_base+"sm_vs_halomass.pdf", bbox_inches='tight')
+
+
+
+
+    def mass_metal_budget(self,savename=None):
+
+        f_npz = self.npz_base + "{}.npz".format("mass_met_budget_150kpc")
+        if os.path.isfile(f_npz):
+            f_npz = np.load(f_npz)
+            m_grp = f_npz['m_grp']
+            m_winds = f_npz['m_winds']
+            mz_winds = f_npz['mz_winds']
+            m_stars = f_npz['m_stars']
+            mz_stars = f_npz['mz_stars']
+            m_ISM = f_npz['m_ISM']
+            mz_ISM = f_npz['mz_ISM']
+            m_CGM = f_npz['m_CGM']
+            mz_CGM = f_npz['mz_CGM']
+            m_cool_CGM = f_npz['m_cool_CGM']
+            mz_cool_CGM = f_npz['mz_cool_CGM']
+            m_warm_CGM = f_npz['m_warm_CGM']
+            mz_warm_CGM = f_npz['mz_warm_CGM']
+            m_hot_CGM = f_npz['m_hot_CGM']
+            mz_hot_CGM = f_npz['mz_hot_CGM']
+        else:
+            # Get CGMsnap group ids, and main subhalo ids:
+            self.load_CGMsnap_ids()
+            cat = readsubfHDF5.subfind_catalog('/n/ghernquist/Illustris/Runs/Illustris-1/',self.snapnum,keysel=['GroupPos','GroupFirstSub','Group_M_Crit200','SubhaloStarMetallicity'])
+            self.sub_ids = np.int32(cat.GroupFirstSub[np.int32(self.grp_ids)])
+
+            
+            # # check Wind/Stars mass ratio
+            # gal_wm = AU.PhysicalMass(np.array(self.galf['wind_totmass']))
+            # gal_sm = AU.PhysicalMass(np.array(self.galf['stellar_totmass']))
+            # print "gal_wm/gal_sm ",gal_wm/gal_sm 
+            # # i = gal_sm > 0
+            # f = np.log10(gal_wm[self.sub_ids]/gal_sm[self.sub_ids])
+            # f = f[f==f]
+            # print "np.median(np.log10(gal_wm/gal_sm)) ",np.median(f)
+
+            # Group:
+            m_grp = AU.PhysicalMass(cat.Group_M_Crit200[np.int32(self.grp_ids)])
+
+            # Winds:
+            m_winds = AU.PhysicalMass(np.array(self.galf['wind_totmass'])[self.sub_ids])
+            mz_winds = 0.4*cat.SubhaloStarMetallicity[self.sub_ids]*m_winds # VERY ROUGH ESTIMATE!
+
+            # Stars:
+            m_stars = AU.PhysicalMass(np.array(self.galf['stellar_totmass'])[self.sub_ids])
+            mz_stars = cat.SubhaloStarMetallicity[self.sub_ids]*m_stars
+
+            # ISM and CGM
+            def load_CGM_snap(fn,load='all'):
+                data_dict = {}
+                f = h5py.File(fn,'r')
+                if load=='all':
+                    for key in f['Header'].attrs:
+                        data_dict[key] = f['Header'].attrs[key]
+                    for key in f['PartType0']:
+                        data_dict[key] = np.copy(f['PartType0'][key])
+                else:
+                    data_dict[key] = f['Header'].attrs[key]
+                return data_dict
+
+            i = 0
+            m_ISM = np.zeros(0) # from CGM_snap, with radial cut for 150 kpc
+            mz_ISM = np.zeros(0) # from CGM_snap, with radial cut for 150 kpc
+            m_CGM = np.zeros(0) # from CGM_snap, with radial cut for 150 kpc
+            mz_CGM = np.zeros(0) # from CGM_snap, with radial cut for 150 kpc
+            m_cool_CGM = np.zeros(0) # from CGM_snap, with radial cut for 150 kpc and T < 10^5 K.
+            mz_cool_CGM = np.zeros(0) # from CGM_snap, with radial cut for 150 kpc and T < 10^5 K.
+            m_warm_CGM = np.zeros(0) # from CGM_snap, with radial cut for 150 kpc and 10^5 K < T < 10^6 K.
+            mz_warm_CGM = np.zeros(0) # from CGM_snap, with radial cut for 150 kpc and 10^5 K < T < 10^6 K.
+            m_hot_CGM = np.zeros(0) # from CGM_snap, with radial cut for 150 kpc and T > 10^6 K.
+            mz_hot_CGM = np.zeros(0) # from CGM_snap, with radial cut for 150 kpc and T > 10^6 K.
+
+            # for fn in glob.glob(self.CGMsnap_base+"s{}/*.hdf5".format(self.snapnum)):
+            # self.grp_ids = self.grp_ids[:25]
+            for grp_id in self.grp_ids:
+                fn = self.CGMsnap_base+"s{}/{}.hdf5".format(self.snapnum,str(int(grp_id)).zfill(5))
+                print "fn ",fn
+                print "i ",i
+                data_dict = load_CGM_snap(fn)
+                rho = AU.PhysicalDensity(np.array(data_dict["RHO "]),0.19728)
+                x = np.array(data_dict["POS "])
+
+                grp_pos = cat.GroupPos[grp_id]
+                x_cent = self._fix_pos(grp_pos,x,boxsize=75000.)
+                r = AU._dist(x_cent,np.array([0.,0.,0.]))
+                r = AU.PhysicalPosition(r,0.19728)
+
+                r_cut = r <= 150.
+                rho = rho[r_cut]
+                mass = AU.PhysicalMass(np.array(data_dict["MASS"]))[r_cut]
+                z = np.array(data_dict["GZ  "])[r_cut]
+                u = np.array(data_dict["U   "])[r_cut]
+                Nelec = np.array(data_dict["NE  "])[r_cut]
+                T = AU.GetTemp(u, Nelec, 5.0/3.0)
+
+                in_ISM = self._find_ISM_gas(rho)
+                in_CGM = np.logical_not(in_ISM)
+                
+                m_ISM = np.append(m_ISM,np.sum(mass[in_ISM]))
+                mz_ISM = np.append(mz_ISM,np.sum(z[in_ISM]*mass[in_ISM]))
+                m_CGM = np.append(m_CGM,np.sum(mass[in_CGM]))
+                mz_CGM = np.append(mz_CGM,np.sum(z[in_CGM]*mass[in_CGM]))
+                cool_CGM = np.logical_and(in_CGM,T <= 10.**5.)
+                m_cool_CGM = np.append(m_cool_CGM,np.sum(mass[cool_CGM]))
+                mz_cool_CGM = np.append(mz_cool_CGM,np.sum(z[cool_CGM]*mass[cool_CGM]))
+                warm_CGM = np.logical_and(in_CGM,np.logical_and(T > 10.**5.,T <= 10.**6.))
+                m_warm_CGM = np.append(m_warm_CGM,np.sum(mass[warm_CGM]))
+                mz_warm_CGM = np.append(mz_warm_CGM,np.sum(z[warm_CGM]*mass[warm_CGM]))
+                hot_CGM = np.logical_and(in_CGM,T > 10.**6.)
+                m_hot_CGM = np.append(m_hot_CGM,np.sum(mass[hot_CGM]))
+                mz_hot_CGM = np.append(mz_hot_CGM,np.sum(z[hot_CGM]*mass[hot_CGM]))
+
+                i += 1
+
+            np.savez(f_npz, m_grp=m_grp,m_winds=m_winds,mz_winds=mz_winds,m_stars=m_stars,mz_stars=mz_stars,\
+                m_ISM=m_ISM,mz_ISM=mz_ISM,m_CGM=m_CGM,mz_CGM=mz_CGM,m_cool_CGM=m_cool_CGM,mz_cool_CGM=mz_cool_CGM,\
+                m_warm_CGM=m_warm_CGM,mz_warm_CGM=mz_warm_CGM,m_hot_CGM=m_hot_CGM,mz_hot_CGM=mz_hot_CGM)
+
+
+        if True:
+            # Bin by stellar mass
+            n_mbins = 50
+            # [mbins_min,mbins_max] = AU._bin_setup(10.**10.,10.**11.5,n_mbins,logbins=True)
+            [mbins_min,mbins_max] = AU._bin_setup(10.,11.5,n_mbins)
+            mbins_min = 10.**mbins_min
+            mbins_max = 10.**mbins_max
+
+            print "mbins_min ",mbins_min
+
+            [m_stars_Q1,m_stars_med,m_stars_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,m_stars,min_percentile=10,max_percentile=90)
+            [m_gal_Q1,m_gal_med,m_gal_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,m_stars+m_ISM,min_percentile=10,max_percentile=90)
+            [mz_gal_Q1,mz_gal_med,mz_gal_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,mz_stars+mz_ISM,min_percentile=10,max_percentile=90)
+            [m_winds_Q1,m_winds_med,m_winds_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,m_winds,min_percentile=10,max_percentile=90)
+            [mz_winds_Q1,mz_winds_med,mz_winds_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,mz_winds,min_percentile=10,max_percentile=90)
+            [m_cool_CGM_Q1,m_cool_CGM_med,m_cool_CGM_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,m_cool_CGM,min_percentile=10,max_percentile=90)
+            [mz_cool_CGM_Q1,mz_cool_CGM_med,mz_cool_CGM_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,mz_cool_CGM,min_percentile=10,max_percentile=90)
+            [m_warm_CGM_Q1,m_warm_CGM_med,m_warm_CGM_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,m_warm_CGM,min_percentile=10,max_percentile=90)
+            [mz_warm_CGM_Q1,mz_warm_CGM_med,mz_warm_CGM_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,mz_warm_CGM,min_percentile=10,max_percentile=90)
+            [m_hot_CGM_Q1,m_hot_CGM_med,m_hot_CGM_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,m_hot_CGM,min_percentile=10,max_percentile=90)
+            [mz_hot_CGM_Q1,mz_hot_CGM_med,mz_hot_CGM_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,mz_hot_CGM,min_percentile=10,max_percentile=90)
+
+
+            # Plot Baryon budget
+            plt.figure()
+            x = np.log10(mbins_min) 
+            print "x ",x
+            plt.plot(x,np.log10(m_winds_med),label='Winds',color='brown',ls='dotted')
+            plt.fill_between(x,np.log10(m_winds_Q1),np.log10(m_winds_Q3),alpha=0.3,color='brown')
+            plt.plot(x,np.log10(m_gal_med),label='Stars+ISM',color='green')
+            plt.fill_between(x,np.log10(m_gal_Q1),np.log10(m_gal_Q3),alpha=0.3,color='green')
+            plt.plot(x,np.log10(m_cool_CGM_med),label='Cool CGM',color='blue')
+            plt.fill_between(x,np.log10(m_cool_CGM_Q1),np.log10(m_cool_CGM_Q3),alpha=0.3,color='blue')
+            plt.plot(x,np.log10(m_warm_CGM_med),label='Warm CGM',color='gold')
+            plt.fill_between(x,np.log10(m_warm_CGM_Q1),np.log10(m_warm_CGM_Q3),alpha=0.3,color='gold')
+            plt.plot(x,np.log10(m_hot_CGM_med),label='Hot CGM',color='red')
+            plt.fill_between(x,np.log10(m_hot_CGM_Q1),np.log10(m_hot_CGM_Q3),alpha=0.3,color='red')
+            
+            x = np.ones(5)*10.8
+            y = np.array([10.7,11.0,10.5,9.6,11.3])
+            yerr = np.array([0.1,0.08,0.5,0.6,0.2])
+            plt.errorbar(np.copy(x[0]),np.copy(y[0]),yerr=np.copy(yerr[0]),color='green')
+            plt.errorbar(np.copy(x[1]),np.copy(y[1]),yerr=np.copy(yerr[1]),color='blue')
+            plt.errorbar(np.copy(x[2]),np.copy(y[2]),yerr=np.copy(yerr[2]),color='gold')
+            plt.errorbar(np.copy(x[3]),np.copy(y[3]),yerr=np.copy(yerr[3]),color='red')
+            plt.errorbar(np.copy(x[4]),np.copy(y[4]),yerr=np.copy(yerr[4]),color='black')
+            plt.savefig(self.fig_base+'mass_budget.pdf') 
+
+            # Plot metal budget
+            plt.figure() 
+            x = np.log10(mbins_min)
+            plt.plot(x,np.log10(mz_winds_med),label='Winds',color='brown',ls='dotted')
+            plt.fill_between(x,np.log10(mz_winds_Q1),np.log10(mz_winds_Q3),alpha=0.3,color='brown')
+            plt.plot(x,np.log10(mz_gal_med),label='Stars+ISM',color='green')
+            plt.fill_between(x,np.log10(mz_gal_Q1),np.log10(mz_gal_Q3),alpha=0.3,color='green')
+            plt.plot(x,np.log10(mz_cool_CGM_med),label='Cool CGM',color='blue')
+            plt.fill_between(x,np.log10(mz_cool_CGM_Q1),np.log10(mz_cool_CGM_Q3),alpha=0.3,color='blue')
+            plt.plot(x,np.log10(mz_warm_CGM_med),label='Warm CGM',color='chartreuse')
+            plt.fill_between(x,np.log10(mz_warm_CGM_Q1),np.log10(mz_warm_CGM_Q3),alpha=0.3,color='chartreuse')
+            plt.plot(x,np.log10(mz_hot_CGM_med),label='Hot CGM',color='red')
+            plt.fill_between(x,np.log10(mz_hot_CGM_Q1),np.log10(mz_hot_CGM_Q3),alpha=0.3,color='red')
+            plt.savefig(self.fig_base+'metal_budget.pdf')
+
+
+
+
+
+
+
+
+
+
+
 
     def galprop_vs_CGMprop(self,galprop,CGMprop,savename=None):
         # galprops: stellar mass, SFR, environment
@@ -246,52 +449,112 @@ class illustris_fan:
 
 
 
-    def coldens_plot(self,species,kpc_mode=False,Rvir_mode=False):
+    def coldens_plot(self,species,kpc_mode=False,Rvir_mode=False,vmin=13.,vmax=16.,low_ssfr_pop=False,high_ssfr_pop=False,Mmin=10**10.5,Mmax=10**11.):
         # Load all grid files.
         # Calculate radii for each one.
         # hexbin the full radius vs column density spread, by kpc or Rvir.
 
-    
-        f_npz = self.npz_base + "allgridcells_{}.npz".format(species)
-        if os.path.isfile(f_npz):
-            dat = np.load(f_npz)
-            print list(dat)
-            N = dat['N']
-            r_kpc = dat['r_kpc']
-            r_Rvir = dat['r_Rvir']
-        else:
-            i = 0
-            N = np.zeros(0)
-            r = np.zeros(0)
-            for fn in glob.glob(self.grid_base+"s{}/*.hdf5".format(self.snapnum)):
-                print "fn ",fn
-                print "i ",i
-                f = h5py.File(fn,'r')
-                grp_id = f['Header'].attrs['grp_id']
-                grp_Rvir = f['Header'].attrs['grp_Rvir']
-                grid = f['grids'][species]
-                grid_rad = f['Header'].attrs['grid_radius_pkpc']
-                ngrid = f['Header'].attrs['ngrid']
-                grid = np.array(f['grids'][species])
-                f.close()
+        nbinx = 100.
+        nbiny = 100.
+        twod_hist = np.zeros([nbinx,nbiny])
 
+        i = 0
+        for fn in glob.glob(self.grid_base+"s{}/*.hdf5".format(self.snapnum)):
+            print "fn ",fn
+            print "i ",i
+            f = h5py.File(fn,'r')
+            grp_id = f['Header'].attrs['grp_id']
+            grp_Rvir = f['Header'].attrs['grp_Rvir']
+            grid = f['grids'][species]
+            grid_rad = f['Header'].attrs['grid_radius_pkpc']
+            ngrid = f['Header'].attrs['ngrid']
+            grid = np.array(f['grids'][species])
+            f.close()
+
+            # check if galaxy matches desired properties.
+            gal_props = self._get_gal_props(grp_id)
+            ssfr = gal_props['ssfr']
+            sm = gal_props['sm']
+
+            cond1 = (ssfr < 10.**-11.) and (sm > Mmin) and (sm < Mmax) #(sm > 10.**10.5) and (sm < 10.**11)
+            cond2 = (ssfr > 10.**-11.) and (sm > Mmin) and (sm < Mmax) #(sm > 10.**10.5) and (sm < 10.**11)
+            if (low_ssfr_pop and cond1) or (high_ssfr_pop and cond2) or (not low_ssfr_pop and not high_ssfr_pop):
                 [gridx,gridy] = np.meshgrid(np.arange(ngrid),np.arange(ngrid))
                 grid_cent = (ngrid-1)/2. #assume square grid: grid_centx = grid_centy = grid_cent
                 r_grid = np.sqrt((gridx-grid_cent)**2+(gridy-grid_cent)**2)
                 r_kpc = self._grid_to_kpc(r_grid,ngrid,grid_rad)
                 r_Rvir = r_kpc/AU.PhysicalPosition(grp_Rvir,0.19728)
+
                 if Rvir_mode:
-                    r = np.append(r,r_Rvir)
+                    H,xedges,yedges = np.histogram2d(np.ravel(grid),np.ravel(r_Rvir),bins=[nbinx,nbiny],range=[[0.,1.],[vmin,vmax]])
+                    twod_hist += H
                 elif kpc_mode:
-                    r = np.append(r,r_kpc)
-                N = np.append(N,grid)
+                    # H,xedges,yedges = np.histogram2d(np.ravel(r_kpc),np.ravel(grid),bins=[nbinx,nbiny],range=[[0.,150.],[vmin,vmax]])
+                    H,yedges,xedges = np.histogram2d(np.ravel(grid),np.ravel(r_kpc),bins=[nbiny,nbinx],range=[[vmin,vmax],[0.,200.]],normed=False)
+                    twod_hist += H
                 i+=1
 
-            np.savez(f_npz,N=N,r_kpc=r_kpc,r_Rvir=r_Rvir)
+
+            # np.savez(f_npz,N=N,r_kpc=r_kpc,r_Rvir=r_Rvir)
+
+        # a = np.array([[1,2],[3,4]])
+        # plt.imshow(a,aspect='auto',cmap=plt.cm.cubehelix,origin="lower",extent=(0,150.,vmin,vmax))
+        # print "twod_hist ",twod_hist
+        for i in np.arange(nbinx):
+            twod_hist[i] /= (2*np.pi*(xedges[1:]))
+        plt.figure(figsize=(4,4))
+        plt.imshow(twod_hist,aspect='auto',cmap=plt.cm.cubehelix,origin="lower",extent=(0,200.,vmin,vmax),zorder=1)
+        plt.ylabel(r"log$_{10}$ N$_\mathrm{OVI}$ (cm$^{-2}$)")
+        plt.xlabel("Projected Radius (pkpc)")
+        
+        # Add COS-Halos stuff:
+        cos_dat = np.loadtxt("cosdata_condense.txt")
+        elem = cos_dat[:,0]
+        ion = cos_dat[:,1]
+        M = 10.**(cos_dat[:,2])
+        sfr = cos_dat[:,3]
+        sfr_upperlim = cos_dat[:,4]
+        R = cos_dat[:,5]
+        N_spec = cos_dat[:,6]
+        N_spec_err = cos_dat[:,7]
+        
+        ssfr = sfr/M
+        if low_ssfr_pop:
+            ssfr_cut = ssfr <= 10.**-11.
+            if species == "Mg2": species_cut = np.logical_and(elem==6,ion==2)
+            elif species == "Si3": species_cut = np.logical_and(elem==7,ion==3)
+            elif species == "O6": species_cut = np.logical_and(elem==4,ion==6)
+
+            mass_cut = np.logical_and(M>=Mmin,M<=Mmax) #M>=10.**11. 
+            full = np.logical_and(np.logical_and(ssfr_cut,species_cut),mass_cut)
+            x = R[full]
+            y = N_spec[full]
+            yerr = N_spec_err[full]
+            upper_lim = yerr == -2
+            normal = np.logical_not(upper_lim)
+            print " x[normal],y[normal],yerr[normal]",x[normal],y[normal],yerr[normal]
+            plt.errorbar(x[normal],y[normal],yerr=yerr[normal],ls='none',marker='o',color='red',zorder=2)
+            plt.errorbar(x[upper_lim],y[upper_lim],ls='none',marker='v',color='red',zorder=3)
+        elif high_ssfr_pop:
+            ssfr_cut = ssfr >= 10.**-11.
+            if species == "Mg2": species_cut = np.logical_and(elem==6,ion==2)
+            elif species == "Si3": species_cut = np.logical_and(elem==7,ion==3)
+            elif species == "O6": species_cut = np.logical_and(elem==4,ion==6)
+            mass_cut = np.logical_and(M>=Mmin,M<=Mmax) #M>=10.**11. 
+            full = np.logical_and(np.logical_and(ssfr_cut,species_cut),mass_cut)
+            x = R[full]
+            y = N_spec[full]
+            yerr = N_spec_err[full]
+            upper_lim = yerr == -2
+            normal = np.logical_not(upper_lim)
+            print " x[normal],y[normal],yerr[normal]",x[normal],y[normal],yerr[normal]
+            plt.errorbar(x[normal],y[normal],yerr=yerr[normal],ls='none',marker='o',color='cyan',zorder=2)
+            plt.errorbar(x[upper_lim],y[upper_lim],ls='none',marker='v',color='cyan',zorder=3)
 
 
-        plt.hexbin(r_kpc,N,cmap=plt.cm.cubehelix,mincnt=1)
-        plt.savefig("OVI_coldens_test.pdf")
+        plt.ylim([vmin,vmax])
+        plt.savefig(self.fig_base+"{}_coldens_medm_lowssfr_wCOS".format(species), bbox_inches='tight')
+
 
 
     def plot_grids(self,species,vmin=10.,vmax=25.):
@@ -370,6 +633,37 @@ class illustris_fan:
     def _grid_to_kpc(self,grid_dist,ngrid,grid_radius):
         kpc_dist = grid_dist * (2*grid_radius)/ngrid
         return kpc_dist
+
+    def _get_gal_props(self,grp_id):
+        sub_id = np.int32(self.cat.GroupFirstSub[grp_id])
+        
+        data_dict = {}
+        data_dict['sm'] = AU.PhysicalMass(np.array(self.galf['stellar_totmass'][sub_id]))
+        data_dict['sfr'] = np.array(self.galf['gas_totsfr'][sub_id])
+        data_dict['ssfr'] = data_dict['sfr']/data_dict['sm']
+        return data_dict
+
+
+    def _fix_pos(self,grp_pos,pos,boxsize):
+
+        def _pbc(delta):
+            index1=delta > +boxsize/2
+            index2=delta < -boxsize/2
+            delta[index1]-=boxsize
+            delta[index2]+=boxsize
+            return delta
+
+        dx = _pbc(pos[:,0]-grp_pos[0])
+        dy = _pbc(pos[:,1]-grp_pos[1])
+        dz = _pbc(pos[:,2]-grp_pos[2])
+
+        new_pos = np.zeros_like(pos)
+        new_pos[:,0] = dx
+        new_pos[:,1] = dz
+        new_pos[:,2] = dy
+
+        return new_pos
+
 
 if __name__ == '__main__':
     illustris_fan()
