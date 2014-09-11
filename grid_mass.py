@@ -160,6 +160,7 @@ class grid_mass:
             # Other miscellaneous stuff
             self.grid_radius = AU.CodePosition(self.grid_radius_pkpc,self.redshift,hubble=self.hubble)
             self.npart = self.res**3.
+            self.box = AU.CodePosition(self.box,self.redshift,hubble=self.hubble) #HERE
             self.ngrid=int(np.ceil(40*self.npart**(1./3)/self.box*2*self.grid_radius))
             self.tab = cc.CloudyTable(self.redshift,atten_type=self.cloudy_type)
             self.n_species = len(self.elem_list)
@@ -226,7 +227,7 @@ class grid_mass:
 
 
 
-    def load_CGM_file(self,CGMsnap_file_path,i):
+    def load_CGM_file(self,CGMsnap_file_path,i,use_block_name=False):
         f=h5py.File(CGMsnap_file_path,'r')
         bar = f['PartType0']
 

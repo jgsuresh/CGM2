@@ -107,6 +107,10 @@ class sfr_plot:
         self.label_list = ["Fiducial","No AGN","Higher Mass-Loading","Faster Winds","Fixed-E Hot Winds","Fixed-v Hot Winds","Pristine Winds","Fully Enriched Winds"]
         self.color_list = ["blue","cyan","chartreuse","gold","saddlebrown","magenta","gray","black"]
         self.ls_list = ["solid","solid","solid","solid","solid","solid","solid","solid"]
+        # self.base_list = [c0_256_base,c2_base]
+        # self.label_list = ["Higher Mass-Loading","Fully Enriched Winds"]
+        # self.color_list = ["blue","cyan"]
+        # self.ls_list = ["solid","solid"]
         self.extract_sfr_data()
 
 
@@ -134,7 +138,8 @@ class sfr_plot:
             # y = self.ss_dat(sfr,n=50)
             print "y ",y
             plt.semilogy(x,y,label=self.label_list[i],color=self.color_list[i],linestyle=self.ls_list[i])
-        plt.legend(prop={'size':5.7},ncol=2)
+        lg = plt.legend(prop={'size':6.3},ncol=2,columnspacing=0.6,handletextpad=0.1)
+        lg.draw_frame(False)
         plt.xlim([0.45,1.0])
         plt.ylim([10.**-3.,1.0])
         #plt.ylabel(r' SFRD $\left[M_\odot$ yr$^{-1}$ Mpc$^{-3} \right]$')
@@ -159,7 +164,7 @@ class sfr_plot:
         plt.show()
 
         # print "saving to {}".format(self.fig_base+"sfr_plot.pdf")
-        plt.savefig(self.fig_base+"sfr_plot.pdf")
+        plt.savefig(self.fig_base+"sfr_plot_noframe.pdf")
 
     def ss_dat(self,dat,n=2):
         s = np.size(dat)

@@ -148,24 +148,24 @@ class full_analysis:
         ##############################
         # 3D data analysis functions #
         ##############################
-        # self.phase_budget('m',savename='m_budget_lowmetal',minimal=False)
-        # self.phase_budget('z',savename='z_budget_lowmetal',minimal=False)
-        # self.CGM_and_gal_metallicity(savename="massmet_newfan")
+        self.phase_budget('m',savename='m_budget_ds',minimal=True)
+        self.phase_budget('z',savename='z_budget_ds',minimal=True)
+        # self.CGM_and_gal_metallicity(savename="massmet_newleg")
         # self.radial_profile('T')
         # self.radial_profile('z')
 
         ##############################
         # 2D data analysis functions #
         ##############################
-        self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_z2",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_z2",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_z2",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_z2",show_Fumagalli=True)
+        # self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_z2",show_Fumagalli=True)
+        # self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_z2",show_Fumagalli=True)
+        # self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_z2",show_Fumagalli=True)
+        # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_z2",show_Fumagalli=True)
         # print "2"
         # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_newfan2")
         # print "3"
         # self.grid_sightlines("H1",200.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="coldens_newfan2")
-
+        # self.coverfrac_bootstrap("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2)
     ############################################################################################################
     ############################################################################################################
 
@@ -284,10 +284,12 @@ class full_analysis:
         p1.set_ylim([0.1,10.])
         p1.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
         p1.xaxis.set_ticks(np.arange(11.0,12.6,0.5))
-        p1.set_xlabel(r"$\log_{10}\left[M_{\rm Halo}\right]$")
+        p1.set_xlabel(r"$\log_{10}\left[\frac{M_{\rm Halo}}{M_\odot}\right]$")
         # p1.set_ylabel(r"$\log_{10}\left[ \frac{M_{\rm baryons}}{M_{\rm Halo} \times \Omega_b} \right]$")
         p1.set_ylabel(r"$\frac{M_{\rm baryons}}{M_{\rm Halo} \times f_b}$")
-        p1.legend(loc=2,prop={'size':5.5},ncol=2,columnspacing=0.3,borderpad=0.2)
+        # lg = p1.legend(loc=2,prop={'size':5.5},ncol=2,columnspacing=0.3,borderpad=0.2)
+        lg = p1.legend(loc=2,prop={'size':6.1},ncol=2,columnspacing=0.8,handletextpad=0.1,handlelength=1.6)
+        lg.draw_frame(False)
 
         font = {'family' : 'serif',
         'color'  : 'darkred',
@@ -303,7 +305,7 @@ class full_analysis:
         p2.xaxis.set_ticks(np.arange(11.0,12.6,0.5))
         # p2.set_ylabel(r"$\log_{10}\left[ \frac{Z_{\rm baryons}}{Z_\odot} \right]$")
         p2.set_ylabel(r"$\frac{Z_{\rm baryons}}{Z_\odot}$")
-        p2.set_xlabel(r"$\log_{10}\left[M_{\rm Halo}\right]$")
+        p2.set_xlabel(r"$\log_{10}\left[\frac{M_{\rm Halo}}{M_\odot}\right]$")
         #p2.legend(loc=2,prop={'size':5})
 
         plt.subplots_adjust(wspace=0.4)
@@ -312,6 +314,219 @@ class full_analysis:
             plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
         else:
             plt.savefig(self.fig_base+"mass_budget.pdf", bbox_inches='tight')
+
+
+
+
+    def phase_budget(self,data_type,mmin=1e11,mmax=1e18,savename=None,log_plot=False,minimal=True):
+        plt.close('all')    
+        if not minimal:
+            plt.figure(figsize=(3.54331,3.14*2))
+            p1 = plt.subplot(4,1,1)
+            p2 = plt.subplot(4,1,2)
+            p3 = plt.subplot(4,1,3)
+            p4 = plt.subplot(4,1,4)
+        else:
+            plt.figure(figsize=(3.54331,3.14*2))
+            p1 = plt.subplot(2,1,1)
+            p2 = plt.subplot(2,1,2)
+
+        bmap = brewer2mpl.get_map('Spectral','Diverging',9, reverse=True)
+        cmap = bmap.mpl_colormap
+
+        rho_cut = 10**(-2.8)
+        rho_SFR = 0.13
+        T_cut = 10.**5.
+
+        # Bin by galaxy stellar mass:
+        #mbins_min = 10.**(9.+np.array([0.,.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.2,1.4,1.6,1.8]))
+        #mbins_max = 10.**(9.+np.array([.1,.2,.3,.4,.5,.6,.7,.8,.9,1.0,1.2,1.4,1.6,1.8,2.0]))
+        mbins_min = 10.**(9.+np.array([.5,.6,.7,.8,.9,1.0,1.2,1.4,1.6,1.8]))
+        mbins_max = 10.**(9.+np.array([.6,.7,.8,.9,1.0,1.2,1.4,1.6,1.8,2.0]))
+        mbins_med = 10.**((np.log10(mbins_min) + np.log10(mbins_max))/2.)
+        n_mbins = np.size(mbins_min)
+
+        for i in np.arange(self.ndat):
+            npz_fname = "phasebudget_z_{}_s{}_9mingalmass.npz".format(self.run_list[i],self.snapnum_list[i])
+            if os.path.isfile(self.npz_base+npz_fname):
+                print "Loaded from npz!: {}".format(self.npz_base+npz_fname)
+                f = np.load(self.npz_base+npz_fname)
+                gal_mass = f['gal_mass']
+                vw_budget_gal = f['vw_budget_gal']
+                mw_budget_gal = f['mw_budget_gal']
+                zw_budget_gal = f['zw_budget_gal']
+                f.close()
+            else:
+                grp_ids = self.find_desired_grpids(i,minmass=mmin,maxmass=mmax)
+                gal_dict = self.get_gal_props(i,grp_ids)
+                gal_mass = gal_dict['gal_mass']
+
+                in_mbin = gal_mass > 10.**9.5
+
+                gal_mass = gal_mass[in_mbin]
+                # no radial cut implemented yet!
+                # m = np.zeros(0)
+                # z = np.zeros(0)
+                # T = np.zeros(0)
+                # rho = np.zeros(0)
+                # vol = np.zeros(0)
+                selected_grp_ids = grp_ids[in_mbin]
+
+                mw_budget_gal = np.zeros([np.size(selected_grp_ids),4])
+                zw_budget_gal = np.zeros([np.size(selected_grp_ids),4])
+                vw_budget_gal = np.zeros([np.size(selected_grp_ids),4])
+                for j in np.arange(np.size(selected_grp_ids)):
+                    print "{} of {}".format(j,np.size(selected_grp_ids))
+                    grp_id = selected_grp_ids[j]
+                    grp_data = self.load_CGMsnap_data(i,grp_id,data_entry='all')
+                    redshift = grp_data['redshift']
+                    #pos = AU.PhysicalPosition(np.array(grp_data['Coordinates']),grp_data['redshift'])
+                    #grp_pos = AU.PhysicalPosition(np.array(grp_data['grp_pos']),grp_data['redshift'])
+                    #r_los = np.sqrt((pos[:,0]-grp_pos[0])**2+(pos[:,1]-grp_pos[1])**2)
+                    m = AU.PhysicalMass(np.array(grp_data['Masses']))
+                    z = np.array(grp_data['GFM_Metallicity'])
+                    u = np.array(grp_data['InternalEnergy'])
+                    nelec = np.array(grp_data["ElectronAbundance"])
+                    T = AU.GetTemp(u, nelec, gamma = 5.0/3.0)
+                    rho = AU.PhysicalDensity(np.array(grp_data['Density']),redshift)
+                    vol = AU.PhysicalVolume(grp_data['Volume'],redshift)
+
+                    rho /= AU.ProtonMass
+
+                    cde = np.logical_and(np.logical_and(T < T_cut,rho >= rho_cut),rho < rho_SFR)
+                    cdi = np.logical_and(T < T_cut,rho < rho_cut)
+                    hde = np.logical_and(np.logical_and(T > T_cut,rho >= rho_cut),rho < rho_SFR)
+                    hdi = np.logical_and(T > T_cut,rho < rho_cut)
+                    CGM = rho < rho_SFR
+                    m_tot = np.sum(m[CGM])
+                    z_tot = np.sum(m[CGM]*z[CGM])
+                    v_tot = np.sum(vol[CGM])
+                    mw_budget = np.array([np.sum(m[cde]),np.sum(m[cdi]),np.sum(m[hde]),np.sum(m[hdi])])/m_tot
+                    zw_budget = np.array([np.sum(m[cde]*z[cde]),np.sum(m[cdi]*z[cdi]),np.sum(m[hde]*z[hde]),np.sum(m[hdi]*z[hdi])])/z_tot
+                    # print "np.sum(cde) ",np.sum(cde)
+                    # print "np.min(T) ",np.min(T)
+                    # print "np.max(rho) ",np.min(T)
+                    vw_budget = np.array([np.sum(vol[cde]),np.sum(vol[cdi]),np.sum(vol[hde]),np.sum(vol[hdi])])/v_tot
+                    mw_budget_gal[j,:] = mw_budget
+                    zw_budget_gal[j,:] = zw_budget
+                    vw_budget_gal[j,:] = vw_budget
+
+
+                np.savez(self.npz_base+npz_fname,gal_mass=gal_mass,mw_budget_gal=mw_budget_gal,zw_budget_gal=zw_budget_gal,vw_budget_gal=vw_budget_gal)
+
+
+            # if data_type == 'v':
+            #     [Q1,med,Q3] = AU._calc_percentiles(vw_budget_gal)
+            # elif data_type == 'm':
+            #     [Q1,med,Q3] = AU._calc_percentiles(mw_budget_gal)
+            # elif data_type == 'z':
+            #     [Q1,med,Q3] = AU._calc_percentiles(zw_budget_gal)
+
+            if data_type == 'v':
+                u = vw_budget_gal
+                p1.set_title(r'CGM Volume Budget')
+            elif data_type == 'm':
+                u = mw_budget_gal
+                # p1.set_title(r'CGM Mass Budget')
+                p1.set_ylabel(r'Mass Fraction')
+                p2.set_ylabel(r'Mass Fraction')
+            elif data_type == 'z':
+                u = zw_budget_gal
+                # p1.set_title(r'CGM Metal Budget')
+                p1.set_ylabel(r'Metal Fraction')
+                p2.set_ylabel(r'Metal Fraction')
+
+            # print "vw_budget_gal ",vw_budget_gal
+            # print "mw_budget_gal ",mw_budget_gal
+            # print "zw_budget_gal ",zw_budget_gal
+
+            [Q1_cde,med_cde,Q3_cde] = AU._calc_percentiles_v2(gal_mass,mbins_min,mbins_max,u[:,0])
+            [Q1_cdi,med_cdi,Q3_cdi] = AU._calc_percentiles_v2(gal_mass,mbins_min,mbins_max,u[:,1])
+            [Q1_hde,med_hde,Q3_hde] = AU._calc_percentiles_v2(gal_mass,mbins_min,mbins_max,u[:,2])
+            [Q1_hdi,med_hdi,Q3_hdi] = AU._calc_percentiles_v2(gal_mass,mbins_min,mbins_max,u[:,3])
+
+            if log_plot:
+                p1.loglog(mbins_med,med_cde,label=self.label_list[i],color=self.color_list[i],linestyle=self.linestyle_list[i])
+                p1.set_ylim([0.05,1.])
+                p1.set_xlim([10.**9.5,10.**11])
+                p2.loglog(mbins_med,med_cdi,label=self.label_list[i],color=self.color_list[i],linestyle=self.linestyle_list[i])
+                p2.set_ylim([0.05,1.])
+                p2.set_xlim([10.**9.5,10.**11])
+                p3.loglog(mbins_med,med_hde,label=self.label_list[i],color=self.color_list[i],linestyle=self.linestyle_list[i])
+                p3.set_ylim([0.05,1.])
+                p3.set_xlim([10.**9.5,10.**11])
+                p4.loglog(mbins_med,med_hdi,label=self.label_list[i],color=self.color_list[i],linestyle=self.linestyle_list[i])
+                p4.set_ylim([0.05,1.])
+                p4.set_xlim([10.**9.5,10.**11])
+                p4.set_xlabel('Galaxy Mass')
+            else:
+                if not minimal: 
+                    p1.semilogx(mbins_med,med_cde,label=self.label_list[i],color=self.color_list[i],linestyle=self.linestyle_list[i])
+                    p1.set_ylim([0.,1.])
+                    p1.set_xlim([10.**9.5,10.**11])
+                    p1.set_ylabel(r'Cold-Dense')
+                    p2.semilogx(mbins_med,med_cdi,label=self.label_list[i],color=self.color_list[i],linestyle=self.linestyle_list[i])
+                    p2.set_ylim([0.,1.])
+                    p2.set_xlim([10.**9.5,10.**11])
+                    p2.set_ylabel(r'Cold-Diffuse')
+                    p3.semilogx(mbins_med,med_hde,label=self.label_list[i],color=self.color_list[i],linestyle=self.linestyle_list[i])
+                    p3.set_ylim([0.,1.])
+                    p3.set_xlim([10.**9.5,10.**11])
+                    p3.set_ylabel(r'Warm-Dense')
+                    p4.semilogx(mbins_med,med_hdi,label=self.label_list[i],color=self.color_list[i],linestyle=self.linestyle_list[i])
+                    p4.set_ylim([0.,1.])
+                    p4.set_xlim([10.**9.5,10.**11])
+                    p4.set_ylabel(r'Warm-Diffuse')
+                    p4.set_xlabel(r'Galaxy Mass')
+                else:
+                    font_c = {'family' : 'serif',
+                    'color'  : 'darkblue',
+                    'weight' : 'normal',
+                    'size'   : 14,
+                    }
+
+                    font_w = {'family' : 'serif',
+                    'color'  : 'darkred',
+                    'weight' : 'normal',
+                    'size'   : 14,
+                    }
+
+                    p1.semilogx(mbins_med,med_cde,label=self.label_list[i],color=self.color_list[i],linestyle=self.linestyle_list[i])
+                    p1.set_xlim([10.**9.5,10.**11])
+                    p1.set_ylim([0.,1.])
+                    # p1.set_ylabel(r'Cool-Dense')
+                    if data_type == 'm':
+                        p1.text(10.**9.6,0.87,"Cool-Dense",fontdict=font_c)
+                    elif data_type == 'z':
+                        p1.text(10.**10.9,0.87,"Cool-Dense",fontdict=font_c,ha='right')
+                    p1.set_xlabel(r"$\log_{10}\left[\frac{M_{\rm *,gal}}{M_\odot}\right]$")
+                    p2.semilogx(mbins_med,med_hdi,label=self.label_list[i],color=self.color_list[i],linestyle=self.linestyle_list[i])
+                    p2.set_ylim([0.,1.])
+                    p2.set_xlim([10.**9.5,10.**11])
+                    # p2.set_ylabel(r'Warm-Diffuse')
+                    if data_type == 'm':
+                        p2.text(10.**9.6,0.87,"Warm-Diffuse",fontdict=font_w)
+                    elif data_type == 'z':
+                        p2.text(10.**10.9,0.87,"Warm-Diffuse",fontdict=font_w,ha='right')
+                    p2.set_xlabel(r"$\log_{10}\left[\frac{M_{\rm *,gal}}{M_\odot}\right]$")
+
+
+        if not minimal:
+            p2.legend(prop={'size':5})
+            plt.subplots_adjust(left=0.2,hspace=0.7)
+        else:
+            # p2.legend(bbox_to_anchor=(0., 1.05, 1., .107), loc=8, ncol=2, borderaxespad=0.,prop={'size':7})
+            # plt.subplots_adjust(left=0.2,hspace=0.6)
+            p2.legend(bbox_to_anchor=(0., 2.5, 1., 0.), loc=8, ncol=2, borderaxespad=0.,prop={'size':7})
+            plt.subplots_adjust(left=0.2,top=0.8,hspace=0.4)
+
+        if savename != None:
+            plt.savefig(self.fig_base+savename+".pdf")
+        else:
+            plt.savefig(self.fig_base+"{}_budget.pdf".format(data_type))
+
+
+
 
 
 
@@ -371,11 +586,11 @@ class full_analysis:
 
             if data_type == 'z':
                 [Q1,med,Q3] = AU._calc_percentiles(z_profile_gal)
-                plt.ylabel(r'Log$_{10}\left[\frac{Z}{Z_\odot}\right]$')
+                plt.ylabel(r'$\log_{10}\left[\frac{Z}{Z_\odot}\right]$')
                 med /= AU.SolarMetallicity
             if data_type == 'T':
                 [Q1,med,Q3] = AU._calc_percentiles(T_profile_gal)
-                plt.ylabel(r'Temperature [K]')
+                plt.ylabel(r'$\log_{10}\left[\frac{{\rm Temperature}}{\rm K}\right]$')
             if data_type == 'rho':
                 [Q1,med,Q3] = AU._calc_percentiles(rho_profile_gal)
                 plt.ylabel(r'Density [cm$^{-3}$]')
@@ -544,6 +759,172 @@ class full_analysis:
                 plt.savefig(self.fig_base+"fc_within_R.pdf", bbox_inches='tight')
 
                 
+
+    def coverfrac_bootstrap(self,species,max_R,coldens_min=0,coldens_max=1000,minmass=10**11.9,maxmass=10**12.1,savename=None,rudie_155=False,rudie_172=False,rudie_19=False,rudie_203=False,show_Fumagalli=False):
+        # Calculates covering fraction in similar way to observers.  Gather all halos within specified mass range, and treat 
+        # all corresponding sightlines together.  
+
+        plt.close('all')
+        plt.figure(figsize=(3.54331,3.14))
+
+        # Set up bins for radius:
+        n_Rbins = 50
+        [Rbins_min,Rbins_max] = AU._bin_setup(0.,max_R,n_Rbins)
+        Rbins_med = (Rbins_min+Rbins_max)/2.
+
+        for i in np.arange(self.ndat):
+            print "Working on {}".format(self.run_list[i])
+            
+            grp_ids = self.find_desired_grpids(i,minmass=minmass,maxmass=maxmass)
+            grp_ids2 = self.find_desired_grpids_withoutsnap(i,minmass=minmass,maxmass=maxmass)
+            if not np.array_equal(grp_ids,grp_ids2):
+                print "somethings wrong"
+            # print "grp_ids ",np.sort(grp_ids)
+
+            r = np.zeros(0)
+            N = np.zeros(0)
+            for j in np.arange(np.size(grp_ids)):
+                grp_id = grp_ids[j]
+                grp_data = self.load_grid_data(i,grp_id)
+                # print list(grp_data.keys())
+                grid = grp_data[species]
+                grid_rad = grp_data['grid_radius_pkpc']
+                ngrid = grp_data['ngrid']
+
+                [gridx,gridy] = np.meshgrid(np.arange(ngrid),np.arange(ngrid))
+                grid_cent = (ngrid-1)/2. #assume square grid: grid_centx = grid_centy = grid_cent
+                r_grid = np.sqrt((gridx-grid_cent)**2+(gridy-grid_cent)**2)
+                r_kpc = self._grid_to_kpc(r_grid,ngrid,grid_rad)
+                
+                dist_thresh = max_R
+                if dist_thresh > grid_rad:
+                    raise Exception('Desired radial threshold ({}) exceeded grid radius ({}) for covering fraction calculation.'.format(dist_thresh,grid_rad))
+
+                r = np.append(r,r_kpc)
+                N = np.append(N,grid)
+
+
+        # Bootstrap for < 90 kpc, and 10 sightlines:
+        print "Starting bootstrap now..."
+        N_sample = 100000
+        r_cut = r <= 180.
+        N_dist = N[r_cut]
+        fc_dist = np.zeros(N_sample)
+        for i in np.arange(N_sample):
+            s = np.random.choice(N_dist,size=25)
+            fc_dist[i] = np.sum(np.logical_and(s > coldens_min, s < coldens_max))/25.
+        # Now we find the median and quartiles of distribution:
+        print "fc_dist ",fc_dist
+        print "Bootstrap results: "
+        print "Median: ",np.median(fc_dist)
+        print "1-sig below: ", np.percentile(fc_dist,32)
+        print "1-sig above: ", np.percentile(fc_dist,68)
+        print "2-sig below: ", np.percentile(fc_dist,5)
+        print "2-sig above: ", np.percentile(fc_dist,95)
+        print "std-dev: ", np.std(fc_dist)
+        print "mean: ",np.mean(fc_dist)
+
+        # Bootstrap for < 180 kpc, and 25 sightlines.  10 within 90 kpc, 15 within 90-180 kpc:
+        print "Starting bootstrap now..."
+        N_sample = 100000
+        r_cut1 = r <= 90.
+        r_cut2 = np.logical_and(r > 90.,r <= 180.)
+        N_dist1 = N[r_cut1]
+        N_dist2 = N[r_cut2]
+        fc_dist = np.zeros(N_sample)
+        for i in np.arange(N_sample):
+            s = np.append(np.random.choice(N_dist1,size=10),np.random.choice(N_dist2,size=15))
+            fc_dist[i] = np.sum(np.logical_and(s > coldens_min, s < coldens_max))/25.
+        # Now we find the median and quartiles of distribution:
+        print "fc_dist ",fc_dist
+        print "Bootstrap results: "
+        print "Median: ",np.median(fc_dist)
+        print "1-sig below: ", np.percentile(fc_dist,32)
+        print "1-sig above: ", np.percentile(fc_dist,68)
+        print "2-sig below: ", np.percentile(fc_dist,5)
+        print "2-sig above: ", np.percentile(fc_dist,95)
+        print "mean ",np.mean(fc_dist)
+        print "std-dev: ", np.std(fc_dist)
+
+
+
+        if False:
+            plt.plot(Rbins_med,fc,color=self.color_list[i],label=self.label_list[i],zorder=1)
+
+
+            # Rudie et al. 2012, cumulative covering fraction for different values of N_HI for M_halo ~ 10^12
+            if rudie_155:
+                xdat = np.array([90.,180.])
+                ydat = np.array([0.9,0.6])
+                yerr = np.array([0.09,0.1])
+                xerr = np.array([8.,16.])
+                plt.ylim([0.,1.6])
+                plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple',zorder=9)
+                if show_Fumagalli:
+                    plt.scatter(np.array([90.,180.]),np.array([0.38,0.22]),marker='D',color='gray',zorder=10)
+            if rudie_172:
+                xdat = np.array([90.,180.])
+                ydat = np.array([0.3,0.28])
+                yerr = np.array([0.14,0.09])
+                xerr = np.array([8.,16.])
+                plt.ylim([0.,1.0])
+                plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple',zorder=9)
+                if show_Fumagalli:
+                    plt.scatter(np.array([90.,180.]),np.array([0.16,0.07]),marker='D',color='gray',zorder=10)
+            elif rudie_19:
+                xdat = np.array([90.,180.])
+                ydat = np.array([0.1,0.08])
+                yerr = np.array([0.09,0.05])
+                xerr = np.array([8.,16.])
+                plt.ylim([0.,0.4])
+                plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple',zorder=9)
+                if show_Fumagalli:
+                    plt.scatter(np.array([90.,180.]),np.array([0.06,0.03]),marker='D',color='gray',zorder=10)
+            elif rudie_203:
+                xdat = np.array([90.,180.])
+                ydat = np.array([0.,0.04])
+                yerr = np.array([0.1,0.04])
+                xerr = np.array([8.,16.])
+                plt.ylim([0.,0.4])
+                plt.errorbar(xdat,ydat,yerr=yerr,xerr=xerr,fmt='.',color='purple',zorder=9)
+                if show_Fumagalli:
+                    plt.scatter(np.array([90.,180.]),np.array([0.03,0.01]),marker='D',color='gray',zorder=10)
+
+
+                
+            if coldens_vs_R:
+                plt.xlim([0.,max_R])
+                plt.xlabel('Radius [pkpc]')
+                plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
+                plt.legend(prop={'size':5},ncol=2)
+                plt.subplots_adjust(left=0.2,bottom=0.18)
+                if savename != None:
+                    plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
+                else:
+                    plt.savefig(self.fig_base+"cd_v_R.pdf", bbox_inches='tight')
+            elif coverfrac_vs_R:
+                plt.xlim([0.,max_R])
+                plt.xlabel('Radius [pkpc]')
+                plt.ylim([-0.05,1.1])
+                plt.ylabel(r"$f_C (R)$")
+                plt.legend(prop={'size':5},ncol=2)
+                plt.subplots_adjust(left=0.2,bottom=0.18)
+                if savename != None:
+                    plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
+                else:
+                    plt.savefig(self.fig_base+"fc_vs_R.pdf", bbox_inches='tight')
+            elif coverfrac_within_R:
+                plt.xlim([0.,max_R])
+                plt.xlabel('Radius [pkpc]')
+                plt.ylabel(r"$f_C (< R)$")
+                plt.legend(prop={'size':5},ncol=2)
+                plt.subplots_adjust(left=0.2,bottom=0.18)
+                if savename != None:
+                    plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
+                else:
+                    plt.savefig(self.fig_base+"fc_within_R.pdf", bbox_inches='tight')
+
+
 
 
 

@@ -101,7 +101,12 @@ class illustris_fan:
 
     def mass_metal_budget(self,savename=None):
 
-        f_npz = self.npz_base + "{}.npz".format("mass_met_budget_150kpc")
+        # # Get CGMsnap group ids, and main subhalo ids:
+        # self.load_CGMsnap_ids()
+        # cat = readsubfHDF5.subfind_catalog('/n/ghernquist/Illustris/Runs/Illustris-1/',self.snapnum,keysel=['GroupPos','GroupFirstSub','Group_M_Crit200','SubhaloStarMetallicity'])
+        # self.sub_ids = np.int32(cat.GroupFirstSub[np.int32(self.grp_ids)])
+
+        f_npz = self.npz_base + "{}.npz".format("mass_met_budget_Rvir")
         if os.path.isfile(f_npz):
             f_npz = np.load(f_npz)
             m_grp = f_npz['m_grp']
@@ -145,6 +150,7 @@ class illustris_fan:
             # Stars:
             m_stars = AU.PhysicalMass(np.array(self.galf['stellar_totmass'])[self.sub_ids])
             mz_stars = cat.SubhaloStarMetallicity[self.sub_ids]*m_stars
+            gal_ssfr = np.array(self.galf['gas_totsfr'])[self.sub_ids]/m_stars
 
             # ISM and CGM
             def load_CGM_snap(fn,load='all'):
@@ -186,7 +192,8 @@ class illustris_fan:
                 r = AU._dist(x_cent,np.array([0.,0.,0.]))
                 r = AU.PhysicalPosition(r,0.19728)
 
-                r_cut = r <= 150.
+                # r_cut = r <= 150.
+                r_cut = r <= 10000.
                 rho = rho[r_cut]
                 mass = AU.PhysicalMass(np.array(data_dict["MASS"]))[r_cut]
                 z = np.array(data_dict["GZ  "])[r_cut]
@@ -215,10 +222,10 @@ class illustris_fan:
 
             np.savez(f_npz, m_grp=m_grp,m_winds=m_winds,mz_winds=mz_winds,m_stars=m_stars,mz_stars=mz_stars,\
                 m_ISM=m_ISM,mz_ISM=mz_ISM,m_CGM=m_CGM,mz_CGM=mz_CGM,m_cool_CGM=m_cool_CGM,mz_cool_CGM=mz_cool_CGM,\
-                m_warm_CGM=m_warm_CGM,mz_warm_CGM=mz_warm_CGM,m_hot_CGM=m_hot_CGM,mz_hot_CGM=mz_hot_CGM)
+                m_warm_CGM=m_warm_CGM,mz_warm_CGM=mz_warm_CGM,m_hot_CGM=m_hot_CGM,mz_hot_CGM=mz_hot_CGM,gal_ssfr=gal_ssfr)
 
 
-        if True:
+        if False:
             # Bin by stellar mass
             n_mbins = 50
             # [mbins_min,mbins_max] = AU._bin_setup(10.**10.,10.**11.5,n_mbins,logbins=True)
@@ -239,47 +246,120 @@ class illustris_fan:
             [mz_warm_CGM_Q1,mz_warm_CGM_med,mz_warm_CGM_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,mz_warm_CGM,min_percentile=10,max_percentile=90)
             [m_hot_CGM_Q1,m_hot_CGM_med,m_hot_CGM_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,m_hot_CGM,min_percentile=10,max_percentile=90)
             [mz_hot_CGM_Q1,mz_hot_CGM_med,mz_hot_CGM_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,mz_hot_CGM,min_percentile=10,max_percentile=90)
+        elif True:
+            # Bin by stellar mass
+            n_mbins = 50
+            # [mbins_min,mbins_max] = AU._bin_setup(10.**10.,10.**11.5,n_mbins,logbins=True)
+            [mbins_min,mbins_max] = AU._bin_setup(11.2,13.,n_mbins)
+            mbins_min = 10.**mbins_min
+            mbins_max = 10.**mbins_max
+
+            print "mbins_min ",mbins_min
+
+            [m_stars_Q1,m_stars_med,m_stars_Q3] = AU._calc_percentiles_v2(m_grp,mbins_min,mbins_max,m_stars,min_percentile=10,max_percentile=90)
+            [m_gal_Q1,m_gal_med,m_gal_Q3] = AU._calc_percentiles_v2(m_grp,mbins_min,mbins_max,m_stars+m_ISM,min_percentile=10,max_percentile=90)
+            [mz_gal_Q1,mz_gal_med,mz_gal_Q3] = AU._calc_percentiles_v2(m_grp,mbins_min,mbins_max,mz_stars+mz_ISM,min_percentile=10,max_percentile=90)
+            [m_winds_Q1,m_winds_med,m_winds_Q3] = AU._calc_percentiles_v2(m_grp,mbins_min,mbins_max,m_winds,min_percentile=10,max_percentile=90)
+            [mz_winds_Q1,mz_winds_med,mz_winds_Q3] = AU._calc_percentiles_v2(m_grp,mbins_min,mbins_max,mz_winds,min_percentile=10,max_percentile=90)
+            [m_cool_CGM_Q1,m_cool_CGM_med,m_cool_CGM_Q3] = AU._calc_percentiles_v2(m_grp,mbins_min,mbins_max,m_cool_CGM,min_percentile=10,max_percentile=90)
+            [mz_cool_CGM_Q1,mz_cool_CGM_med,mz_cool_CGM_Q3] = AU._calc_percentiles_v2(m_grp,mbins_min,mbins_max,mz_cool_CGM,min_percentile=10,max_percentile=90)
+            [m_warm_CGM_Q1,m_warm_CGM_med,m_warm_CGM_Q3] = AU._calc_percentiles_v2(m_grp,mbins_min,mbins_max,m_warm_CGM,min_percentile=10,max_percentile=90)
+            [mz_warm_CGM_Q1,mz_warm_CGM_med,mz_warm_CGM_Q3] = AU._calc_percentiles_v2(m_grp,mbins_min,mbins_max,mz_warm_CGM,min_percentile=10,max_percentile=90)
+            [m_hot_CGM_Q1,m_hot_CGM_med,m_hot_CGM_Q3] = AU._calc_percentiles_v2(m_grp,mbins_min,mbins_max,m_hot_CGM,min_percentile=10,max_percentile=90)
+            [mz_hot_CGM_Q1,mz_hot_CGM_med,mz_hot_CGM_Q3] = AU._calc_percentiles_v2(m_grp,mbins_min,mbins_max,mz_hot_CGM,min_percentile=10,max_percentile=90)
+        else:
+            # Bin by sSFR:
+            self.sub_ids = np.sort(self.sub_ids)
+            gal_ssfr = np.array(self.galf['gas_totsfr'])[np.int32(self.sub_ids)]/m_stars
+            # impose stellar mass cut 10^11<M<10^11.5
+            m_cut = np.logical_and(m_stars >= 10.**11.,m_stars <= 10.**11.5)
+            gal_ssfr = gal_ssfr[m_cut]
+            m_stars = m_stars[m_cut]
+            mz_stars = mz_stars[m_cut]
+            m_ISM = m_ISM[m_cut]
+            mz_ISM = mz_ISM[m_cut]
+            m_cool_CGM = m_cool_CGM[m_cut]
+            mz_cool_CGM = mz_cool_CGM[m_cut]
+            m_warm_CGM = m_warm_CGM[m_cut]
+            mz_warm_CGM = mz_warm_CGM[m_cut]
+            m_hot_CGM = m_hot_CGM[m_cut]
+            mz_hot_CGM = mz_hot_CGM[m_cut]
+
+            # Bin by ssfr
+            n_mbins = 25
+            [mbins_min,mbins_max] = AU._bin_setup(-13,-10,n_mbins)
+            mbins_min = 10.**mbins_min
+            mbins_max = 10.**mbins_max
+
+            print "mbins_min ",mbins_min
+
+            [m_stars_Q1,m_stars_med,m_stars_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,m_stars,min_percentile=10,max_percentile=90)
+            [m_gal_Q1,m_gal_med,m_gal_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,m_stars+m_ISM,min_percentile=10,max_percentile=90)
+            [mz_gal_Q1,mz_gal_med,mz_gal_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,mz_stars+mz_ISM,min_percentile=10,max_percentile=90)
+            [m_winds_Q1,m_winds_med,m_winds_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,m_winds,min_percentile=10,max_percentile=90)
+            [mz_winds_Q1,mz_winds_med,mz_winds_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,mz_winds,min_percentile=10,max_percentile=90)
+            [m_cool_CGM_Q1,m_cool_CGM_med,m_cool_CGM_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,m_cool_CGM,min_percentile=10,max_percentile=90)
+            [mz_cool_CGM_Q1,mz_cool_CGM_med,mz_cool_CGM_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,mz_cool_CGM,min_percentile=10,max_percentile=90)
+            [m_warm_CGM_Q1,m_warm_CGM_med,m_warm_CGM_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,m_warm_CGM,min_percentile=10,max_percentile=90)
+            [mz_warm_CGM_Q1,mz_warm_CGM_med,mz_warm_CGM_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,mz_warm_CGM,min_percentile=10,max_percentile=90)
+            [m_hot_CGM_Q1,m_hot_CGM_med,m_hot_CGM_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,m_hot_CGM,min_percentile=10,max_percentile=90)
+            [mz_hot_CGM_Q1,mz_hot_CGM_med,mz_hot_CGM_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,mz_hot_CGM,min_percentile=10,max_percentile=90)
 
 
-            # Plot Baryon budget
-            plt.figure()
-            x = np.log10(mbins_min) 
-            print "x ",x
-            plt.plot(x,np.log10(m_winds_med),label='Winds',color='brown',ls='dotted')
-            plt.fill_between(x,np.log10(m_winds_Q1),np.log10(m_winds_Q3),alpha=0.3,color='brown')
-            plt.plot(x,np.log10(m_gal_med),label='Stars+ISM',color='green')
-            plt.fill_between(x,np.log10(m_gal_Q1),np.log10(m_gal_Q3),alpha=0.3,color='green')
-            plt.plot(x,np.log10(m_cool_CGM_med),label='Cool CGM',color='blue')
-            plt.fill_between(x,np.log10(m_cool_CGM_Q1),np.log10(m_cool_CGM_Q3),alpha=0.3,color='blue')
-            plt.plot(x,np.log10(m_warm_CGM_med),label='Warm CGM',color='gold')
-            plt.fill_between(x,np.log10(m_warm_CGM_Q1),np.log10(m_warm_CGM_Q3),alpha=0.3,color='gold')
-            plt.plot(x,np.log10(m_hot_CGM_med),label='Hot CGM',color='red')
-            plt.fill_between(x,np.log10(m_hot_CGM_Q1),np.log10(m_hot_CGM_Q3),alpha=0.3,color='red')
-            
-            x = np.ones(5)*10.8
-            y = np.array([10.7,11.0,10.5,9.6,11.3])
-            yerr = np.array([0.1,0.08,0.5,0.6,0.2])
-            plt.errorbar(np.copy(x[0]),np.copy(y[0]),yerr=np.copy(yerr[0]),color='green')
-            plt.errorbar(np.copy(x[1]),np.copy(y[1]),yerr=np.copy(yerr[1]),color='blue')
-            plt.errorbar(np.copy(x[2]),np.copy(y[2]),yerr=np.copy(yerr[2]),color='gold')
-            plt.errorbar(np.copy(x[3]),np.copy(y[3]),yerr=np.copy(yerr[3]),color='red')
-            plt.errorbar(np.copy(x[4]),np.copy(y[4]),yerr=np.copy(yerr[4]),color='black')
-            plt.savefig(self.fig_base+'mass_budget.pdf') 
 
-            # Plot metal budget
-            plt.figure() 
-            x = np.log10(mbins_min)
-            plt.plot(x,np.log10(mz_winds_med),label='Winds',color='brown',ls='dotted')
-            plt.fill_between(x,np.log10(mz_winds_Q1),np.log10(mz_winds_Q3),alpha=0.3,color='brown')
-            plt.plot(x,np.log10(mz_gal_med),label='Stars+ISM',color='green')
-            plt.fill_between(x,np.log10(mz_gal_Q1),np.log10(mz_gal_Q3),alpha=0.3,color='green')
-            plt.plot(x,np.log10(mz_cool_CGM_med),label='Cool CGM',color='blue')
-            plt.fill_between(x,np.log10(mz_cool_CGM_Q1),np.log10(mz_cool_CGM_Q3),alpha=0.3,color='blue')
-            plt.plot(x,np.log10(mz_warm_CGM_med),label='Warm CGM',color='chartreuse')
-            plt.fill_between(x,np.log10(mz_warm_CGM_Q1),np.log10(mz_warm_CGM_Q3),alpha=0.3,color='chartreuse')
-            plt.plot(x,np.log10(mz_hot_CGM_med),label='Hot CGM',color='red')
-            plt.fill_between(x,np.log10(mz_hot_CGM_Q1),np.log10(mz_hot_CGM_Q3),alpha=0.3,color='red')
-            plt.savefig(self.fig_base+'metal_budget.pdf')
+
+        # Plot Baryon budget
+        plt.figure(figsize=(5,5))
+        x = np.log10(mbins_min) 
+        print "x ",x
+        # plt.plot(x,np.log10(m_winds_med),label='Winds',color='brown',ls='dotted')
+        # plt.fill_between(x,np.log10(m_winds_Q1),np.log10(m_winds_Q3),alpha=0.3,color='brown')
+        plt.plot(x,np.log10(m_gal_med),label='Stars+ISM',color='green')
+        # plt.fill_between(x,np.log10(m_gal_Q1),np.log10(m_gal_Q3),alpha=0.3,color='green')
+        plt.plot(x,np.log10(m_cool_CGM_med),label='Cool CGM',color='blue')
+        # plt.fill_between(x,np.log10(m_cool_CGM_Q1),np.log10(m_cool_CGM_Q3),alpha=0.3,color='blue')
+        plt.plot(x,np.log10(m_warm_CGM_med),label='Warm CGM',color='gold')
+        # plt.fill_between(x,np.log10(m_warm_CGM_Q1),np.log10(m_warm_CGM_Q3),alpha=0.3,color='gold')
+        plt.plot(x,np.log10(m_hot_CGM_med),label='Hot CGM',color='red')
+        # plt.fill_between(x,np.log10(m_hot_CGM_Q1),np.log10(m_hot_CGM_Q3),alpha=0.3,color='red')
+        plt.xlabel("Log10(Halo Mass)")
+        plt.ylabel("Log10 (Mass)")
+        plt.legend(loc=4)
+
+
+        # x = np.ones(5)*12.2
+        x = np.array([12.1,12.15,12.2,12.25,12.3])
+        y = np.array([10.7,11.0,10.5,9.6,11.3])
+        yerr = np.array([0.1,0.08,0.5,0.6,0.2])
+        plt.errorbar(np.copy(x[1]),np.copy(y[0]),yerr=np.copy(yerr[0]),color='green',lw=6)
+        plt.errorbar(np.copy(x[0]),np.copy(y[1]),yerr=np.copy(yerr[1]),color='blue',lw=6)
+        plt.errorbar(np.copy(x[2]),np.copy(y[2]),yerr=np.copy(yerr[2]),color='gold',lw=6)
+        plt.errorbar(np.copy(x[3]),np.copy(y[3]),yerr=np.copy(yerr[3]),color='red',lw=6)
+        # x = np.array([10.,15.])
+        # plt.fill_between(x,np.log10(4*10**10.),np.log10(7*10**10.),color='green',alpha=0.2)
+        # plt.fill_between(x,np.log10(7*10**10.),np.log10(12*10**10.),color='blue',alpha=0.2)
+        # plt.fill_between(x,np.log10(1*10**10.),np.log10(10*10**10.),color='gold',alpha=0.2)
+        # plt.fill_between(x,np.log10(1*10**9.),np.log10(14*10**9.),color='red',alpha=0.2)
+        # plt.errorbar(np.copy(x[4]),np.copy(y[4]),yerr=np.copy(yerr[4]),color='black')
+        # plt.xlim([11.,13.])
+        plt.savefig(self.fig_base+'mass_budget_grp.pdf', bbox_inches='tight') 
+        
+
+        # Plot metal budget
+        plt.figure() 
+        x = np.log10(mbins_min)
+        # plt.plot(x,np.log10(mz_winds_med),label='Winds',color='brown',ls='dotted')
+        # plt.fill_between(x,np.log10(mz_winds_Q1),np.log10(mz_winds_Q3),alpha=0.3,color='brown')
+        plt.plot(x,np.log10(mz_gal_med),label='Stars+ISM',color='green')
+        # plt.fill_between(x,np.log10(mz_gal_Q1),np.log10(mz_gal_Q3),alpha=0.3,color='green')
+        plt.plot(x,np.log10(mz_cool_CGM_med),label='Cool CGM',color='blue')
+        # plt.fill_between(x,np.log10(mz_cool_CGM_Q1),np.log10(mz_cool_CGM_Q3),alpha=0.3,color='blue')
+        plt.plot(x,np.log10(mz_warm_CGM_med),label='Warm CGM',color='gold')
+        # plt.fill_between(x,np.log10(mz_warm_CGM_Q1),np.log10(mz_warm_CGM_Q3),alpha=0.3,color='gold')
+        plt.plot(x,np.log10(mz_hot_CGM_med),label='Hot CGM',color='red')
+        # plt.fill_between(x,np.log10(mz_hot_CGM_Q1),np.log10(mz_hot_CGM_Q3),alpha=0.3,color='red')
+        plt.plot(x,np.log10(mz_cool_CGM_med+mz_warm_CGM_med+mz_hot_CGM_med),label='CGM',color='black')
+        plt.savefig(self.fig_base+'metal_budget_grp.pdf')
 
 
 

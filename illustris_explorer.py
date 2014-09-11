@@ -2,6 +2,8 @@ import readsubfHDF5
 import h5py
 import numpy as np
 
+from units import AREPO_units
+AU = AREPO_units()
 
 
 base = "/n/ghernquist/Illustris/Runs/L75n1820FP/"
@@ -16,9 +18,9 @@ cat = readsubfHDF5.subfind_catalog(base,120)
 # Playing around with galaxy properties catalog
 galf = h5py.File(base+"/postprocessing/galprop/galprop_120.hdf5",'r')
 galf.keys()
-gal_sm = np.array(galf['stellar_totmass'])
+gal_sm = AU.PhysicalMass(np.array(galf['stellar_totmass']))
 n_gal = np.size(gal_sm)
-sm_mass_select = np.logical_and(gal_sm > 1.,gal_sm < 40)
+sm_mass_select = np.logical_and(gal_sm > 10.**9.5,gal_sm < 10.**11.5)
 print np.sum(sm_mass_select) #5274
 gal_ids = np.arange(n_gal)[sm_mass_select]
 

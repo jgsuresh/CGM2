@@ -20,15 +20,16 @@ AU = AREPO_units()
 class illustris_CGM_extract:
     def __init__(self,verbose=False):
         run = "ill1"
-        self.snapnum = 120
+        self.snapnum = 68
 
-        # group_min_mass = 10.**11.8 
-        # group_max_mass = 10.**12.2
-        gal_min_stellar_mass = 10.**10.
-        gal_max_stellar_mass = 10.**11.6
+        group_min_mass = 10.**12.2
+        group_max_mass = 10.**15
+        # gal_min_stellar_mass = 10.**10.
+        # gal_max_stellar_mass = 10.**11.6
         dat_str_list = ["Masses","Coordinates","GFM_Metals","GFM_Metallicity","Velocities","Density","Volume","InternalEnergy","ElectronAbundance","NeutralHydrogenAbundance","SmoothingLength"]
         self.block_list = ["MASS","POS ","GMET","GZ  ","VEL ","RHO ","VOL ","U   ","NE  ","NH  ","HSML"]
-        self.savebase = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
+        # self.savebase = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
+        self.savebase = '/n/home04/jsuresh/scratch1/QCGM2/data/CGM_snaps/'
 
         if run == 'ill3': self.snapbase="/n/ghernquist/Illustris/Runs/Illustris-3/output/"
         elif run == 'ill2': self.snapbase="/n/ghernquist/Illustris/Runs/Illustris-2/output/"
@@ -36,8 +37,11 @@ class illustris_CGM_extract:
 
         self.setup_tables(verbose=verbose)
 
-        grnr_arr = self.get_grnr_array(gal_min_stellar_mass,gal_max_stellar_mass)
-        # grnr_arr = np.array([79])
+        # grnr_arr = self.get_grnr_array(gal_min_stellar_mass,gal_max_stellar_mass)
+        gm = AU.PhysicalMass(self.cat.Group_M_Crit200)
+        grnr_arr = np.arange(np.size(gm))
+        grnr_arr = grnr_arr[np.logical_and(gm > group_min_mass,gm < group_max_mass)]
+
 
         for grnr in grnr_arr:
             ts = time.time()
