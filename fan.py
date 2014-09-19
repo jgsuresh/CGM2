@@ -39,7 +39,7 @@ class full_analysis:
 
 
         # Feedback paper runs:
-        redshifts = ['2']
+        redshifts = ['3']
         self.dat_prep(redshifts,g0_BH=1)
         self.dat_prep(redshifts,c2_256=1)
         self.dat_prep(redshifts,c0_sw_256=1)
@@ -148,11 +148,12 @@ class full_analysis:
         ##############################
         # 3D data analysis functions #
         ##############################
-        self.phase_budget('m',savename='m_budget_ds',minimal=True)
-        self.phase_budget('z',savename='z_budget_ds',minimal=True)
+        # self.phase_budget('m',savename='m_budget_ds',minimal=True)
+        # self.phase_budget('z',savename='z_budget_ds',minimal=True)
         # self.CGM_and_gal_metallicity(savename="massmet_newleg")
         # self.radial_profile('T')
         # self.radial_profile('z')
+        # self.columndens_vs_R("O6",150.,minmass=10**11.8,maxmass=10**12.2,plot_mode=1,savename="O6_z3_galaxybinned")
 
         ##############################
         # 2D data analysis functions #
@@ -165,6 +166,7 @@ class full_analysis:
         # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_newfan2")
         # print "3"
         # self.grid_sightlines("H1",200.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="coldens_newfan2")
+        self.grid_sightlines("O6",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="O6_z3_coldens")
         # self.coverfrac_bootstrap("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2)
     ############################################################################################################
     ############################################################################################################
@@ -625,7 +627,7 @@ class full_analysis:
         plt.figure(figsize=(3.54331,3.14))
 
         # Set up bins for radius:
-        n_Rbins = 50
+        n_Rbins = 100
         [Rbins_min,Rbins_max] = AU._bin_setup(0.,max_R,n_Rbins)
         Rbins_med = (Rbins_min+Rbins_max)/2.
 
@@ -664,8 +666,12 @@ class full_analysis:
                 # Calculates the median column density as a function of radius
                 [Q1,med,Q3] = AU._calc_percentiles_v2(r,Rbins_min,Rbins_max,N)
 
-                plt.plot(Rbins_min,med,color=self.color_list[i],label=self.label_list[i],zorder=1)
-                plt.fill_between(Rbins_med,Q1,Q3,color=self.color_list[i],alpha=0.3,zorder=2)
+                x = Rbins_med
+                x[0] = 0
+                x[-1] = max_R
+                print "x ",x
+                plt.plot(x,med,color=self.color_list[i],label=self.label_list[i],zorder=1)
+                # plt.fill_between(Rbins_med,Q1,Q3,color=self.color_list[i],alpha=0.3,zorder=2)
 
             elif coverfrac_vs_R:
                 fc = np.zeros(n_Rbins)
@@ -729,8 +735,13 @@ class full_analysis:
         if coldens_vs_R:
             plt.xlim([0.,max_R])
             plt.xlabel('Radius [pkpc]')
-            plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
-            plt.legend(prop={'size':5},ncol=2)
+            # plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
+            # plt.legend(prop={'size':5},ncol=2)
+            plt.ylabel(r"log$_{10}$ N$_\mathrm{OVI}$ (cm$^{-2}$)")
+            plt.xticks(np.array([0.,50.,100.,150.]))
+            lg=plt.legend(prop={'size':6.5},loc=3,handletextpad=0.1)
+            lg.draw_frame(False)
+            plt.title(r"$z=3$")
             plt.subplots_adjust(left=0.2,bottom=0.18)
             if savename != None:
                 plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
@@ -758,6 +769,81 @@ class full_analysis:
             else:
                 plt.savefig(self.fig_base+"fc_within_R.pdf", bbox_inches='tight')
 
+
+
+    def columndens_vs_R(self,species,kpc_thresh,minmass=0.,maxmass=1e18,plot_mode=1,run_mode='save',savename=None):
+        # Plots column density vs radius for a given range of halo masses.  
+
+        #Plot mode is:
+        # 1: Only median line shown
+        # 2: Median and scatter about median shown
+
+        plt.close('all')
+        plt.figure()
+
+        # Set up bins for radius:
+        n_Rbins = 50
+        [Rbins_min,Rbins_max] = AU._bin_setup(0.,200.,n_Rbins)
+
+        for i in np.arange(self.ndat):
+            # Check if npz for this data has been saved before:
+            # foo = "{}kpc".format(kpc_thresh)
+            # npz_fname = "fc_{}_s{}_{}_N{}_within{}.npz".format(self.run_list[i],self.snapnum_list[i],species,Nmin,foo)
+            # print self.npz_base+npz_fname
+            if False: #os.path.isfile(self.npz_base+npz_fname):
+                print "Loaded from npz!"
+                f = np.load(self.npz_base+npz_fname)
+                m = f['m']
+                fc_vs_R = f['fc_vs_R']
+                f.close()
+            else:
+                grp_ids = self.find_desired_grpids(i,minmass=minmass,maxmass=maxmass)
+                print "grp_ids: ",grp_ids
+                print "np.size(grp_ids) ",np.size(grp_ids)
+                m = np.zeros(np.size(grp_ids))
+                fc = np.zeros(np.size(grp_ids))
+                N_vs_R = np.zeros([np.size(grp_ids),n_Rbins])
+                for j in np.arange(np.size(grp_ids)):
+                    grp_id = grp_ids[j]
+                    grp_data = self.load_grid_data(i,grp_id)
+                    grid = grp_data[species]
+                    grid_rad = grp_data['grid_radius_pkpc']
+                    ngrid = grp_data['ngrid']
+
+                    [gridx,gridy] = np.meshgrid(np.arange(ngrid),np.arange(ngrid))
+                    grid_cent = (ngrid-1)/2. #assume square grid: grid_centx = grid_centy = grid_cent
+                    r_grid = np.sqrt((gridx-grid_cent)**2+(gridy-grid_cent)**2)
+                    r_kpc = self._grid_to_kpc(r_grid,ngrid,grid_rad)
+
+                    if kpc_thresh > grid_rad:
+                        raise Exception('Desired radial threshold ({}) exceeded grid radius ({}) for covering fraction calculation.'.format(dist_thresh,grid_rad))
+
+                    for R_ind in np.arange(n_Rbins):
+                        in_Rbin = r_kpc<=Rbins_max[R_ind]
+                        if np.sum(in_Rbin) == 0:
+                            N_vs_R[j,R_ind] = 0.
+                        else:
+                            #in_N_range = np.logical_and(grid[in_Rbin]>Nmin,grid[in_Rbin]<Nmax)
+                            #fc_vs_R[j,R_ind] = np.float(np.sum(in_N_range))/np.float(np.sum(in_Rbin))
+                            N_vs_R[j,R_ind] = np.mean(grid[in_Rbin]) # effectively averaging by area instead of by mass
+
+                # Save covering fraction data to npz file
+                # np.savez(self.npz_base+npz_fname,run=self.run_list[i],snapnum=self.snapnum_list[i],species=species,Nmin=Nmax,kpc_thresh=kpc_thresh,grp_ids=grp_ids,m=m,fc_vs_R=fc_vs_R)  
+
+            [Q1,med,Q3] = AU._calc_percentiles(N_vs_R,min_percentile=10,max_percentile=90)
+
+            if plot_mode == 1:
+                plt.plot(Rbins_min,med,color=self.color_list[i],label=self.label_list[i],linestyle=self.linestyle_list[i])
+                if plot_mode == 2:
+                    plt.fill_between(Rbins_min,Q1,Q3,color=self.color_list[i],alpha=0.3)
+                plt.xlabel('Radius [pkpc]')
+                plt.ylabel(r'{} $N(< r)$'.format(species))
+                plt.legend()
+
+        if savename != None:
+            plt.savefig(self.fig_base+savename+".pdf")
+        else:
+            plt.savefig(self.fig_base+"N_vs_R.pdf")
                 
 
     def coverfrac_bootstrap(self,species,max_R,coldens_min=0,coldens_max=1000,minmass=10**11.9,maxmass=10**12.1,savename=None,rudie_155=False,rudie_172=False,rudie_19=False,rudie_203=False,show_Fumagalli=False):
@@ -974,6 +1060,7 @@ class full_analysis:
             print "File could not be opened!: {}".format(self.grid_base+"{}/s{}/{}.hdf5".format(self.run_list[i],self.snapnum_list[i],str(int(grp_id)).zfill(5)))
         for key in list(f['Header'].attrs): grp_data[key] = f['Header'].attrs[key]
         for key in f['grids'].keys(): grp_data[key] = np.array(f['grids'][key])
+        print "returning grp data from ",self.grid_base+"{}/s{}/{}.hdf5".format(self.run_list[i],self.snapnum_list[i],str(int(grp_id)).zfill(5))
         return grp_data 
 
     def _grid_to_kpc(self,r_grid,ngrid,grid_rad):
@@ -1003,7 +1090,7 @@ class full_analysis:
                     self.label_list.append("Cold Winds+BHs-256 (z=4)")
                     self.snapnum_list.append(54)
                 elif redshift == '3':
-                    self.label_list.append("Cold Winds+BHs-256 (z=3)")
+                    self.label_list.append("Fiducial")
                     self.snapnum_list.append(60)
                 elif redshift == '2.5':
                     self.label_list.append("Cold Winds+BHs-256 (z=2.5)")
@@ -1059,7 +1146,7 @@ class full_analysis:
                     self.label_list.append("Cold Winds only (z=4)")
                     self.snapnum_list.append(54)
                 elif redshift == '3':
-                    self.label_list.append("Cold Winds only (z=3)")
+                    self.label_list.append("No AGN")
                     self.snapnum_list.append(60)
                 elif redshift == '2':
                     # self.label_list.append("Cold Winds only (z=2)")
@@ -1154,7 +1241,7 @@ class full_analysis:
                     self.label_list.append("Strong Winds+BHs (z=4)")
                     self.snapnum_list.append(54)
                 elif redshift == '3':
-                    self.label_list.append("Strong Winds+BHs (z=4)")
+                    self.label_list.append("Higher Mass-Loading")
                     self.snapnum_list.append(60)
                 elif redshift == '2':
                     self.label_list.append("Higher Mass-loading")
@@ -1191,7 +1278,7 @@ class full_analysis:
                     self.label_list.append("Gamma=0+BHs (z=4)")
                     self.snapnum_list.append(54)
                 elif redshift == '3':
-                    self.label_list.append("Gamma=0+BHs (z=3)")
+                    self.label_list.append("Fiducial")
                     self.snapnum_list.append(60)
                 elif redshift == '2.5':
                     self.label_list.append("Gamma=0+BHs (z=2.5)")
@@ -1338,7 +1425,7 @@ class full_analysis:
                     self.label_list.append("Gamma=0.5 + BHs (z=4)")
                     self.snapnum_list.append(1)
                 elif redshift == '3':
-                    self.label_list.append("Gamma=0.5 + BHs (z=3)")
+                    self.label_list.append("Fixed-E Hot Winds")
                     self.snapnum_list.append(3)
                 elif redshift == '2.5':
                     self.label_list.append("Gamma=0.5 + BHs (z=2.5)")
@@ -1544,7 +1631,7 @@ class full_analysis:
                     self.label_list.append("Gamma=0.5-fixv (z=4)")
                     self.snapnum_list.append(1)
                 elif redshift == '3':
-                    self.label_list.append("Gamma=0.5-fixv (z=3)")
+                    self.label_list.append("Fixed-v Hot Winds")
                     self.snapnum_list.append(3)
                 elif redshift == '2.5':
                     self.label_list.append("Gamma=0.5-fixv (z=2.5)")
@@ -1573,6 +1660,9 @@ class full_analysis:
                 self.color_list.append("gold")
                 self.linestyle_list.append("solid")
                 self.snapdir_list.append(gam_snapbase+"gam_50_fixv_nothermal/output/")
+                if redshift == '3':
+                    self.label_list.append("Faster Winds")
+                    self.snapnum_list.append(3)
                 if redshift == '2':
                     self.label_list.append("Faster Winds")
                     self.snapnum_list.append(5)

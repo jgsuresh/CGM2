@@ -29,14 +29,16 @@ class grid_mass:
     def __init__(self):
         self.base = "/n/ghernquist/Illustris/Runs/Illustris-1/output/"
         self.res=1820
-        self.snapnum_arr = np.array([120])
+        self.snapnum_arr = np.array([68])
         # self.redshift = 0.19728
         self.grid_radius_pkpc = 200
         self.elem_list = ["H","Mg","Si","O"]
         self.ion_list = [1,2,3,6]
         self.cloudy_type = "ion_out_fancy_atten"
-        self.loadbase = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
-        self.savebase = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
+        # self.loadbase = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
+        # self.savebase = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
+        self.loadbase = '/n/home04/jsuresh/scratch1/QCGM2/data/CGM_snaps/'
+        self.savebase = '/n/home04/jsuresh/scratch1/QCGM2/data/grids/'
 
 
         # Here's where the magic happens

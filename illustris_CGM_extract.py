@@ -18,7 +18,7 @@ AU = AREPO_units()
 
 
 class illustris_CGM_extract:
-    def __init__(self,verbose=False):
+    def __init__(self,verbose=True):
         run = "ill1"
         self.snapnum = 68
 

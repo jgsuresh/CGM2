@@ -20,20 +20,25 @@ import os
 class illustris_fan:
     def __init__(self):
         self.snapbase = "/n/ghernquist/Illustris/Runs/Illustris-1/output/"
-        self.CGMsnap_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
-        self.grid_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
-        self.fig_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/figs/'
-        self.npz_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/npz/'
+        # self.CGMsnap_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
+        # self.grid_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
+        # self.fig_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/figs/'
+        # self.npz_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/npz/'
+        self.CGMsnap_base = '/n/home04/jsuresh/scratch1/QCGM2/data/CGM_snaps/'
+        self.grid_base = '/n/home04/jsuresh/scratch1/QCGM2/data/grids/'
+        self.fig_base = '/n/home04/jsuresh/scratch1/QCGM2/data/figs/'
+        self.npz_base = '/n/home04/jsuresh/scratch1/QCGM2/data/npz/'
 
-        self.snapnum = 120
+        self.snapnum = 68 #120
 
         #read in catalog + galprop file
         # self.cat = readsubfHDF5.subfind_catalog('/n/ghernquist/Illustris/Runs/Illustris-1/',self.snapnum,keysel=['GroupFirstSub'],subcat=False)
-        self.galf = h5py.File(self.snapbase+"/postprocessing/galprop/galprop_{}.hdf5".format(self.snapnum),'r')
+        self.galf = h5py.File(self.snapbase+"/postprocessing/galprop/galprop_{}.hdf5".format(str(self.snapnum).zfill(3)),'r')
 
         # self.cat = readsubfHDF5.subfind_catalog(self.snapbase, self.snapnum, long_ids=True, double_output=True, keysel=["GroupFirstSub","SubhaloGrNr"])
         # self.load_gal_props()
         # self.gal_mass_vs_sSFR()
+        # self.halo_baryon_abundance()
 
         # self.plot_grids("H1",vmax=25.)
         # self.plot_grids("Si3",vmax=18.)
@@ -41,7 +46,7 @@ class illustris_fan:
         # self.galprop_vs_CGMprop('sm','CGM_ISM_metal_ratio')
         # self.gal_mass_vs_Rvir()
         # self.coldens_plot('Si3',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.)
-        self.mass_metal_budget()
+        self.mass_metal_budget(BH_split=True)
 
         self.galf.close()
 
@@ -97,9 +102,38 @@ class illustris_fan:
             plt.savefig(self.fig_base+"sm_vs_halomass.pdf", bbox_inches='tight')
 
 
+    def halo_baryon_abundance(self,savename=None):
+        self.load_CGMsnap_ids()
+
+        print "self.grp_ids ",self.grp_ids
+        cat = readsubfHDF5.subfind_catalog('/n/ghernquist/Illustris/Runs/Illustris-1/',self.snapnum,keysel=['Group_M_Crit200'],subcat=False)
+        grp_mass = cat.Group_M_Crit200[np.int32(self.grp_ids)]
+
+        fb = (0.0456/0.27)
+        gas_mass = np.zeros(0)
+        for grp_id in self.grp_ids:
+            f = self.CGMsnap_base+"s{}/{}.hdf5".format(self.snapnum,str(int(grp_id)).zfill(5))
+            data_dict = self.load_CGM_snap(f)
+            gas_mass = np.append(gas_mass,np.sum(data_dict['MASS']))
+
+        frac = gas_mass/(fb*grp_mass)
+
+        plt.figure()
+        x = np.log10(AU.PhysicalMass(grp_mass))
+        y = frac
+        plt.scatter(x,y)
+        plt.savefig(self.fig_base+"halo_gas_abundance.pdf")
+
+        plt.figure()
+        x = np.log10(AU.PhysicalMass(grp_mass))
+        y = gas_mass/grp_mass
+        plt.scatter(x,y)
+        plt.xlabel(r"$M_{200}$")
+        plt.ylabel(r"$\frac{M_{\rm gas}}{M_{200}}$")
+        plt.savefig(self.fig_base+"halo_gas_abundance_v2.pdf")
 
 
-    def mass_metal_budget(self,savename=None):
+    def mass_metal_budget(self,savename=None,BH_split=False):
 
         # # Get CGMsnap group ids, and main subhalo ids:
         # self.load_CGMsnap_ids()
@@ -247,7 +281,7 @@ class illustris_fan:
             [m_hot_CGM_Q1,m_hot_CGM_med,m_hot_CGM_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,m_hot_CGM,min_percentile=10,max_percentile=90)
             [mz_hot_CGM_Q1,mz_hot_CGM_med,mz_hot_CGM_Q3] = AU._calc_percentiles_v2(m_stars,mbins_min,mbins_max,mz_hot_CGM,min_percentile=10,max_percentile=90)
         elif True:
-            # Bin by stellar mass
+            # Bin by group mass
             n_mbins = 50
             # [mbins_min,mbins_max] = AU._bin_setup(10.**10.,10.**11.5,n_mbins,logbins=True)
             [mbins_min,mbins_max] = AU._bin_setup(11.2,13.,n_mbins)
@@ -304,6 +338,12 @@ class illustris_fan:
             [mz_warm_CGM_Q1,mz_warm_CGM_med,mz_warm_CGM_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,mz_warm_CGM,min_percentile=10,max_percentile=90)
             [m_hot_CGM_Q1,m_hot_CGM_med,m_hot_CGM_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,m_hot_CGM,min_percentile=10,max_percentile=90)
             [mz_hot_CGM_Q1,mz_hot_CGM_med,mz_hot_CGM_Q3] = AU._calc_percentiles_v2(gal_ssfr,mbins_min,mbins_max,mz_hot_CGM,min_percentile=10,max_percentile=90)
+
+        if BH_split:
+            # In each group mass bin, take separately the groups with top 25% BH mass, and groups with bot 25% BH mass [NOT IMPLEMENTED]
+            # Do simple thing: split by arbitrary BH mass:
+            gal_BHmass = AU.PhysicalMass(np.array(self.galf['bh_totmass'])[np.int32(self.sub_ids)])
+
 
 
 
@@ -662,6 +702,17 @@ class illustris_fan:
             plt.savefig(img_savepath)
 
 
+    def load_CGM_snap(self,fn,load='all'):
+        data_dict = {}
+        f = h5py.File(fn,'r')
+        if load=='all':
+            for key in f['Header'].attrs:
+                data_dict[key] = f['Header'].attrs[key]
+            for key in f['PartType0']:
+                data_dict[key] = np.copy(f['PartType0'][key])
+        else:
+            data_dict[key] = f['Header'].attrs[key]
+        return data_dict
 
     def load_CGMsnap_ids(self):
         grp_ids = np.zeros(0)
