@@ -410,8 +410,6 @@ class illustris_fan:
 
 
 
-
-
     def galprop_vs_CGMprop(self,galprop,CGMprop,savename=None):
         # galprops: stellar mass, SFR, environment
         # CGMprop: total metallicity, total metal mass, ion covering fraction
@@ -435,6 +433,7 @@ class illustris_fan:
             gal_sm = AU.PhysicalMass(np.array(galf['stellar_totmass']))
             gal_sfr = AU.PhysicalMass(np.array(galf['gas_totsfr']))
             x = gal_sfr[self.sub_ids]/gal_sm[self.sub_ids]
+
 
         print "Done loading galaxy properties! "
 
