@@ -11,7 +11,7 @@ import time
 
 import hdfsim
 import cold_gas
-import convert_cloudy as cc
+import convert_cloudy as ccl
 import fieldize
 #import hsml
 from units import AREPO_units
@@ -19,7 +19,7 @@ AU = AREPO_units()
 
 from mpi4py import MPI
 import os.path
-# import readsubfHDF5
+import readsubfHDF5
 
 import glob
 
@@ -29,16 +29,25 @@ class grid_mass:
     def __init__(self):
         self.base = "/n/ghernquist/Illustris/Runs/Illustris-1/output/"
         self.res=1820
-        self.snapnum_arr = np.array([68])
-        # self.redshift = 0.19728
+        self.snapnum_arr = np.array([120])
+        self.redshift = 0.19728
         self.grid_radius_pkpc = 200
-        self.elem_list = ["H","Mg","Si","O"]
-        self.ion_list = [1,2,3,6]
-        self.cloudy_type = "ion_out_fancy_atten"
-        # self.loadbase = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
-        # self.savebase = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
-        self.loadbase = '/n/home04/jsuresh/scratch1/QCGM2/data/CGM_snaps/'
-        self.savebase = '/n/home04/jsuresh/scratch1/QCGM2/data/grids/'
+        # self.elem_list = ["H","Mg","Si","N","O"]
+        self.elem_list = ["N","O"]
+        self.ion_list = [5,6]
+        self.cloudy_list = ["ion_out_fancy_atten","UVB_sf_xrays_ext"]
+        self.tempfac_arr = np.array([1,3.,10.])
+        self.tab_list = [\
+        ccl.CloudyTable(self.redshift,directory='/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM/sbird/cloudy/ion_out_fancy_atten/'),\
+        ccl.CloudyTable(self.redshift,directory='/n/home04/jsuresh/scratch1/Cloudy_test/UVB_sf_xrays_ext/')]
+        self.n_cloudy_var = len(self.cloudy_list)
+        self.n_tempfac = len(self.tempfac_arr)
+        # self.cloudy_type = "ion_out_fancy_atten"
+        self.loadbase = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
+        self.savebase = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
+        # self.loadbase = '/n/home04/jsuresh/scratch1/QCGM2/data/CGM_snaps/'
+        # self.savebase = '/n/home04/jsuresh/scratch1/QCGM2/data/grids/'
+        
 
 
         # Here's where the magic happens
@@ -72,7 +81,24 @@ class grid_mass:
                 self.grp_mass = np.zeros(0)
                 self.grp_pos = np.zeros([0,3])
                 self.grp_Rvir = np.zeros(0)
-                for fn in glob.glob(self.loadbase+"s{}/*.hdf5".format(snapnum)):
+                if True: 
+                    for fn in glob.glob(self.loadbase+"s{}/*.hdf5".format(snapnum)):
+                    # for fn in glob.glob(self.loadbase+"s{}/*.hdf5".format(snapnum))[:10]:
+                        print "fn ",fn
+                        f = h5py.File(fn,'r')
+                        grp_id = f['Header'].attrs['grp_id']
+                        m = AU.PhysicalMass(f['Header'].attrs['grp_mass'])
+                        x = f['Header'].attrs['grp_pos']
+                        R = f['Header'].attrs['grp_Rvir']
+                        f.close()
+
+                        x = np.array([x])
+                        self.grp_ids = np.append(self.grp_ids,grp_id)
+                        self.grp_mass = np.append(self.grp_mass,m)
+                        self.grp_pos = np.append(self.grp_pos,x,axis=0)
+                        self.grp_Rvir = np.append(self.grp_Rvir,R)
+                else:
+                    fn = "/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/s120/00273.hdf5"
                     print "fn ",fn
                     f = h5py.File(fn,'r')
                     grp_id = f['Header'].attrs['grp_id']
@@ -123,9 +149,15 @@ class grid_mass:
             self.grid_radius = AU.CodePosition(self.grid_radius_pkpc,self.redshift,hubble=self.hubble)
             self.npart = self.res**3.
             self.ngrid=int(np.ceil(40*self.npart**(1./3)/self.box*2*self.grid_radius))
-            self.tab = cc.CloudyTable(self.redshift,atten_type=self.cloudy_type)
+            # self.tab = cc.CloudyTable(self.redshift,atten_type=self.cloudy_type)
             self.n_species = len(self.elem_list)
 
+
+            if "UVB_sf_xrays_ext" in self.cloudy_list:
+                galprop = h5py.File(self.base+"postprocessing/galprop/galprop_{}.hdf5".format(snapnum),'r')
+                cat = readsubfHDF5.subfind_catalog(self.base,snapnum,keysel=['GroupFirstSub'])
+                subids = cat.GroupFirstSub[np.int32(self.grp_ids)]
+                self.grp_SFR = np.array(galprop['gas_sfr_inrad'])[subids]
 
             for i in np.arange(self.n_selected_groups):
                 if (i % size == rank):
@@ -134,7 +166,8 @@ class grid_mass:
                     gpos  = self.grp_pos[i]
                     r200  = self.grp_Rvir[i]
                     
-                    self.grid = np.zeros([self.n_species,self.ngrid,self.ngrid])
+                    self.grid = np.zeros([self.n_cloudy_var,self.n_tempfac,self.n_species,self.ngrid,self.ngrid])
+                    # self.grid = np.zeros([self.n_cloudy_var,self.n_species,self.ngrid,self.ngrid])
                     #grid = np.zeros([ngrid,ngrid])
 
                     CGMsnap_file_path = self.loadbase+ "s{}/{}.hdf5".format(snapnum,str(int(grp_id)).zfill(5))
@@ -147,11 +180,11 @@ class grid_mass:
                         print "File {} already exists!  Skipping...".format(savename)
                     else:
                         print "working on {}".format(savename)
-                        [m,pos,metals,rho,u,nelec,hsml,T,neut_frac] = self.load_CGM_file(CGMsnap_file_path,i)
+                        [m,pos,metals,rho,u,nelec,hsml,T,neut_frac] = self.load_CGM_file(i,CGMsnap_file_path)
 
                         pos_cent = self._fix_pos(self.grp_pos[i],pos,self.box)
                         print "pos_cent: ",pos_cent
-                        self.calc_grid(m,pos_cent,metals,rho,hsml,T,neut_frac,kernel_type='SPH')
+                        self.calc_grid(i,m,pos_cent,metals,rho,hsml,T,neut_frac,kernel_type='SPH')
 
                         print "Saving group file now to {}".format(savename)
                         print ""
@@ -177,18 +210,31 @@ class grid_mass:
                         grp.attrs["grid_radius_pkpc"] = self.grid_radius_pkpc
                         grp.attrs["ngrid"] = self.ngrid
 
-                        p_grp = f.create_group('grids')
-                        for i in xrange(self.n_species):
-                            elem = self.elem_list[i]
-                            ion = self.ion_list[i]
-                            dataset_name = elem+str(ion)
-                            p_grp.create_dataset(dataset_name,data=self.grid[i,:,:])
+                        for cc in xrange(self.n_cloudy_var):
+                            cloudy = self.cloudy_list[cc]
+                            c_grp = f.create_group(cloudy)
+                            for tt in xrange(self.n_tempfac):
+                                tempfac = self.tempfac_arr[tt]
+                                t_grp = c_grp.create_group("temp_fac_{}".format(tempfac))
+                                for ss in xrange(self.n_species):
+                                    elem = self.elem_list[ss]
+                                    ion = self.ion_list[ss]
+                                    dataset_name = elem+str(ion)
+                                    t_grp.create_dataset(dataset_name,data=self.grid[cc,tt,ss,:,:])
+                        # for cc in xrange(self.n_cloudy_var):
+                        #     cloudy = self.cloudy_list[cc]
+                        #     c_grp = f.create_group(cloudy)
+                        #     for ss in xrange(self.n_species):
+                        #         elem = self.elem_list[ss]
+                        #         ion = self.ion_list[ss]
+                        #         dataset_name = elem+str(ion)
+                        #         c_grp.create_dataset(dataset_name,data=self.grid[cc,ss,:,:])
                         f.close()
 
 
 
 
-    def load_CGM_file(self,CGMsnap_file_path,i,use_block_name=True):
+    def load_CGM_file(self,i,CGMsnap_file_path,use_block_name=True):
         f=h5py.File(CGMsnap_file_path,'r')
         bar = f['PartType0']
 
@@ -215,6 +261,7 @@ class grid_mass:
             vol = np.array(bar["Volume"])
 
         hsml = (3.*vol/4./np.pi)**(0.33333333)
+        hsml *= 2. # SPH fudge factor [see research notes from 10/10/14]
         del vol
         T = AU.GetTemp(u, nelec, gamma = 5.0/3.0)
 
@@ -238,6 +285,22 @@ class grid_mass:
         #interpolate the density
         ts = time.time()
         print "starting to fieldize"
+        # print np.shape(ion_mass)
+        # print np.shape(coords)
+        # print np.shape(grid)
+        # print np.shape(hsml_grid)
+        # print np.isnan(np.sum(ion_mass))
+        # print np.isnan(np.sum(coords))
+        # print np.isnan(np.sum(grid))
+        # print np.isnan(np.sum(hsml_grid))
+        # ion_mass = 1.0*np.ones_like(ion_mass)
+        # ion_mass[np.log10(ion_mass)<-35.] = 0.
+        # print np.max(ion_mass)
+        # print np.min(ion_mass)
+        # print np.max(np.log10(ion_mass))
+        # print np.min(np.log10(ion_mass))
+        # print np.max(coords)
+        # print np.min(coords)
         if kernel_type == 'SPH':
             fieldize.sph_str(coords,ion_mass,grid,hsml_grid,weights=weights)
         elif kernel_type == 'TOPHAT':
@@ -246,10 +309,10 @@ class grid_mass:
         return
 
 
-    def calc_grid(self,m,pos,metals,rho,hsml,T,neut_frac,kernel_type='SPH'):
+    def calc_grid(self,i,m,pos,metals,rho,hsml,T,neut_frac,kernel_type='SPH'):
         print "initial # of particles before picking out: ",np.size(m)
         for d in np.arange(3):
-            ind = np.abs(pos[:,d]) <= self.grid_radius
+            ind = np.abs(pos[:,d]) <= 1.5*self.grid_radius
             pos = pos[ind]
             m = m[ind]
             metals = metals[ind]
@@ -260,6 +323,7 @@ class grid_mass:
             #print "np.sum(ind) ",np.sum(ind)
 
         print "# of particles to fieldize over: ",np.size(m)
+        r = AU.PhysicalPosition(np.sqrt(pos[:,0]**2.+pos[:,1]**2.+pos[:,2]**2.),self.redshift)
 
         # Impose cut on T and rho so cloudy doesn't die:
         T_cut = np.logical_and(np.log10(T) >= 3.,np.log10(T) <= 8.6)
@@ -278,37 +342,83 @@ class grid_mass:
             rho = rho[cloudy_cut]
             rho_Hatoms = rho_Hatoms[cloudy_cut]
             neut_frac = neut_frac[cloudy_cut] 
+            r = r[cloudy_cut]
 
-        for i in xrange(self.n_species):
-            elem = self.elem_list[i]
-            ion = self.ion_list[i]
-            print "species: {}".format(elem+str(ion))
+        pos_orig = np.copy(pos)
+        m_orig = np.copy(m)
+        metals_orig = np.copy(metals)
+        hsml_orig = np.copy(hsml)
+        T_orig = np.copy(T)
+        rho_orig = np.copy(rho)
+        rho_Hatoms_orig = np.copy(rho_Hatoms)
+        neut_frac_orig = np.copy(neut_frac)
+        r_orig = np.copy(r)
 
+        for cc in xrange(self.n_cloudy_var):
+            tab = self.tab_list[cc]
+            cloudy = self.cloudy_list[cc]
+            for tt in xrange(self.n_tempfac):
+                tempfac = self.tempfac_arr[tt]
+                low_dens = np.log10(rho_Hatoms) < -3.
+                T = np.copy(T_orig)
+                T[low_dens] *= tempfac
 
-            # elem_massfrac = metals[:,AU.elem_lookup(elem)]
-            # ion_frac = self.tab.ion(elem,ion,rho_Hatoms,T)
-            # species_mass = m*elem_massfrac*ion_frac
+                T_cut = np.logical_and(np.log10(T) >= 3.,np.log10(T) <= 8.6)
+                pos = pos_orig[T_cut]
+                m = m_orig[T_cut]
+                metals = metals_orig[T_cut]
+                hsml = hsml_orig[T_cut]
+                T = T_orig[T_cut]
+                rho = rho_orig[T_cut]
+                rho_Hatoms = rho_Hatoms_orig[T_cut]
+                # print "np.array_equiv(rho_Hatoms,rho_Hatoms_orig) ",np.array_equiv(rho_Hatoms,rho_Hatoms_orig)
+                neut_frac = neut_frac_orig[T_cut] 
+                r = r_orig[T_cut]
 
-            if elem == "H" and ion == 1:
-                H_massfrac = metals[:,0]
-                star=cold_gas.RahmatiRT(self.redshift, self.hubble)
-                fake_bar = {'Density':rho,'NeutralHydrogenAbundance':neut_frac}
-                new_neut_frac = star.get_reproc_HI(fake_bar)
-                species_mass = m*H_massfrac * new_neut_frac
+                for ss in xrange(self.n_species):
+                    elem = self.elem_list[ss]
+                    ion = self.ion_list[ss]
+                    print "species: {}".format(elem+str(ion))
+                    print "cloudy: {}".format(cloudy)
+                    print "tempfac: {}".format(tempfac)
 
-            else: 
-                elem_massfrac = metals[:,AU.elem_lookup(elem)]
-                ion_frac = self.tab.ion(elem,ion,rho_Hatoms,T)
-                species_mass = m*elem_massfrac*ion_frac
+                    # elem_massfrac = metals[:,AU.elem_lookup(elem)]
+                    # ion_frac = self.tab.ion(elem,ion,rho_Hatoms,T)
+                    # species_mass = m*elem_massfrac*ion_frac
 
-            self.sub_gridize_single_halo(pos,hsml,species_mass,self.grid[i,:,:],kernel_type=kernel_type)
+                    if elem == "H" and ion == 1:
+                        H_massfrac = metals[:,0]
+                        star=cold_gas.RahmatiRT(self.redshift, self.hubble)
+                        fake_bar = {'Density':rho,'NeutralHydrogenAbundance':neut_frac}
+                        new_neut_frac = star.get_reproc_HI(fake_bar)
+                        species_mass = m*H_massfrac * new_neut_frac
 
-            elem_mass_g = AU.elem_atom_mass(elem)
-            massg=AU.UnitMass_in_g/self.hubble*(1/elem_mass_g)
-            epsilon=2.*self.grid_radius/self.ngrid*AU.UnitLength_in_cm/self.hubble/(1+self.redshift)
-            self.grid[i,:,:] *= (massg/epsilon**2)
-            self.grid[i,:,:] += 0.1
-            np.log10(self.grid[i,:,:],self.grid[i,:,:])
+                    else:
+                        elem_massfrac = metals[:,AU.elem_lookup(elem)]
+                        if cloudy == "ion_out_fancy_atten":
+                            ion_frac = tab.ion(elem,ion,rho_Hatoms,T)
+                        elif cloudy == "UVB_sf_xrays_ext":
+                            beta = self.grp_SFR[i]/r**2.
+                            print "SFR = ",self.grp_SFR[i]
+                            ion_frac = tab.ion(elem,ion,rho_Hatoms,T,beta=beta)
+                        species_mass = m*elem_massfrac*ion_frac
+
+                    # self.sub_gridize_single_halo(pos,hsml,species_mass,self.grid[cc,tt,ss,:,:],kernel_type=kernel_type)
+                    # self.sub_gridize_single_halo(pos,hsml,species_mass,self.grid[cc,ss,:,:],kernel_type=kernel_type)
+                    # temp_grid = np.copy(self.grid[cc,ss,:,:])
+                    temp_grid = np.zeros([self.ngrid,self.ngrid])
+                    self.sub_gridize_single_halo(pos,hsml,species_mass,temp_grid,kernel_type=kernel_type)
+                    self.grid[cc,tt,ss,:,:] = temp_grid
+
+                    elem_mass_g = AU.elem_atom_mass(elem)
+                    massg=AU.UnitMass_in_g/self.hubble*(1/elem_mass_g)
+                    epsilon=2.*self.grid_radius/self.ngrid*AU.UnitLength_in_cm/self.hubble/(1+self.redshift)
+                    self.grid[cc,tt,ss,:,:] *= (massg/epsilon**2)
+                    self.grid[cc,tt,ss,:,:] += 0.1
+                    np.log10(self.grid[cc,tt,ss,:,:],self.grid[cc,tt,ss,:,:])
+                    # self.grid[cc,ss,:,:] *= (massg/epsilon**2)
+                    # self.grid[cc,ss,:,:] += 0.1
+                    # np.log10(self.grid[cc,ss,:,:],self.grid[cc,ss,:,:])
 
 
     def _fix_pos(self,grp_pos,pos,boxsize):
