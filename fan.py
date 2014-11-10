@@ -24,10 +24,14 @@ import glob
 
 class full_analysis:
     def __init__(self):
-        self.CGMsnap_base = '/n/home04/jsuresh/CGM_new/data/CGM_snaps/'
-        self.grid_base = '/n/home04/jsuresh/CGM_new/data/grids/'
-        self.fig_base = '/n/home04/jsuresh/CGM_new/data/figs/'
-        self.npz_base = '/n/home04/jsuresh/CGM_new/data/npz/'
+        # self.CGMsnap_base = '/n/home04/jsuresh/CGM_new/data/CGM_snaps/'
+        # self.grid_base = '/n/home04/jsuresh/CGM_new/data/grids/'
+        # self.fig_base = '/n/home04/jsuresh/CGM_new/data/figs/'
+        # self.npz_base = '/n/home04/jsuresh/CGM_new/data/npz/'
+        self.CGMsnap_base = '/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/CGM_snaps/'
+        self.grid_base = '/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/grids/'
+        self.fig_base = '/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/figs/'
+        self.npz_base = '/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/npz/'
 
         # Select which runs to be analyzed concurrently:
         self.run_list = []
@@ -39,15 +43,15 @@ class full_analysis:
 
 
         # Feedback paper runs:
-        redshifts = ['3']
+        redshifts = ['2']
         self.dat_prep(redshifts,g0_BH=1)
-        self.dat_prep(redshifts,c2_256=1)
-        self.dat_prep(redshifts,c0_sw_256=1)
-        self.dat_prep(redshifts,g50_fixv_nothermal=1)
-        self.dat_prep(redshifts,g50_BH=1)
-        self.dat_prep(redshifts,g50_fixv=1)
-        self.dat_prep(redshifts,c0_nometalwinds=1)
-        self.dat_prep(redshifts,c0_fullmetalwinds=1)
+        # self.dat_prep(redshifts,c2_256=1)
+        # self.dat_prep(redshifts,c0_sw_256=1)
+        # self.dat_prep(redshifts,g50_fixv_nothermal=1)
+        # self.dat_prep(redshifts,g50_BH=1)
+        # self.dat_prep(redshifts,g50_fixv=1)
+        # self.dat_prep(redshifts,c0_nometalwinds=1)
+        # self.dat_prep(redshifts,c0_fullmetalwinds=1)
 
         # Check runs:
         # redshifts = ['2']
@@ -158,15 +162,29 @@ class full_analysis:
         ##############################
         # 2D data analysis functions #
         ##############################
-        # self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_z2",show_Fumagalli=True)
-        # self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_z2",show_Fumagalli=True)
-        # self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_z2",show_Fumagalli=True)
-        # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_z2",show_Fumagalli=True)
+        self.plot_grids("H1")
+        self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_z2_c2",show_Fumagalli=True)
+        self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_z2_c2",show_Fumagalli=True)
+        self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_z2_c2",show_Fumagalli=True)
+        self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_z2_c2",show_Fumagalli=True)
         # print "2"
-        # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_newfan2")
+        # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_c2")
         # print "3"
         # self.grid_sightlines("H1",200.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="coldens_newfan2")
-        self.grid_sightlines("O6",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="O6_z3_coldens")
+        # self.grid_sightlines("O6",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="O6_z3_coldens")
+
+        # self.grid_sightlines("H1",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="H1_z25_coldens")
+        # self.grid_sightlines("Mg2",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="Mg2_z25_coldens")
+        # self.grid_sightlines("C3",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="C3_z25_coldens")
+        # self.grid_sightlines("C4",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="C4_z25_coldens")
+        # self.grid_sightlines("Si3",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="Si3_z25_coldens")
+        # self.grid_sightlines("Si4",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="Si4_z25_coldens")
+        # self.grid_sightlines("O6",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="O6_z25_coldens")
+
+        # self.plot_grids("H1")
+        # self.plot_grids("C4")
+        # self.plot_grids("Si4")
+        # self.plot_grids("O6")
         # self.coverfrac_bootstrap("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2)
     ############################################################################################################
     ############################################################################################################
@@ -618,6 +636,35 @@ class full_analysis:
     ##############################
     # 2D data analysis functions #
     ##############################
+
+    def plot_grids(self,species,vmin=10.,vmax=25.):
+
+        # for fn in glob.glob(self.grid_base+"s{}/*.hdf5".format(self.snapnum)):
+        for i in xrange(len(self.run_list)):
+            run = self.run_list[i]
+            snapnum = self.snapnum_list[i]
+            for fn in glob.glob(self.grid_base+"{}/s{}/*.hdf5".format(run,snapnum)):
+                print "fn ",fn
+                f = h5py.File(fn,'r')
+                grp_id = f['Header'].attrs['grp_id']
+                grid_rad = f['Header'].attrs['grid_radius_pkpc']
+                ngrid = f['Header'].attrs['ngrid']
+                grid = np.array(f['grids'][species])
+
+                img_savepath = "{}/grids/{}/s{}/{}_{}.pdf".format(self.fig_base,run,snapnum,str(int(grp_id)).zfill(5),species)
+
+                maxdist = grid_rad
+
+                plt.close('all')
+                plt.imshow(grid,origin='lower',extent=(-maxdist,maxdist,-maxdist,maxdist),vmin=vmin,vmax=vmax,cmap=plt.cm.cubehelix) #spb_jet2
+                bar=plt.colorbar()
+                bar_label = r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)"
+                bar.set_label(bar_label)
+                plt.xlabel(r"y (pkpc)")
+                plt.ylabel(r"z (pkpc)")
+                plt.savefig(img_savepath)
+                f.close()
+
 
     def grid_sightlines(self,species,max_R,coldens_min=0,coldens_max=1000,minmass=10**11.9,maxmass=10**12.1,savename=None,coldens_vs_R=False,coverfrac_vs_R=False,coverfrac_within_R=False,rudie_155=False,rudie_172=False,rudie_19=False,rudie_203=False,show_Fumagalli=False):
         # Calculates covering fraction in similar way to observers.  Gather all halos within specified mass range, and treat 
@@ -1075,7 +1122,8 @@ class full_analysis:
         mv_snapbase = "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/" 
         sb_snapbase = "/n/hernquistfs1/spb/Cosmo/"
         js_snapbase = "/n/home04/jsuresh/runs/Cosmo5_V6/output"
-        gam_snapbase = "/n/hernquistfs1/jsuresh/Runs/"
+        # gam_snapbase = "/n/hernquistfs1/jsuresh/Runs/"
+        gam_snapbase = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/"
 
         bmap = brewer2mpl.get_map('Spectral','Diverging',9, reverse=True)
         cmap = bmap.mpl_colormap
@@ -1152,6 +1200,10 @@ class full_analysis:
                     # self.label_list.append("Cold Winds only (z=2)")
                     self.label_list.append("No AGN")
                     self.snapnum_list.append(68)
+                elif redshift == '2.5':
+                    # self.label_list.append("Cold Winds only (z=2)")
+                    self.label_list.append("No AGN")
+                    self.snapnum_list.append(63)
                 elif redshift == '0.3':
                     self.label_list.append("Cold Winds only (z=0.3)")
                     self.snapnum_list.append(114)
@@ -1246,6 +1298,9 @@ class full_analysis:
                 elif redshift == '2':
                     self.label_list.append("Higher Mass-loading")
                     self.snapnum_list.append(68)
+                elif redshift == '2.5':
+                    self.label_list.append("Higher Mass-loading")
+                    self.snapnum_list.append(63)
                 elif redshift == '0.3':
                     self.label_list.append("Strong Winds+BHs (z=4)")
                     self.snapnum_list.append(114)
@@ -1663,6 +1718,9 @@ class full_analysis:
                 if redshift == '3':
                     self.label_list.append("Faster Winds")
                     self.snapnum_list.append(3)
+                if redshift == '2.5':
+                    self.label_list.append("Faster Winds")
+                    self.snapnum_list.append(4)
                 if redshift == '2':
                     self.label_list.append("Faster Winds")
                     self.snapnum_list.append(5)

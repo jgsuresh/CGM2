@@ -35,13 +35,23 @@ class grid_mass:
         # self.elem_list = ["H","Mg","Si","N","O"]
         self.elem_list = ["N","O"]
         self.ion_list = [5,6]
-        self.cloudy_list = ["ion_out_fancy_atten","UVB_sf_xrays_ext"]
+        # self.cloudy_list = ["ion_out_fancy_atten","UVB_sf_xrays_ext"]
+        self.cloudy_list = ["UVB_sf_xrays_ext"]
+
+        # Modify temperatures of low-density CGM?
+        self.modify_temp = False
         self.tempfac_arr = np.array([1,3.,10.])
+        self.n_tempfac = len(self.tempfac_arr)
+        
+        # Multiple sources of radiation, or only use central galaxy?
+        self.multiple_sources = True
+        self.mmin_source = 10.**9.
+
+        # ccl.CloudyTable(self.redshift,directory='/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM/sbird/cloudy/ion_out_fancy_atten/'),
         self.tab_list = [\
-        ccl.CloudyTable(self.redshift,directory='/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM/sbird/cloudy/ion_out_fancy_atten/'),\
         ccl.CloudyTable(self.redshift,directory='/n/home04/jsuresh/scratch1/Cloudy_test/UVB_sf_xrays_ext/')]
         self.n_cloudy_var = len(self.cloudy_list)
-        self.n_tempfac = len(self.tempfac_arr)
+        
         # self.cloudy_type = "ion_out_fancy_atten"
         self.loadbase = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
         self.savebase = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
@@ -84,7 +94,7 @@ class grid_mass:
                 if True: 
                     for fn in glob.glob(self.loadbase+"s{}/*.hdf5".format(snapnum)):
                     # for fn in glob.glob(self.loadbase+"s{}/*.hdf5".format(snapnum))[:10]:
-                        print "fn ",fn
+                        # print "fn ",fn
                         f = h5py.File(fn,'r')
                         grp_id = f['Header'].attrs['grp_id']
                         m = AU.PhysicalMass(f['Header'].attrs['grp_mass'])
@@ -98,7 +108,7 @@ class grid_mass:
                         self.grp_pos = np.append(self.grp_pos,x,axis=0)
                         self.grp_Rvir = np.append(self.grp_Rvir,R)
                 else:
-                    fn = "/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/s120/00273.hdf5"
+                    fn = "/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/s120/00300.hdf5"
                     print "fn ",fn
                     f = h5py.File(fn,'r')
                     grp_id = f['Header'].attrs['grp_id']
@@ -359,21 +369,21 @@ class grid_mass:
             cloudy = self.cloudy_list[cc]
             for tt in xrange(self.n_tempfac):
                 tempfac = self.tempfac_arr[tt]
-                low_dens = np.log10(rho_Hatoms) < -3.
+                low_dens = np.copy(np.log10(rho_Hatoms) < -3.)
                 T = np.copy(T_orig)
                 T[low_dens] *= tempfac
 
                 T_cut = np.logical_and(np.log10(T) >= 3.,np.log10(T) <= 8.6)
-                pos = pos_orig[T_cut]
-                m = m_orig[T_cut]
-                metals = metals_orig[T_cut]
-                hsml = hsml_orig[T_cut]
-                T = T_orig[T_cut]
-                rho = rho_orig[T_cut]
-                rho_Hatoms = rho_Hatoms_orig[T_cut]
+                pos = np.copy(pos_orig[T_cut])
+                m = np.copy(m_orig[T_cut])
+                metals = np.copy(metals_orig[T_cut])
+                hsml = np.copy(hsml_orig[T_cut])
+                T = np.copy(T[T_cut])
+                rho = np.copy(rho_orig[T_cut])
+                rho_Hatoms = np.copy(rho_Hatoms_orig[T_cut])
                 # print "np.array_equiv(rho_Hatoms,rho_Hatoms_orig) ",np.array_equiv(rho_Hatoms,rho_Hatoms_orig)
-                neut_frac = neut_frac_orig[T_cut] 
-                r = r_orig[T_cut]
+                neut_frac = np.copy(neut_frac_orig[T_cut])
+                r = np.copy(r_orig[T_cut])
 
                 for ss in xrange(self.n_species):
                     elem = self.elem_list[ss]

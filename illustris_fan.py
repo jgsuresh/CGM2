@@ -20,33 +20,71 @@ import os
 class illustris_fan:
     def __init__(self):
         self.snapbase = "/n/ghernquist/Illustris/Runs/Illustris-1/output/"
-        # self.CGMsnap_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
-        # self.grid_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
-        # self.fig_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/figs/'
-        # self.npz_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/npz/'
-        self.CGMsnap_base = '/n/home04/jsuresh/scratch1/QCGM2/data/CGM_snaps/'
-        self.grid_base = '/n/home04/jsuresh/scratch1/QCGM2/data/grids/'
-        self.fig_base = '/n/home04/jsuresh/scratch1/QCGM2/data/figs/'
-        self.npz_base = '/n/home04/jsuresh/scratch1/QCGM2/data/npz/'
+        self.CGMsnap_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
+        self.grid_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
+        self.fig_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/figs/'
+        self.npz_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/npz/'
+        # self.CGMsnap_base = '/n/home04/jsuresh/scratch1/QCGM2/data/CGM_snaps/'
+        # self.grid_base = '/n/home04/jsuresh/scratch1/QCGM2/data/grids/'
+        # self.fig_base = '/n/home04/jsuresh/scratch1/QCGM2/data/figs/'
+        # self.npz_base = '/n/home04/jsuresh/scratch1/QCGM2/data/npz/'
 
-        self.snapnum = 68 #120
+        self.snapnum = 120
 
         #read in catalog + galprop file
         # self.cat = readsubfHDF5.subfind_catalog('/n/ghernquist/Illustris/Runs/Illustris-1/',self.snapnum,keysel=['GroupFirstSub'],subcat=False)
         self.galf = h5py.File(self.snapbase+"/postprocessing/galprop/galprop_{}.hdf5".format(str(self.snapnum).zfill(3)),'r')
 
-        # self.cat = readsubfHDF5.subfind_catalog(self.snapbase, self.snapnum, long_ids=True, double_output=True, keysel=["GroupFirstSub","SubhaloGrNr"])
+        self.cat = readsubfHDF5.subfind_catalog(self.snapbase, self.snapnum, long_ids=True, double_output=True, keysel=["GroupFirstSub","SubhaloGrNr"])
         # self.load_gal_props()
         # self.gal_mass_vs_sSFR()
         # self.halo_baryon_abundance()
 
         # self.plot_grids("H1",vmax=25.)
         # self.plot_grids("Si3",vmax=18.)
+        # self.plot_grids("N5",vmax=16.)
         # self.plot_grids("O6",vmax=16.)
         # self.galprop_vs_CGMprop('sm','CGM_ISM_metal_ratio')
         # self.gal_mass_vs_Rvir()
-        # self.coldens_plot('Si3',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.)
-        self.mass_metal_budget(BH_split=True)
+        # self.coldens_plot('N5',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,savename='N5_test')
+        # self.coldens_plot('N5',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',savename='N5_lowssfr_medm_xrays')
+        # self.coldens_plot('N5',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',savename='N5_lowssfr_medm_UVB')
+        # self.coldens_plot('N5',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',savename='N5_highssfr_medm_xrays')
+        # self.coldens_plot('N5',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',savename='N5_highssfr_medm_UVB')
+        # self.coldens_plot('N5',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='UVB_sf_xrays_ext',savename='N5_lowssfr_highm_xrays')
+        # self.coldens_plot('N5',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='ion_out_fancy_atten',savename='N5_lowssfr_highm_UVB')
+        # self.coldens_plot('N5',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='UVB_sf_xrays_ext',savename='N5_highssfr_highm_xrays')
+        # self.coldens_plot('N5',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='ion_out_fancy_atten',savename='N5_highssfr_highm_UVB')
+
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=1,savename='N5_highssfr_medm_xrays')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=1,savename='N5_highssfr_medm_UVB')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='UVB_sf_xrays_ext',tempfac=1,savename='N5_lowssfr_highm_xrays')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='ion_out_fancy_atten',tempfac=1,savename='N5_lowssfr_highm_UVB')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='UVB_sf_xrays_ext',tempfac=1.,savename='O6_highssfr_highm_xrays_t1')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='ion_out_fancy_atten',tempfac=1.,savename='O6_highssfr_highm_UVB_t1')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='UVB_sf_xrays_ext',tempfac=3.,savename='O6_highssfr_highm_xrays_t3')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='ion_out_fancy_atten',tempfac=3.,savename='O6_highssfr_highm_UVB_t3')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='UVB_sf_xrays_ext',tempfac=10.,savename='O6_highssfr_highm_xrays_t10')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='ion_out_fancy_atten',tempfac=10.,savename='O6_highssfr_highm_UVB_t10')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='UVB_sf_xrays_ext',tempfac=1.,savename='O6_lowssfr_highm_xrays_t1')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='ion_out_fancy_atten',tempfac=1.,savename='O6_lowssfr_highm_UVB_t1')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='UVB_sf_xrays_ext',tempfac=3.,savename='O6_lowssfr_highm_xrays_t3')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='ion_out_fancy_atten',tempfac=3.,savename='O6_lowssfr_highm_UVB_t3')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='UVB_sf_xrays_ext',tempfac=10.,savename='O6_lowssfr_highm_xrays_t10')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='ion_out_fancy_atten',tempfac=10.,savename='O6_lowssfr_highm_UVB_t10')
+
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=1.,savename='O6_lowssfr_medm_xrays_t1')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=1.,savename='O6_lowssfr_medm_UVB_t1')
+        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=3.,savename='O6_lowssfr_medm_xrays_t3')
+        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=3.,savename='O6_lowssfr_medm_UVB_t3')
+        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=10.,savename='O6_lowssfr_medm_xrays_t10')
+        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=10.,savename='O6_lowssfr_medm_UVB_t10')
+        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=3.,savename='O6_highssfr_medm_xrays_t3')
+        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=3.,savename='O6_highssfr_medm_UVB_t3')
+        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=10.,savename='O6_highssfr_medm_xrays_t10')
+        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=10.,savename='O6_highssfr_medm_UVB_t10')
+
+        # self.mass_metal_budget(BH_split=True)
 
         self.galf.close()
 
@@ -568,7 +606,7 @@ class illustris_fan:
 
 
 
-    def coldens_plot(self,species,kpc_mode=False,Rvir_mode=False,vmin=13.,vmax=16.,low_ssfr_pop=False,high_ssfr_pop=False,Mmin=10**10.5,Mmax=10**11.):
+    def coldens_plot(self,species,kpc_mode=False,Rvir_mode=False,vmin=13.,vmax=16.,low_ssfr_pop=False,high_ssfr_pop=False,Mmin=10**10.5,Mmax=10**11.,cloudy=None,tempfac=None,savename=None):
         # Load all grid files.
         # Calculate radii for each one.
         # hexbin the full radius vs column density spread, by kpc or Rvir.
@@ -577,48 +615,92 @@ class illustris_fan:
         nbiny = 100.
         twod_hist = np.zeros([nbinx,nbiny])
 
-        i = 0
-        for fn in glob.glob(self.grid_base+"s{}/*.hdf5".format(self.snapnum)):
-            print "fn ",fn
-            print "i ",i
-            f = h5py.File(fn,'r')
-            grp_id = f['Header'].attrs['grp_id']
-            grp_Rvir = f['Header'].attrs['grp_Rvir']
-            grid = f['grids'][species]
-            grid_rad = f['Header'].attrs['grid_radius_pkpc']
-            ngrid = f['Header'].attrs['ngrid']
-            grid = np.array(f['grids'][species])
-            f.close()
 
-            # check if galaxy matches desired properties.
-            gal_props = self._get_gal_props(grp_id)
-            ssfr = gal_props['ssfr']
-            sm = gal_props['sm']
+        
+        # save as hdf5 file.
+        if Mmin == 10.**11:
+            masstag = 'highm'
+        elif Mmin == 10.**10.5:
+            masstag = 'medm'
+        elif Mmin == 10.**10.:
+            masstag = 'lowm'
+        if low_ssfr_pop: ssfr_tag = 'lowssfr'
+        elif high_ssfr_pop: ssfr_tag = 'highssfr'
+        if tempfac != None and cloudy != None:
+            save_hdf5 = self.npz_base+"{}_{}_{}_{}_t{}.hdf5".format(species,masstag,ssfr_tag,cloudy,tempfac)
+        else: 
+            save_hdf5 = self.npz_base+"{}_{}_{}_{}.hdf5".format(species,masstag,ssfr_tag,cloudy)
+        
+        print "save_hdf5 ",save_hdf5
 
-            cond1 = (ssfr < 10.**-11.) and (sm > Mmin) and (sm < Mmax) #(sm > 10.**10.5) and (sm < 10.**11)
-            cond2 = (ssfr > 10.**-11.) and (sm > Mmin) and (sm < Mmax) #(sm > 10.**10.5) and (sm < 10.**11)
-            if (low_ssfr_pop and cond1) or (high_ssfr_pop and cond2) or (not low_ssfr_pop and not high_ssfr_pop):
-                [gridx,gridy] = np.meshgrid(np.arange(ngrid),np.arange(ngrid))
-                grid_cent = (ngrid-1)/2. #assume square grid: grid_centx = grid_centy = grid_cent
-                r_grid = np.sqrt((gridx-grid_cent)**2+(gridy-grid_cent)**2)
-                r_kpc = self._grid_to_kpc(r_grid,ngrid,grid_rad)
-                r_Rvir = r_kpc/AU.PhysicalPosition(grp_Rvir,0.19728)
+        if os.path.isfile(save_hdf5):
+            g = h5py.File(save_hdf5,'r')
+            twod_hist = np.array(g['histogram']['twod_hist'])
+            xedges = np.array(g['histogram']['xedges'])
+            yedges = np.array(g['histogram']['yedges'])
+            g.close()
+        else: 
+            i = 0
+            print "hi"
+            print self.grid_base+"s{}/*.hdf5".format(self.snapnum)
+            print glob.glob(self.grid_base+"s{}/*.hdf5".format(self.snapnum))
+            for fn in glob.glob(self.grid_base+"s{}/*.hdf5".format(self.snapnum)):
+                print "fn ",fn
+                print "i ",i
+                f = h5py.File(fn,'r')
+                grp_id = f['Header'].attrs['grp_id']
+                grp_Rvir = f['Header'].attrs['grp_Rvir']
+                grid_rad = f['Header'].attrs['grid_radius_pkpc']
+                ngrid = f['Header'].attrs['ngrid']
+                if tempfac != None and cloudy != None:
+                    grid = np.array(f[cloudy]['temp_fac_{}'.format(tempfac)][species])
+                elif tempfac == None and cloudy != None:
+                    grid = np.array(f[cloudy][species])
+                else:
+                    grid = np.array(f['grids'][species])
+                f.close()
 
-                if Rvir_mode:
-                    H,xedges,yedges = np.histogram2d(np.ravel(grid),np.ravel(r_Rvir),bins=[nbinx,nbiny],range=[[0.,1.],[vmin,vmax]])
-                    twod_hist += H
-                elif kpc_mode:
-                    # H,xedges,yedges = np.histogram2d(np.ravel(r_kpc),np.ravel(grid),bins=[nbinx,nbiny],range=[[0.,150.],[vmin,vmax]])
-                    H,yedges,xedges = np.histogram2d(np.ravel(grid),np.ravel(r_kpc),bins=[nbiny,nbinx],range=[[vmin,vmax],[0.,200.]],normed=False)
-                    twod_hist += H
-                i+=1
+                # save as hdf5 file?
+
+                # check if galaxy matches desired properties.
+                gal_props = self._get_gal_props(grp_id)
+                ssfr = gal_props['ssfr']
+                sm = gal_props['sm']
+
+                cond1 = (ssfr < 10.**-11.) and (sm > Mmin) and (sm < Mmax) #(sm > 10.**10.5) and (sm < 10.**11)
+                cond2 = (ssfr > 10.**-11.) and (sm > Mmin) and (sm < Mmax) #(sm > 10.**10.5) and (sm < 10.**11)
+                if (low_ssfr_pop and cond1) or (high_ssfr_pop and cond2) or (not low_ssfr_pop and not high_ssfr_pop):
+                    [gridx,gridy] = np.meshgrid(np.arange(ngrid),np.arange(ngrid))
+                    grid_cent = (ngrid-1)/2. #assume square grid: grid_centx = grid_centy = grid_cent
+                    r_grid = np.sqrt((gridx-grid_cent)**2+(gridy-grid_cent)**2)
+                    r_kpc = self._grid_to_kpc(r_grid,ngrid,grid_rad)
+                    r_Rvir = r_kpc/AU.PhysicalPosition(grp_Rvir,0.19728)
+
+                    if Rvir_mode:
+                        H,xedges,yedges = np.histogram2d(np.ravel(grid),np.ravel(r_Rvir),bins=[nbinx,nbiny],range=[[0.,1.],[vmin,vmax]])
+                        twod_hist += H
+                    elif kpc_mode:
+                        # H,xedges,yedges = np.histogram2d(np.ravel(r_kpc),np.ravel(grid),bins=[nbinx,nbiny],range=[[0.,150.],[vmin,vmax]])
+                        H,yedges,xedges = np.histogram2d(np.ravel(grid),np.ravel(r_kpc),bins=[nbiny,nbinx],range=[[vmin,vmax],[0.,200.]],normed=False)
+                        twod_hist += H
+                    i+=1
+
+            # g = h5py.File(save_hdf5,'w-')
+            # h_grp = g.create_group('histogram')
+            # h_grp.create_dataset("twod_hist",data=twod_hist)
+            # h_grp.create_dataset("xedges",data=xedges)
+            # h_grp.create_dataset("yedges",data=yedges)
+            # g.close()
+
+        # np.savez(f_npz,N=N,r_kpc=r_kpc,r_Rvir=r_Rvir)
 
 
-            # np.savez(f_npz,N=N,r_kpc=r_kpc,r_Rvir=r_Rvir)
+
 
         # a = np.array([[1,2],[3,4]])
         # plt.imshow(a,aspect='auto',cmap=plt.cm.cubehelix,origin="lower",extent=(0,150.,vmin,vmax))
-        # print "twod_hist ",twod_hist
+        print "twod_hist ",twod_hist
+        print "xedges ",xedges
         for i in np.arange(nbinx):
             twod_hist[i] /= (2*np.pi*(xedges[1:]))
         plt.figure(figsize=(4,4))
@@ -643,6 +725,7 @@ class illustris_fan:
             if species == "Mg2": species_cut = np.logical_and(elem==6,ion==2)
             elif species == "Si3": species_cut = np.logical_and(elem==7,ion==3)
             elif species == "O6": species_cut = np.logical_and(elem==4,ion==6)
+            elif species == "N5": species_cut = np.logical_and(elem==3,ion==5)
 
             mass_cut = np.logical_and(M>=Mmin,M<=Mmax) #M>=10.**11. 
             full = np.logical_and(np.logical_and(ssfr_cut,species_cut),mass_cut)
@@ -671,8 +754,22 @@ class illustris_fan:
             plt.errorbar(x[upper_lim],y[upper_lim],ls='none',marker='v',color='cyan',zorder=3)
 
 
+        if species == 'N5':
+            x_ul = np.array([78.,82.9,76.9,112.2,134.6,101.0,83.1,91.0,110.3,120.9,149.2,90.7,60.3,43.7,23.0,52.7,18.3,54.7,19.1,154.4,132.3,31.6,112.1,37.2,87.2,35.4,32.3,88.3,82.7,38.9,142.8,113.1,47.1,102.5,150.0,33.8,116.4,46.2])
+            N_ul = np.array([13.5,13.6,13.5,13.4,13.6,13.4,13.7,14.1,13.9,13.5,13.5,13.8,14.5,14.0,14.0,13.8,13.8,13.5,13.6,13.7,13.4,13.8,13.7,14.0,13.5,13.9,13.5,13.7,14.0,14.0,14.0,13.7,13.7,13.7,13.7,13.9,13.6,13.5])
+            x_det = np.array([44.3,19.7,92.6,96.8])
+            N_det = np.array([14.2,13.7,13.7,13.7])
+            plt.errorbar(x_ul,N_ul,ls='none',marker='v',color='yellow')
+            plt.errorbar(x_det,N_net,yerr=np.ones_like(x_det)*0.1,ls='none',marker='o',color='green')
+
+            # h = np.loadtxt('/n/home04/jsuresh/Python/MyModules/CGM/coshalos_NV.txt')
+            # h =
+
         plt.ylim([vmin,vmax])
-        plt.savefig(self.fig_base+"{}_coldens_medm_lowssfr_wCOS".format(species), bbox_inches='tight')
+        if savename == None:
+            plt.savefig(self.fig_base+"{}_coldens_medm_lowssfr_wCOS".format(species), bbox_inches='tight')
+        else:
+            plt.savefig(self.fig_base+savename+".pdf",bbox_inches='tight')
 
 
 
@@ -684,21 +781,23 @@ class illustris_fan:
             grp_id = f['Header'].attrs['grp_id']
             grid_rad = f['Header'].attrs['grid_radius_pkpc']
             ngrid = f['Header'].attrs['ngrid']
-            grid = np.array(f['grids'][species])
+            # grid = np.array(f['grids'][species])
+            for cloudy in ['ion_out_fancy_atten','UVB_sf_xrays_ext']:
+                grid = np.array(f[cloudy][species])
+
+                img_savepath = "{}/grids/s{}/{}_{}_{}.pdf".format(self.fig_base,self.snapnum,str(int(grp_id)).zfill(5),species,cloudy)
+
+                maxdist = grid_rad
+
+                plt.close('all')
+                plt.imshow(grid,origin='lower',extent=(-maxdist,maxdist,-maxdist,maxdist),vmin=vmin,vmax=vmax,cmap=plt.cm.cubehelix) #spb_jet2
+                bar=plt.colorbar()
+                bar_label = r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)"
+                bar.set_label(bar_label)
+                plt.xlabel(r"y (pkpc)")
+                plt.ylabel(r"z (pkpc)")
+                plt.savefig(img_savepath)
             f.close()
-
-            img_savepath = "{}/grids/s{}/{}_{}.pdf".format(self.fig_base,self.snapnum,str(int(grp_id)).zfill(5),species)
-
-            maxdist = grid_rad
-
-            plt.close('all')
-            plt.imshow(grid,origin='lower',extent=(-maxdist,maxdist,-maxdist,maxdist),vmin=vmin,vmax=vmax,cmap=plt.cm.cubehelix) #spb_jet2
-            bar=plt.colorbar()
-            bar_label = r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)"
-            bar.set_label(bar_label)
-            plt.xlabel(r"y (pkpc)")
-            plt.ylabel(r"z (pkpc)")
-            plt.savefig(img_savepath)
 
 
     def load_CGM_snap(self,fn,load='all'):

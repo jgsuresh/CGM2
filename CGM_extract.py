@@ -13,19 +13,19 @@ AU = AREPO_units()
 
 
 def main(run=None,base=None):
-    # run = "ill1"
-    run = "no_metal_cooling"
-    base="/n/hernquistfs1/jsuresh/Runs/{}/output/".format(run)
+    # run = "no_metal_cooling"
+    # base="/n/hernquistfs1/jsuresh/Runs/{}/output/".format(run)
+    # fnummax=8
+    run = "c0_fullmetalwinds"
+    base="/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(run)
     fnummax=8
-    #snapnum_arr = np.array([54,60,68,85,114,135])
-    #snapnum_arr = np.array([1,3,5,7])
-    snapnum_arr = np.array([5])
-    # snapnum_arr = np.array([60])
-    group_min_mass = 10.**11.8 #10.**12.2
-    group_max_mass = 10.**12.2
+    snapnum_arr = np.array([4])
+    group_min_mass = 10.**11.8
+    group_max_mass = 10.**16.
+    # group_max_mass = 10.**12.2
     #dat_str_list = ["Masses","Coordinates","GFM_Metals","GFM_Metallicity","Velocities","Density","Volume","InternalEnergy","ElectronAbundance","Radius","NeutralHydrogenAbundance"]
     dat_str_list = ["Masses","Coordinates","GFM_Metals","GFM_Metallicity","Velocities","Density","Volume","InternalEnergy","ElectronAbundance","NeutralHydrogenAbundance","SmoothingLength"]
-    savebase = '/n/home04/jsuresh/CGM_new/data/CGM_snaps/'
+    savebase = '/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/CGM_snaps/'
 
 
     if run == "gam_25_BH":
@@ -94,10 +94,10 @@ def main(run=None,base=None):
     for snapnum in snapnum_arr:
         if rank == 0:
             # Create necessary folder if it does not exist:
-            CGM_snapdir = savebase+"{}/s{}/".format(run,snapnum)
-            if not os.path.isdir(CGM_snapdir):
-                print "Trying to create {}".format(CGM_snapdir)
-                os.mkdir(CGM_snapdir)
+            # CGM_snapdir = savebase+"{}/s{}/".format(run,snapnum)
+            # if not os.path.isdir(CGM_snapdir):
+            #     print "Trying to create {}".format(CGM_snapdir)
+            #     os.mkdir(CGM_snapdir)
 
             # Get header information before proceeding:
             fname = base+"snapdir_"+str(snapnum).zfill(3)+"/snap_"+str(snapnum).zfill(3)+".0.hdf5"
@@ -113,12 +113,11 @@ def main(run=None,base=None):
             f.close()
 
             cat=readsubfHDF5.subfind_catalog(base,snapnum,subcat=False)
-            #cat=readsubfHDF5.subfind_catalog(base,135,keysel=["GroupMass","GroupPos","Group_R_Crit200"])
+            # cat=readsubfHDF5.subfind_catalog(base,4,subcat=False,keysel=["GroupMass","GroupPos","Group_R_Crit200"])
 
             # Select by minimum group mass threshold:
             grp_mass = np.array(cat.Group_M_Crit200) #check what hubble is
             m = AU.PhysicalMass(grp_mass)
-            #mass_select = (m > group_min_mass)
             mass_select = np.logical_and(m > group_min_mass, m < group_max_mass)
 
             grp_mass = grp_mass[mass_select]
@@ -126,10 +125,14 @@ def main(run=None,base=None):
             grp_ids = grp_ids[mass_select]
             grp_pos = np.array(cat.GroupPos)[mass_select]
             grp_Rvir = np.array(cat.Group_R_Crit200)[mass_select]
-            #grp_BHmass = np.array(cat.GroupBHMass)[mass_select]
-            #grp_BHMdot = np.array(cat.GroupBHMdot)[mass_select]
+            grp_BHmass = np.array(cat.GroupBHMass)[mass_select]
+            grp_BHMdot = np.array(cat.GroupBHMdot)[mass_select]
             n_selected_groups = np.float32(np.size(grp_mass))
-            del cat
+            # grp_ids = np.array([3])
+            # grp_pos = cat.GroupPos[grp_ids]
+            # print "grp_pos ",grp_pos
+            # n_selected_groups = 1
+            # del cat
         else:
             redshift = None
             hubble = None
@@ -188,10 +191,11 @@ def main(run=None,base=None):
         for i in np.arange(n_selected_groups):
             grp_id = grp_ids[i]
             gpos  = grp_pos[i]
-            r200  = grp_Rvir[i]
+            # r200  = grp_Rvir[i]
 
             # Check whether file exists:
             filepath = savebase+ "{}/s{}/{}.hdf5".format(run,snapnum,str(int(grp_id)).zfill(5))
+            # filepath = savebase+ "{}.hdf5".format(run,snapnum,str(int(grp_id)).zfill(5))
             if os.path.isfile(filepath):
                 if rank == 0:
                     print "File {} already exists!  Skipping...".format(filepath)
@@ -200,6 +204,9 @@ def main(run=None,base=None):
             else:
                 dist_thresh = AU.CodePosition(500.*np.sqrt(3),redshift) #3*r200
                 ind = get_gas_ind(gpos,dist_thresh,gas_kdtree,box)
+                # dist_thresh = 500.
+                # ind = get_gas_ind_BOX(gpos,dist_thresh,pos)
+
 
                 send_dict = {}
                 if np.size(ind) > 0:
@@ -245,15 +252,14 @@ def main(run=None,base=None):
                     grp.attrs["grp_mass"] = grp_mass[i]
                     grp.attrs["grp_pos"] = grp_pos[i]
                     grp.attrs["grp_Rvir"] = grp_Rvir[i]
-                    #grp.attrs["grp_BHmass"] = grp_BHmass[i]
-                    #grp.attrs["grp_BHMdot"] = grp_BHMdot[i]
+                    grp.attrs["grp_BHmass"] = grp_BHmass[i]
+                    grp.attrs["grp_BHMdot"] = grp_BHMdot[i]
 
                     p_grp = f.create_group('PartType0')
                     for key in save_dict:
                         #print save_dict[key]
                         p_grp.create_dataset(key,data=save_dict[key])
                     f.close()
-
 
 
 
@@ -296,6 +302,23 @@ def get_gas_ind(grp_pos,dist_thresh,gas_kdtree,box):
 
     #n_found = np.size(ind)
     return np.uint64(ind)
+
+
+def get_gas_ind_BOX(grp_pos,dist_thresh,gas_pos): 
+    # simple test function.  NOTE: does not handle box boundaries correctly.
+    xc = np.logical_and(gas_pos[:,0] >= grp_pos[0]-dist_thresh,gas_pos[:,0] <= grp_pos[0]+dist_thresh)
+    yc = np.logical_and(gas_pos[:,1] >= grp_pos[1]-dist_thresh,gas_pos[:,1] <= grp_pos[1]+dist_thresh)
+    zc = np.logical_and(gas_pos[:,2] >= grp_pos[2]-dist_thresh,gas_pos[:,2] <= grp_pos[2]+dist_thresh)
+    ind = np.logical_and(np.logical_and(xc,yc),zc)
+
+    print "grp_pos[0]-dist_thresh ",grp_pos[0]-dist_thresh
+    print "grp_pos[0]+dist_thresh ",grp_pos[0]+dist_thresh
+    print "grp_pos[1]-dist_thresh ",grp_pos[1]-dist_thresh
+    print "grp_pos[1]+dist_thresh ",grp_pos[1]+dist_thresh
+    print "grp_pos[2]-dist_thresh ",grp_pos[2]-dist_thresh
+    print "grp_pos[2]+dist_thresh ",grp_pos[2]+dist_thresh
+
+    return ind
 
 
 if __name__ == '__main__':

@@ -26,64 +26,37 @@ class grid_mass:
 
     def __init__(self):
         # self.run_list = ['']
-        self.run = 'no_metal_cooling'
-        self.base = "/n/hernquistfs1/jsuresh/Runs/{}/output/".format(self.run)
+        # self.run = 'c0_fullmetalwinds' #'gam_50_fixv'#'gam_50_fixv_nothermal' #'gam_50_BH'
+        # self.base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run)
+        # self.res=256
+        # self.run = 'c0_256'#'c0_sw_256'
+        # self.run_list = ['c0_256','c2_256','c0_sw_256']
+        # self.base_list = [\
+        # "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/Cosmo0_V6/L25n256/output/",\
+        # "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/Cosmo2_V6/L25n256/output/",\
+        # "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/Cosmo0_V6_strongWinds/L25n256/output/"]
+        self.run_list = ['c0_fullmetalwinds','c0_nometalwinds','gam_50_fixv','gam_50_fixv_nothermal','gam_50_BH']
+        self.base_list = [\
+        "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[0]),\
+        "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[1]),\
+        "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[2]),\
+        "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[3]),\
+        "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[4]),\
+        ]
         self.res=256
-        # self.snapnum_arr = np.array([60])
-        #self.snapnum_arr = np.array([54,60,68,85,114,135])
-        self.snapnum_arr = np.array([5])
+        # self.snapnum_arr = np.array([60,63,68])
+        self.snapnum_arr = np.array([3,4,5])
         self.group_min_mass = 10.**11.8 #11 CAREFUL
         self.grid_radius_pkpc = 200
-        self.elem_list = ["H"]
-        self.ion_list = [1]
-        self.cloudy_type = "ion_out_fancy_atten"
-        self.loadbase = '/n/home04/jsuresh/CGM_new/data/CGM_snaps/'
-        self.savebase = '/n/home04/jsuresh/CGM_new/data/grids/'
-
-        if self.run == "c0_128":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6/L25n128/output/"
-            self.res=128
-            #boxsize = 25000
-        elif self.run == "c0_256":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6/L25n256/output/"
-            self.res=256
-            #boxsize = 25000
-        elif self.run == "c0_512":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6/L25n512/output/"
-            self.res=512
-            #boxsize = 75000
-        elif self.run == "c0_fw_256":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6_fastWinds/L25n256/output/"
-            self.res=256
-        elif self.run == "c0_sw_256":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo0_V6_strongWinds/L25n256/output/"
-            self.res=256
-        elif self.run == "c2_256":
-            self.base="/n/hernquistfs1/mvogelsberger/projects/GFM/Production/Cosmo/Cosmo2_V6/L25n256/output/"
-            self.res=256
-        elif self.run == "c4_512":
-            self.base="/n/hernquistfs1/spb/Cosmo/Cosmo4_V6/L25n512/output/"
-            self.res=512
-            #boxsize = 75000
-        elif self.run == "c5_256":
-            self.base="/n/home04/jsuresh/runs/Cosmo5_V6/output/"
-            self.res=256
-        elif self.run == "c3_512":
-            self.base="/n/hernquistfs1/spb/Cosmo/Cosmo3_V6/L25n512/output/"
-            self.res=512
-            #boxsize = 75000
-        if self.run == 'ill3':
-            self.base="/n/ghernquist/Illustris/Runs/Illustris-3/output/"
-            self.res=455
-            #boxsize = 75000
-        elif self.run == 'ill2':
-            self.base="/n/ghernquist/Illustris/Runs/Illustris-2/output/"
-            self.res=910
-            #boxsize = 75000
-        elif self.run == 'ill1':
-            self.base="/n/ghernquist/Illustris/Runs/Illustris-1/output/"
-            self.res=1820
-            #boxsize = 75000
+        # self.elem_list = ["H"]
+        # self.ion_list = [1]
+        self.elem_list = ["H","Mg","C","C","Si","Si","O"]
+        self.ion_list = [1,2,3,4,3,4,6]
+        # self.cloudy_type = "ion_out_fancy_atten"
+        self.loadbase = '/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/CGM_snaps/'
+        self.savebase = '/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/grids/'
+        # self.loadbase = '/n/home04/jsuresh/'
+        # self.savebase = '/n/home04/jsuresh/'
 
         # Here's where the magic happens
         comm = MPI.COMM_WORLD
@@ -93,142 +66,155 @@ class grid_mass:
         print "my size = {}".format(size)
         #print "done with MPI comm/rank/size initialization!"
 
-        for snapnum in self.snapnum_arr:
-            if rank == 0:
-                # Create necessary folder if it does not exist:
-                grid_dir = self.savebase+"{}/s{}/".format(self.run,snapnum)
-                if not os.path.isdir(grid_dir):
-                    print "Trying to create {}".format(grid_dir)
-                    os.mkdir(grid_dir)
+        for rr in xrange(len(self.run_list)):
+            self.run = self.run_list[rr]
+            self.base = self.base_list[rr]
+            for snapnum in self.snapnum_arr:
+                if rank == 0:
+                    # Create necessary folder if it does not exist:
+                    grid_dir = self.savebase+"{}/s{}/".format(self.run,snapnum)
+                    if not os.path.isdir(grid_dir):
+                        print "Trying to create {}".format(grid_dir)
+                        os.mkdir(grid_dir)
 
-                # Get header information before proceeding:
-                fname = self.base+"snapdir_"+str(snapnum).zfill(3)+"/snap_"+str(snapnum).zfill(3)+".0.hdf5"
-                f = h5py.File(fname,'r')
-                self.redshift=f["Header"].attrs["Redshift"]
-                self.hubble=f["Header"].attrs["HubbleParam"]
-                self.box=f["Header"].attrs["BoxSize"]
-                self.omegam=f["Header"].attrs["Omega0"]
-                self.omegal=f["Header"].attrs["OmegaLambda"]
-                print "redshift: ", self.redshift
-                f.close()
-
-
-                cat=readsubfHDF5.subfind_catalog(self.base,snapnum,subcat=False)
-                #cat=readsubfHDF5.subfind_catalog(base,135,keysel=["GroupMass","GroupPos","Group_R_Crit200"])
-
-                # Select by minimum group mass threshold:
-                self.grp_mass = np.array(cat.Group_M_Crit200) #check what hubble is
-                self.m = AU.PhysicalMass(self.grp_mass)
-                mass_select = (self.m > self.group_min_mass)
-
-                self.grp_mass = self.grp_mass[mass_select]
-                self.grp_ids = np.arange(np.float64(cat.ngroups))
-                self.grp_ids = self.grp_ids[mass_select]
-                self.grp_pos = np.array(cat.GroupPos)[mass_select]
-                self.grp_Rvir = np.array(cat.Group_R_Crit200)[mass_select]
-                #grp_BHmass = np.array(cat.GroupBHMass)[mass_select]
-                #grp_BHMdot = np.array(cat.GroupBHMdot)[mass_select]
-                self.n_selected_groups = np.float32(np.size(self.grp_mass))
-                del cat
-            else:
-                self.redshift = None
-                self.hubble = None
-                self.box = None
-                self.omegam = None
-                self.omegal = None
-                self.grp_mass = None
-                self.m = None
-                self.grp_ids = None
-                self.grp_pos = None
-                self.grp_Rvir = None
-                self.n_selected_groups = None
-
-            # Broadcast necessary data from root process to other processes
-            self.redshift = comm.bcast(self.redshift,root=0)
-            self.hubble = comm.bcast(self.hubble,root=0)
-            self.box = comm.bcast(self.box,root=0)
-            self.omegam = comm.bcast(self.omegam,root=0)
-            self.omegal = comm.bcast(self.omegal,root=0)
-            self.grp_mass = comm.bcast(self.grp_mass,root=0)
-            self.grp_pos = comm.bcast(self.grp_pos,root=0)
-            self.m = comm.bcast(self.m,root=0)
-            self.grp_ids = comm.bcast(self.grp_ids,root=0)
-            self.grp_pos = comm.bcast(self.grp_pos,root=0)
-            self.grp_Rvir = comm.bcast(self.grp_Rvir,root=0)
-            self.n_selected_groups = comm.bcast(self.n_selected_groups,root=0)
-
-            # Other miscellaneous stuff
-            self.grid_radius = AU.CodePosition(self.grid_radius_pkpc,self.redshift,hubble=self.hubble)
-            self.npart = self.res**3.
-            self.box = AU.CodePosition(self.box,self.redshift,hubble=self.hubble) #HERE
-            self.ngrid=int(np.ceil(40*self.npart**(1./3)/self.box*2*self.grid_radius))
-            self.tab = cc.CloudyTable(self.redshift,atten_type=self.cloudy_type)
-            self.n_species = len(self.elem_list)
+                    # Get header information before proceeding:
+                    fname = self.base+"snapdir_"+str(snapnum).zfill(3)+"/snap_"+str(snapnum).zfill(3)+".0.hdf5"
+                    f = h5py.File(fname,'r')
+                    self.redshift=f["Header"].attrs["Redshift"]
+                    self.hubble=f["Header"].attrs["HubbleParam"]
+                    self.box=f["Header"].attrs["BoxSize"]
+                    self.omegam=f["Header"].attrs["Omega0"]
+                    self.omegal=f["Header"].attrs["OmegaLambda"]
+                    print "redshift: ", self.redshift
+                    f.close()
 
 
-            for i in np.arange(self.n_selected_groups):
-                if (i % size == rank):
-                    print "Projecting i / task:", i, rank
-                    grp_id = self.grp_ids[i]
-                    gpos  = self.grp_pos[i]
-                    r200  = self.grp_Rvir[i]
-                    
-                    self.grid = np.zeros([self.n_species,self.ngrid,self.ngrid])
-                    #grid = np.zeros([ngrid,ngrid])
+                    cat=readsubfHDF5.subfind_catalog(self.base,snapnum,subcat=False)
+                    #cat=readsubfHDF5.subfind_catalog(base,135,keysel=["GroupMass","GroupPos","Group_R_Crit200"])
 
-                    CGMsnap_file_path = self.loadbase+ "{}/s{}/{}.hdf5".format(self.run,snapnum,str(int(grp_id)).zfill(5))
-                    outputpath = self.savebase+ "{}/s{}/".format(self.run,snapnum)
-                    savename = outputpath+str(int(grp_id)).zfill(5)+'.hdf5'
+                    # Select by minimum group mass threshold:
+                    self.grp_mass = np.array(cat.Group_M_Crit200) #check what hubble is
+                    self.m = AU.PhysicalMass(self.grp_mass)
+                    mass_select = (self.m > self.group_min_mass)
 
-                    if not os.path.isfile(CGMsnap_file_path):
-                        print "File {} does not exist!  Skipping...".format(CGMsnap_file_path)
-                    elif os.path.isfile(savename):
-                        print "File {} already exists!  Skipping...".format(savename)
-                    else:
-                        print "working on {}".format(savename)
-                        [m,pos,metals,rho,u,nelec,hsml,T,neut_frac] = self.load_CGM_file(CGMsnap_file_path,i)
+                    self.m = self.m[mass_select]
+                    self.grp_mass = self.grp_mass[mass_select]
+                    self.grp_ids = np.arange(np.float64(cat.ngroups))
+                    self.grp_ids = self.grp_ids[mass_select]
+                    self.grp_pos = np.array(cat.GroupPos)[mass_select]
+                    self.grp_Rvir = np.array(cat.Group_R_Crit200)[mass_select]
+                    #grp_BHmass = np.array(cat.GroupBHMass)[mass_select]
+                    #grp_BHMdot = np.array(cat.GroupBHMdot)[mass_select]
+                    self.n_selected_groups = np.float32(np.size(self.grp_mass))
+                    del cat
 
-                        pos_cent = self._fix_pos(self.grp_pos[i],pos,self.box)
-                        print "pos_cent: ",pos_cent
-                        self.calc_grid(m,pos_cent,metals,rho,hsml,T,neut_frac,kernel_type='SPH')
+                    # HERE
+                    # self.grp_mass = self.grp_mass[3]
+                    # self.grp_ids = self.grp_ids[3]
+                    # self.grp_pos = self.grp_pos[3]
+                    # self.grp_Rvir = self.grp_Rvir[3]
+                    # self.n_selected_groups = 1
+                else:
+                    self.redshift = None
+                    self.hubble = None
+                    self.box = None
+                    self.omegam = None
+                    self.omegal = None
+                    self.grp_mass = None
+                    self.m = None
+                    self.grp_ids = None
+                    self.grp_pos = None
+                    self.grp_Rvir = None
+                    self.n_selected_groups = None
 
-                        print "Saving group file now to {}".format(savename)
-                        print ""
-                        # do not overwrite mode:
-                        f=h5py.File(savename,'w-')
-                        #over-write mode:
-                        #f=h5py.File(outputpath+str(int(grp_id)).zfill(5)+'.hdf5','w')
+                # Broadcast necessary data from root process to other processes
+                self.redshift = comm.bcast(self.redshift,root=0)
+                self.hubble = comm.bcast(self.hubble,root=0)
+                self.box = comm.bcast(self.box,root=0)
+                self.omegam = comm.bcast(self.omegam,root=0)
+                self.omegal = comm.bcast(self.omegal,root=0)
+                self.grp_mass = comm.bcast(self.grp_mass,root=0)
+                self.grp_pos = comm.bcast(self.grp_pos,root=0)
+                self.m = comm.bcast(self.m,root=0)
+                self.grp_ids = comm.bcast(self.grp_ids,root=0)
+                self.grp_pos = comm.bcast(self.grp_pos,root=0)
+                self.grp_Rvir = comm.bcast(self.grp_Rvir,root=0)
+                self.n_selected_groups = comm.bcast(self.n_selected_groups,root=0)
 
-                        grp = f.create_group("Header")
-                        grp.attrs["hubble"]=self.hubble
-                        grp.attrs["omegam"]=self.omegam
-                        grp.attrs["omegal"]=self.omegal
-                        grp.attrs["redshift"]=self.redshift
-                        grp.attrs["box"]=self.box
+                # Other miscellaneous stuff
+                self.grid_radius = AU.CodePosition(self.grid_radius_pkpc,self.redshift,hubble=self.hubble)
+                self.npart = self.res**3.
+                # self.box = AU.CodePosition(self.box,self.redshift,hubble=self.hubble)  #self.box is already in code units
+                self.ngrid=int(np.ceil(40*self.npart**(1./3)/self.box*2*self.grid_radius))
+                # self.tab = cc.CloudyTable(self.redshift,atten_type=self.cloudy_type)
+                self.tab = cc.CloudyTable(self.redshift,directory='/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM/sbird/cloudy/ion_out_fancy_atten/')
+                self.n_species = len(self.elem_list)
 
-                        grp.attrs["grp_id"] = grp_id
-                        grp.attrs["grp_mass"] = self.grp_mass[i]
-                        grp.attrs["grp_pos"] = self.grp_pos[i]
-                        grp.attrs["grp_Rvir"] = self.grp_Rvir[i]
-                        #grp.attrs["grp_BHmass"] = grp_BHmass[i]
-                        #grp.attrs["grp_BHMdot"] = grp_BHMdot[i]
 
-                        grp.attrs["grid_radius_pkpc"] = self.grid_radius_pkpc
-                        grp.attrs["ngrid"] = self.ngrid
+                for i in np.arange(self.n_selected_groups):
+                    if (i % size == rank):
+                        print "Projecting i / task:", i, rank
+                        grp_id = self.grp_ids[i]
+                        gpos  = self.grp_pos[i]
+                        print "Group {} has position {} ".format(grp_id,gpos)
+                        r200  = self.grp_Rvir[i]
+                        
+                        self.grid = np.zeros([self.n_species,self.ngrid,self.ngrid])
+                        #grid = np.zeros([ngrid,ngrid])
 
-                        p_grp = f.create_group('grids')
-                        for i in xrange(self.n_species):
-                            elem = self.elem_list[i]
-                            ion = self.ion_list[i]
-                            dataset_name = elem+str(ion)
-                            p_grp.create_dataset(dataset_name,data=self.grid[i,:,:])
-                        f.close()
+                        CGMsnap_file_path = self.loadbase+ "{}/s{}/{}.hdf5".format(self.run,snapnum,str(int(grp_id)).zfill(5))
+                        outputpath = self.savebase+ "{}/s{}/".format(self.run,snapnum)
+                        savename = outputpath+str(int(grp_id)).zfill(5)+'.hdf5'
+
+                        if not os.path.isfile(CGMsnap_file_path):
+                            print "File {} does not exist!  Skipping...".format(CGMsnap_file_path)
+                            print "[Note: log10(mass) = {}]".format(np.log10(self.m[i]))
+                        elif os.path.isfile(savename):
+                            print "File {} already exists!  Skipping...".format(savename)
+                        else:
+                            print "working on {}".format(savename)
+                            [m,pos,metals,rho,u,nelec,hsml,T,neut_frac] = self.load_CGM_file(CGMsnap_file_path,i)
+
+                            pos_cent = self._fix_pos(self.grp_pos[i],pos,self.box)
+                            print "pos_cent: ",pos_cent
+                            self.calc_grid(m,pos_cent,metals,rho,hsml,T,neut_frac,kernel_type='SPH')
+
+                            print "Saving group file now to {}".format(savename)
+                            print ""
+                            # do not overwrite mode:
+                            f=h5py.File(savename,'w-')
+
+                            grp = f.create_group("Header")
+                            grp.attrs["hubble"]=self.hubble
+                            grp.attrs["omegam"]=self.omegam
+                            grp.attrs["omegal"]=self.omegal
+                            grp.attrs["redshift"]=self.redshift
+                            grp.attrs["box"]=self.box
+
+                            grp.attrs["grp_id"] = grp_id
+                            grp.attrs["grp_mass"] = self.grp_mass[i]
+                            grp.attrs["grp_pos"] = self.grp_pos[i]
+                            grp.attrs["grp_Rvir"] = self.grp_Rvir[i]
+                            #grp.attrs["grp_BHmass"] = grp_BHmass[i]
+                            #grp.attrs["grp_BHMdot"] = grp_BHMdot[i]
+
+                            grp.attrs["grid_radius_pkpc"] = self.grid_radius_pkpc
+                            grp.attrs["ngrid"] = self.ngrid
+
+                            p_grp = f.create_group('grids')
+                            for i in xrange(self.n_species):
+                                elem = self.elem_list[i]
+                                ion = self.ion_list[i]
+                                dataset_name = elem+str(ion)
+                                p_grp.create_dataset(dataset_name,data=self.grid[i,:,:])
+                            f.close()
 
 
 
 
     def load_CGM_file(self,CGMsnap_file_path,i,use_block_name=False):
         f=h5py.File(CGMsnap_file_path,'r')
+        print "CGMsnap_file_path: ",CGMsnap_file_path
         bar = f['PartType0']
 
         #print list(bar)
@@ -244,6 +230,7 @@ class grid_mass:
 
         vol = np.array(bar["Volume"])
         hsml = (3.*vol/4./np.pi)**(0.33333333)
+        hsml *= 2. # SPH fudge factor [see research notes from 10/10/14]
         del vol
         T = AU.GetTemp(u, nelec, gamma = 5.0/3.0)
 
