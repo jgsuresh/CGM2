@@ -30,28 +30,35 @@ class grid_mass:
         # self.base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run)
         # self.res=256
         # self.run = 'c0_256'#'c0_sw_256'
+        # self.run_list = ['c0_256']
+        # self.base_list = ["/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/Cosmo0_V6/L25n256/output/"]
+        self.run_list = ['multi_speed']
+        self.base_list = ["/n/home01/ptorrey/Share/apillepich/L25n256/multi_speed_winds/output/"]
         # self.run_list = ['c0_256','c2_256','c0_sw_256']
         # self.base_list = [\
         # "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/Cosmo0_V6/L25n256/output/",\
         # "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/Cosmo2_V6/L25n256/output/",\
         # "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/Cosmo0_V6_strongWinds/L25n256/output/"]
-        self.run_list = ['c0_fullmetalwinds','c0_nometalwinds','gam_50_fixv','gam_50_fixv_nothermal','gam_50_BH']
-        self.base_list = [\
-        "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[0]),\
-        "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[1]),\
-        "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[2]),\
-        "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[3]),\
-        "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[4]),\
-        ]
+        # self.run_list = ['gam_50_fixv','c0_fullmetalwinds','c0_nometalwinds','gam_50_fixv_nothermal','gam_50_BH']
+        # self.base_list = [\
+        # "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[0]),\
+        # "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[1]),\
+        # "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[2]),\
+        # "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[3]),\
+        # "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(self.run_list[4]),\
+        # ]
         self.res=256
         # self.snapnum_arr = np.array([60,63,68])
-        self.snapnum_arr = np.array([3,4,5])
+        # self.snapnum_arr = np.array([3,4,5])
+        # self.snapnum_arr = np.array([4])
+        self.snapnum_arr = np.array([15])
+
         self.group_min_mass = 10.**11.8 #11 CAREFUL
-        self.grid_radius_pkpc = 200
-        # self.elem_list = ["H"]
-        # self.ion_list = [1]
-        self.elem_list = ["H","Mg","C","C","Si","Si","O"]
-        self.ion_list = [1,2,3,4,3,4,6]
+        self.grid_radius_pkpc = 300
+        self.elem_list = ["C","C"]
+        self.ion_list = [-1,4]
+        # self.elem_list = ["H","Mg","C","C","Si","Si","O"]
+        # self.ion_list = [1,2,3,4,3,4,6]
         # self.cloudy_type = "ion_out_fancy_atten"
         self.loadbase = '/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/CGM_snaps/'
         self.savebase = '/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/grids/'
@@ -156,7 +163,6 @@ class grid_mass:
                         print "Projecting i / task:", i, rank
                         grp_id = self.grp_ids[i]
                         gpos  = self.grp_pos[i]
-                        print "Group {} has position {} ".format(grp_id,gpos)
                         r200  = self.grp_Rvir[i]
                         
                         self.grid = np.zeros([self.n_species,self.ngrid,self.ngrid])
@@ -169,45 +175,46 @@ class grid_mass:
                         if not os.path.isfile(CGMsnap_file_path):
                             print "File {} does not exist!  Skipping...".format(CGMsnap_file_path)
                             print "[Note: log10(mass) = {}]".format(np.log10(self.m[i]))
-                        elif os.path.isfile(savename):
-                            print "File {} already exists!  Skipping...".format(savename)
+                        # elif os.path.isfile(savename):
+                        #     print "File {} already exists!  Skipping...".format(savename)
                         else:
                             print "working on {}".format(savename)
                             [m,pos,metals,rho,u,nelec,hsml,T,neut_frac] = self.load_CGM_file(CGMsnap_file_path,i)
 
                             pos_cent = self._fix_pos(self.grp_pos[i],pos,self.box)
-                            print "pos_cent: ",pos_cent
                             self.calc_grid(m,pos_cent,metals,rho,hsml,T,neut_frac,kernel_type='SPH')
 
-                            print "Saving group file now to {}".format(savename)
-                            print ""
-                            # do not overwrite mode:
-                            f=h5py.File(savename,'w-')
+                            # print "Not saving! "
+                            if True:
+                                print "Saving group file now to {}".format(savename)
+                                print ""
+                                # do not overwrite mode:
+                                f=h5py.File(savename,'w-')
 
-                            grp = f.create_group("Header")
-                            grp.attrs["hubble"]=self.hubble
-                            grp.attrs["omegam"]=self.omegam
-                            grp.attrs["omegal"]=self.omegal
-                            grp.attrs["redshift"]=self.redshift
-                            grp.attrs["box"]=self.box
+                                grp = f.create_group("Header")
+                                grp.attrs["hubble"]=self.hubble
+                                grp.attrs["omegam"]=self.omegam
+                                grp.attrs["omegal"]=self.omegal
+                                grp.attrs["redshift"]=self.redshift
+                                grp.attrs["box"]=self.box
 
-                            grp.attrs["grp_id"] = grp_id
-                            grp.attrs["grp_mass"] = self.grp_mass[i]
-                            grp.attrs["grp_pos"] = self.grp_pos[i]
-                            grp.attrs["grp_Rvir"] = self.grp_Rvir[i]
-                            #grp.attrs["grp_BHmass"] = grp_BHmass[i]
-                            #grp.attrs["grp_BHMdot"] = grp_BHMdot[i]
+                                grp.attrs["grp_id"] = grp_id
+                                grp.attrs["grp_mass"] = self.grp_mass[i]
+                                grp.attrs["grp_pos"] = self.grp_pos[i]
+                                grp.attrs["grp_Rvir"] = self.grp_Rvir[i]
+                                #grp.attrs["grp_BHmass"] = grp_BHmass[i]
+                                #grp.attrs["grp_BHMdot"] = grp_BHMdot[i]
 
-                            grp.attrs["grid_radius_pkpc"] = self.grid_radius_pkpc
-                            grp.attrs["ngrid"] = self.ngrid
+                                grp.attrs["grid_radius_pkpc"] = self.grid_radius_pkpc
+                                grp.attrs["ngrid"] = self.ngrid
 
-                            p_grp = f.create_group('grids')
-                            for i in xrange(self.n_species):
-                                elem = self.elem_list[i]
-                                ion = self.ion_list[i]
-                                dataset_name = elem+str(ion)
-                                p_grp.create_dataset(dataset_name,data=self.grid[i,:,:])
-                            f.close()
+                                p_grp = f.create_group('grids')
+                                for i in xrange(self.n_species):
+                                    elem = self.elem_list[i]
+                                    ion = self.ion_list[i]
+                                    dataset_name = elem+str(ion)
+                                    p_grp.create_dataset(dataset_name,data=self.grid[i,:,:])
+                                f.close()
 
 
 
@@ -305,7 +312,12 @@ class grid_mass:
             # ion_frac = self.tab.ion(elem,ion,rho_Hatoms,T)
             # species_mass = m*elem_massfrac*ion_frac
 
-            if elem == "H" and ion == 1:
+            if ion == -1:
+                # Take full element, e.g. all carbon
+                elem_massfrac = metals[:,AU.elem_lookup(elem)]
+                species_mass = m*elem_massfrac
+
+            elif elem == "H" and ion == 1:
                 H_massfrac = metals[:,0]
                 star=cold_gas.RahmatiRT(self.redshift, self.hubble)
                 fake_bar = {'Density':rho,'NeutralHydrogenAbundance':neut_frac}
@@ -318,6 +330,8 @@ class grid_mass:
                 species_mass = m*elem_massfrac*ion_frac
 
             self.sub_gridize_single_halo(pos,hsml,species_mass,self.grid[i,:,:],kernel_type=kernel_type)
+            self.grid[i,:,:][self.grid[i,:,:] < 0.] = 0.
+
 
             elem_mass_g = AU.elem_atom_mass(elem)
             massg=AU.UnitMass_in_g/self.hubble*(1/elem_mass_g)

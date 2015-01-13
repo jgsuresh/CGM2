@@ -14,7 +14,7 @@ AU = AREPO_units()
 class sfr_plot:
     def __init__(self):
         #self.npz_base = "/n/home04/jsuresh/CGM_new/data/npz/"
-        self.fig_base = "/n/home04/jsuresh/CGM_new/data/figs/"
+        self.fig_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/figs/"
 
         bmap_o = brewer2mpl.get_map('Spectral','Diverging',9, reverse=True)
         bmap = bmap_o.mpl_colormap
@@ -31,39 +31,42 @@ class sfr_plot:
         c0_fw_256_base = mv_base+"Cosmo0_V6_fastWinds/L25n256/output/"
         c0_sw_256_base = mv_base+"Cosmo0_V6_strongWinds/L25n256/output/"
 
-        gam_10_BH_base = "/n/hernquistfs1/jsuresh/Runs/gam_10_BH/output/"
-        gam_20_BH_base = "/n/hernquistfs1/jsuresh/Runs/gam_20_BH/output/"
-        gam_30_BH_base = "/n/hernquistfs1/jsuresh/Runs/gam_30_BH/output/"
-        gam_40_BH_base = "/n/hernquistfs1/jsuresh/Runs/gam_40_BH/output/"
-        gam_50_BH_base = "/n/hernquistfs1/jsuresh/Runs/gam_50_BH/output/"
+        gam_10_BH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_10_BH/output/"
+        gam_20_BH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_20_BH/output/"
+        gam_30_BH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_30_BH/output/"
+        gam_40_BH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_40_BH/output/"
+        gam_50_BH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_50_BH/output/"
 
-        gam_10_BH_nothermal_base = "/n/hernquistfs1/jsuresh/Runs/gam_10_BH_nothermal/output/"
-        gam_20_BH_nothermal_base = "/n/hernquistfs1/jsuresh/Runs/gam_20_BH_nothermal/output/"
-        gam_30_BH_nothermal_base = "/n/hernquistfs1/jsuresh/Runs/gam_30_BH_nothermal/output/"
-        gam_40_BH_nothermal_base = "/n/hernquistfs1/jsuresh/Runs/gam_40_BH_nothermal/output/"
-        gam_50_BH_nothermal_base = "/n/hernquistfs1/jsuresh/Runs/gam_50_BH_nothermal/output/"
+        gam_10_BH_nothermal_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_10_BH_nothermal/output/"
+        gam_20_BH_nothermal_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_20_BH_nothermal/output/"
+        gam_30_BH_nothermal_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_30_BH_nothermal/output/"
+        gam_40_BH_nothermal_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_40_BH_nothermal/output/"
+        gam_50_BH_nothermal_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_50_BH_nothermal/output/"
 
-        gam_25_BH_base = "/n/hernquistfs1/jsuresh/Runs/gam_25_BH/output/"
-        gam_25_noBH_base = "/n/hernquistfs1/jsuresh/Runs/gam_25_noBH/output/"
-        gam_50_BH_base = "/n/hernquistfs1/jsuresh/Runs/gam_50_BH/output/"
-        gam_50_noBH_base = "/n/hernquistfs1/jsuresh/Runs/gam_50_noBH/output/"
-        gam_75_BH_base = "/n/hernquistfs1/jsuresh/Runs/gam_75_BH/output/"
-        gam_75_noBH_base = "/n/hernquistfs1/jsuresh/Runs/gam_75_noBH/output/"
-        gam_95_BH_base = "/n/hernquistfs1/jsuresh/Runs/gam_95_BH/output/"
-        gam_95_noBH_base = "/n/hernquistfs1/jsuresh/Runs/gam_95_noBH/output/"
+        gam_25_BH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_25_BH/output/"
+        gam_25_noBH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_25_noBH/output/"
+        gam_50_BH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_50_BH/output/"
+        gam_50_noBH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_50_noBH/output/"
+        gam_75_BH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_75_BH/output/"
+        gam_75_noBH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_75_noBH/output/"
+        gam_95_BH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_95_BH/output/"
+        gam_95_noBH_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_95_noBH/output/"
 
-        gam_25_fixv_base = "/n/hernquistfs1/jsuresh/Runs/gam_25_fixv/output/"
-        gam_50_fixv_base = "/n/hernquistfs1/jsuresh/Runs/gam_50_fixv/output/"
-        gam_75_fixv_base = "/n/hernquistfs1/jsuresh/Runs/gam_75_fixv/output/"
-        gam_95_fixv_base = "/n/hernquistfs1/jsuresh/Runs/gam_95_fixv/output/"
+        gam_25_fixv_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_25_fixv/output/"
+        gam_50_fixv_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_50_fixv/output/"
+        gam_75_fixv_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_75_fixv/output/"
+        gam_95_fixv_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_95_fixv/output/"
 
-        gam_50_fixv_nothermal_base = "/n/hernquistfs1/jsuresh/Runs/gam_50_fixv_nothermal/output/"
+        gam_50_fixv_nothermal_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/gam_50_fixv_nothermal/output/"
 
-        c0_nometalwinds_base = "/n/hernquistfs1/jsuresh/Runs/c0_nometalwinds/output/"
-        c0_fullmetalwinds_base = "/n/hernquistfs1/jsuresh/Runs/c0_fullmetalwinds/output/"
+        c0_nometalwinds_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/c0_nometalwinds/output/"
+        c0_fullmetalwinds_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/c0_fullmetalwinds/output/"
 
-        c0_check_base = "/n/hernquistfs1/jsuresh/Runs/c0_check/output/"
-        c2_check_base = "/n/hernquistfs1/jsuresh/Runs/c2_check/output/"
+        c0_check_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/c0_check/output/"
+        c2_check_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/c2_check/output/"
+
+        multi_speed_base = "/n/home01/ptorrey/Share/apillepich/L25n256/multi_speed_winds/output/"
+        # c2_check_base = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/c2_check/output/"
         
         #self.base_list = [c0_512_base,c4_512_base,c3_512_base,c5_256_base,c0_fw_256_base,c0_sw_256_base]
         #self.label_list = ["c0","c4","c3","c5","fw","sw"]
@@ -103,14 +106,14 @@ class sfr_plot:
         # self.color_list = [bmap(0)]
         # self.ls_list = ["solid"]
 
-        self.base_list = [c0_256_base,c2_base,c0_sw_256_base,gam_50_fixv_nothermal_base,gam_50_BH_base,gam_50_fixv_base,c0_nometalwinds_base,c0_fullmetalwinds_base]
-        self.label_list = ["Fiducial","No AGN","Higher Mass-Loading","Faster Winds","Fixed-E Hot Winds","Fixed-v Hot Winds","Pristine Winds","Fully Enriched Winds"]
-        self.color_list = ["blue","cyan","chartreuse","gold","saddlebrown","magenta","gray","black"]
-        self.ls_list = ["solid","solid","solid","solid","solid","solid","solid","solid"]
-        # self.base_list = [c0_256_base,c2_base]
-        # self.label_list = ["Higher Mass-Loading","Fully Enriched Winds"]
-        # self.color_list = ["blue","cyan"]
-        # self.ls_list = ["solid","solid"]
+        # self.base_list = [c0_256_base,c2_base,c0_sw_256_base,gam_50_fixv_nothermal_base,gam_50_BH_base,gam_50_fixv_base,c0_nometalwinds_base,c0_fullmetalwinds_base]
+        # self.label_list = ["Fiducial","No AGN","Higher Mass-Loading","Faster Winds","Fixed-E Hot Winds","Fixed-v Hot Winds","Pristine Winds","Fully Enriched Winds"]
+        # self.color_list = ["blue","cyan","chartreuse","gold","saddlebrown","magenta","gray","black"]
+        # self.ls_list = ["solid","solid","solid","solid","solid","solid","solid","solid"]
+        self.base_list = [c0_256_base,multi_speed_base,gam_50_fixv_nothermal_base]
+        self.label_list = ["Fiducial","Multi-Speed","Faster Winds"]
+        self.color_list = ["blue","red","gold"]
+        self.ls_list = ["solid","solid","solid"]
         self.extract_sfr_data()
 
 
@@ -133,23 +136,31 @@ class sfr_plot:
             #y = self.ss_dat(np.log10(sfr),n=50)
             x = self.ss_dat(np.log10(1+z),n=50)
             y = self.ss_dat(sfr/(25/0.7)**3,n=50)
+            # y = self.ss_dat(sfr/(25)**3,n=50)
             # y = self.ss_dat(AU.PhysicalSFRD(sfr,z),n=50) #AU.PhysicalVolume(25**3.,z)
             # y = self.ss_dat(AU.PhysicalMdot(sfr)*0.7**3./25**3.,n=50)
             # y = self.ss_dat(sfr,n=50)
             print "y ",y
-            plt.semilogy(x,y,label=self.label_list[i],color=self.color_list[i],linestyle=self.ls_list[i])
+            # plt.semilogy(x,y,label=self.label_list[i],color=self.color_list[i],linestyle=self.ls_list[i])
+            ax1.plot(x,y,label=self.label_list[i],color=self.color_list[i],linestyle=self.ls_list[i],zorder=9)
+            ax1.set_yscale('log')
+        
+        # Add observational points:
+        self.plot_obs_data(ax1)
+
         lg = plt.legend(prop={'size':6.3},ncol=2,columnspacing=0.6,handletextpad=0.1)
         lg.draw_frame(False)
-        plt.xlim([0.45,1.0])
-        plt.ylim([10.**-3.,1.0])
+        plt.xlim([0.,1.0])
+        # plt.xlim([0.45,1.0])
+        # plt.ylim([10.**-3.,1.0])
         #plt.ylabel(r' SFRD $\left[M_\odot$ yr$^{-1}$ Mpc$^{-3} \right]$')
         plt.ylabel(r'SFRD $[$'+'M'+'$_\odot$'+' yr'+r'$^{-1}$'+' cMpc'+r'$^{-3}]$')
         plt.xlabel(r'Log$_{10} [1+z]$')
         plt.subplots_adjust(left=0.2,bottom=0.18,top=0.85)
 
-        ax2 = ax1.twiny()
-        u = 1/0.55
-        new_tick_locations = (1+u)*(np.array([0.47712,0.6021,0.69897,0.8450,1.0]))-u
+        # ax2 = ax1.twiny()
+        # u = 1/0.55
+        # new_tick_locations = (1+u)*(np.array([0.47712,0.6021,0.69897,0.8450,1.0]))-u
         # the 0.8181 comes from the scaling of the x-axis to [0.45,1] instead of [0,1]
 
         def tick_function(X):
@@ -158,18 +169,38 @@ class sfr_plot:
             V = np.rint(V)
             return ["{}".format(int(z)) for z in V]
 
-        ax2.set_xticks(new_tick_locations)
-        ax2.set_xticklabels(tick_function(new_tick_locations))
-        ax2.set_xlabel(r"$z$")
+        # ax2.set_xticks(new_tick_locations)
+        # ax2.set_xticklabels(tick_function(new_tick_locations))
+        # ax2.set_xlabel(r"$z$")
         plt.show()
 
         # print "saving to {}".format(self.fig_base+"sfr_plot.pdf")
-        plt.savefig(self.fig_base+"sfr_plot_noframe.pdf")
+        plt.savefig(self.fig_base+"sfr_plot_multispeed_full.pdf")
 
     def ss_dat(self,dat,n=2):
         s = np.size(dat)
         ind = np.arange(0,s-1,n)
         return dat[ind]
+
+    def plot_obs_data(self,ax):
+        base = '/n/home04/jsuresh/Python/MyModules/jgs_common/SFRD_data/'
+        hb = np.loadtxt(base+'HopkinsBeacom.dat',comments='%')
+        ax.scatter(np.log10(1+hb[:,0]),10.**hb[:,3],marker='x',color='Gainsboro',zorder=1)
+        # ax.set_yscale('log')
+        print "np.log10(1+hb[:,0]) ",np.log10(1+hb[:,0])
+        print "10.**hb[:,3] ",10.**hb[:,3]
+        # ax.errorbar(hb[:,0],hb[:,3],marker='o',linestyle='None')#,xerr=hb[:,1:3],yerr=hb[:,4:6],linestyle='None')
+
+        be = np.loadtxt(base+'Behroozi12.dat',comments='%')
+        ul = 10.**(be[:,1]+be[:,3])-10.**(be[:,1])
+        ll = 10.**(be[:,1])-10.**(be[:,1]-be[:,2])
+        ax.errorbar(np.log10(1+be[:,0]),10.**be[:,1],yerr=[ll,ul],marker='+',color='Gainsboro',linestyle='None',zorder=1)
+        
+
+        #yerr=10.**be[:,2]
+        # print 10.**be
+        # hz = np.loadtxt(base+'highz.dat',comments='%')
+        # ax.scatter(np.log10(1+hz[:,0]),10.**hz[:,1],marker='x',color='Gainsboro')
 
 
 if __name__ == '__main__':

@@ -14,13 +14,16 @@ import brewer2mpl
 from units import AREPO_units
 AU = AREPO_units()
 
+import convert_cloudy as cc
+
 import glob
 import os
 
 class illustris_fan:
     def __init__(self):
         self.snapbase = "/n/ghernquist/Illustris/Runs/Illustris-1/output/"
-        self.CGMsnap_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
+        # self.CGMsnap_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
+        self.CGMsnap_base = '/n/home04/jsuresh/scratch1/CGM_snaps/'
         self.grid_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
         self.fig_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/figs/'
         self.npz_base = '/n/home04/jsuresh/scratch1/AREPOfest/data/npz/'
@@ -30,15 +33,20 @@ class illustris_fan:
         # self.npz_base = '/n/home04/jsuresh/scratch1/QCGM2/data/npz/'
 
         self.snapnum = 120
+        self.redshift = 0.2
 
         #read in catalog + galprop file
         # self.cat = readsubfHDF5.subfind_catalog('/n/ghernquist/Illustris/Runs/Illustris-1/',self.snapnum,keysel=['GroupFirstSub'],subcat=False)
         self.galf = h5py.File(self.snapbase+"/postprocessing/galprop/galprop_{}.hdf5".format(str(self.snapnum).zfill(3)),'r')
 
         self.cat = readsubfHDF5.subfind_catalog(self.snapbase, self.snapnum, long_ids=True, double_output=True, keysel=["GroupFirstSub","SubhaloGrNr"])
-        # self.load_gal_props()
+        self.load_gal_props()
         # self.gal_mass_vs_sSFR()
         # self.halo_baryon_abundance()
+
+        self.tab = cc.CloudyTable(0.2,directory='/n/home04/jsuresh/scratch1/Cloudy_test/UVB_sf_xrays_ext/')
+        self.OVI_weighted_gas('T',savename='T_test_v2')
+        # self.OVI_weighted_gas('rho',savename='rho_test')
 
         # self.plot_grids("H1",vmax=25.)
         # self.plot_grids("Si3",vmax=18.)
@@ -56,6 +64,8 @@ class illustris_fan:
         # self.coldens_plot('N5',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='UVB_sf_xrays_ext',savename='N5_highssfr_highm_xrays')
         # self.coldens_plot('N5',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='ion_out_fancy_atten',savename='N5_highssfr_highm_UVB')
 
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=1,savename='O6_highssfr_medm_xrays_t1_test')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=1,savename='O6_lowssfr_medm_xrays_t1_test')
         # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=1,savename='N5_highssfr_medm_xrays')
         # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=1,savename='N5_highssfr_medm_UVB')
         # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**11.,Mmax=10.**11.5,cloudy='UVB_sf_xrays_ext',tempfac=1,savename='N5_lowssfr_highm_xrays')
@@ -75,14 +85,19 @@ class illustris_fan:
 
         # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=1.,savename='O6_lowssfr_medm_xrays_t1')
         # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=1.,savename='O6_lowssfr_medm_UVB_t1')
-        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=3.,savename='O6_lowssfr_medm_xrays_t3')
-        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=3.,savename='O6_lowssfr_medm_UVB_t3')
-        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=10.,savename='O6_lowssfr_medm_xrays_t10')
-        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=10.,savename='O6_lowssfr_medm_UVB_t10')
-        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=3.,savename='O6_highssfr_medm_xrays_t3')
-        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=3.,savename='O6_highssfr_medm_UVB_t3')
-        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=10.,savename='O6_highssfr_medm_xrays_t10')
-        self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=10.,savename='O6_highssfr_medm_UVB_t10')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=3.,savename='O6_lowssfr_medm_xrays_t3')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=3.,savename='O6_lowssfr_medm_UVB_t3')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=10.,savename='O6_lowssfr_medm_xrays_t10')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=10.,savename='O6_lowssfr_medm_UVB_t10')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=3.,savename='O6_highssfr_medm_xrays_t3')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=3.,savename='O6_highssfr_medm_UVB_t3')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',tempfac=10.,savename='O6_highssfr_medm_xrays_t10')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',tempfac=10.,savename='O6_highssfr_medm_UVB_t10')
+
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',savename='O6_lowssfr_medm_xrays_mult')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,low_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',savename='O6_lowssfr_medm_UVB_mult')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='UVB_sf_xrays_ext',savename='O6_highssfr_medm_xrays_mult')
+        # self.coldens_plot('O6',vmin=11.,vmax=18,kpc_mode=True,high_ssfr_pop=True,Mmin=10.**10.5,Mmax=10.**11.,cloudy='ion_out_fancy_atten',savename='O6_highssfr_medm_UVB_mult')
 
         # self.mass_metal_budget(BH_split=True)
 
@@ -443,7 +458,118 @@ class illustris_fan:
 
 
 
+    def OVI_weighted_gas(self,data_type,Mmin=10**11.4,Mmax=10**11.45,low_ssfr_pop=False,high_ssfr_pop=False,savename=None):
+        # Plot properties of OVI-weighted gas, vs all gas.
 
+        plt.close('all')
+        plt.figure(figsize=(3.54331,3.14))
+
+        # Set up bins for radius:
+        n_Rbins = 50
+        [Rbins_min,Rbins_max] = AU._bin_setup(0.,300.,n_Rbins)
+        Rbins_med = (Rbins_min+Rbins_max)/2.
+
+        # pseudo code:
+        # find all groups in central galaxy stellar mass/sSFR bin that we want
+
+        # get desired group ids:
+        # grp_ids = np.arange(np.size(self.gal_sm))
+        # mass_cut = np.logical_and(self.gal_sm > Mmin, self.gal_sm < Mmax)
+        # grp_ids = grp_ids[mass_cut]
+        # if low_ssfr_pop:
+        #     save_ssfr = self.gal_ssfr[mass_cut]
+        #     ssfr_cut = save_ssfr < 10.**-11
+        #     grp_ids = grp_ids[ssfr_cut]
+        # elif high_ssfr_pop:
+        #     save_ssfr = self.gal_ssfr[mass_cut]
+        #     ssfr_cut = save_ssfr >= 10.**-11
+        #     grp_ids = grp_ids[ssfr_cut]
+        # selecting by myself:
+        grp_ids = np.array([19])
+        n_grps = np.size(grp_ids)
+
+        print "grp_ids ",grp_ids
+
+        z_profile_gal = np.zeros([n_grps,n_Rbins])
+        T_profile_gal = np.zeros([n_grps,n_Rbins])
+        rho_profile_gal = np.zeros([n_grps,n_Rbins])
+        z_OVI_gal = np.zeros([n_grps,n_Rbins])
+        T_OVI_gal = np.zeros([n_grps,n_Rbins])
+        rho_OVI_gal = np.zeros([n_grps,n_Rbins])
+
+        # load CGM snapshots for these groups
+        for j in np.arange(np.size(grp_ids)):
+            grp_id = grp_ids[j]
+            fn = self.CGMsnap_base + "s{}/{}.hdf5".format(self.snapnum,str(int(grp_id)).zfill(5))
+            print "fn ",fn
+            grp_data = self.load_CGM_snap(fn)
+            m = AU.PhysicalMass(np.array(grp_data['MASS']))
+            z = np.array(grp_data["GZ  "])
+            met = np.array(grp_data["GMET"])
+            T = self._get_T(grp_data)
+            rho = AU.PhysicalDensity(np.array(grp_data["RHO "]),self.redshift)
+            r = AU.PhysicalPosition(self._calc_radii(grp_data),self.redshift)
+
+            # Get OVI fraction using CLOUDY table
+            rho_Hatoms = rho*(met[:,0]/AU.ProtonMass)
+            # Cloudy cut:
+            rho_cut = np.logical_and(np.log10(rho_Hatoms) >= -7.,np.log10(rho_Hatoms) <= 4.)
+            T_cut = np.logical_and(np.log10(T) >= 3.,np.log10(T) <= 8.6)
+            cloudy_cut = np.logical_and(T_cut,rho_cut)
+            if np.sum(cloudy_cut) < np.size(m): 
+                print "cloudy cut removed {} particles".format(np.size(m)-np.sum(cloudy_cut))
+                r = r[cloudy_cut]
+                m = m[cloudy_cut]
+                met = met[cloudy_cut]
+                z = z[cloudy_cut]
+                T = T[cloudy_cut]
+                rho = rho[cloudy_cut]
+                rho_Hatoms = rho_Hatoms[cloudy_cut]
+            beta = self.gal_ssfr[grp_id]/(r**2.)
+            elem_frac = met[:,AU.elem_lookup('O')]
+            ion_frac = self.tab.ion('O',6,rho_Hatoms,T,beta=beta)
+            OVI_frac = elem_frac*ion_frac
+            OVI_mass = m*OVI_frac
+
+            
+            
+            # Calculate mass-weighted rho, T as a function of radius:
+
+            for k in np.arange(n_Rbins):
+                in_Rbin = np.logical_and(r > Rbins_min[k], r < Rbins_max[k])
+                z_profile_gal[j,k] = np.sum(m[in_Rbin]*z[in_Rbin])/np.sum(m[in_Rbin])
+                T_profile_gal[j,k] = np.sum(m[in_Rbin]*T[in_Rbin])/np.sum(m[in_Rbin])
+                rho_profile_gal[j,k] = np.sum(m[in_Rbin]*rho[in_Rbin])/np.sum(m[in_Rbin])
+                # Also calculate OVI-weighted values...
+                z_OVI_gal[j,k] = np.sum(OVI_mass[in_Rbin]*z[in_Rbin])/np.sum(OVI_mass[in_Rbin])
+                T_OVI_gal[j,k] = np.sum(OVI_mass[in_Rbin]*T[in_Rbin])/np.sum(OVI_mass[in_Rbin])
+                rho_OVI_gal[j,k] = np.sum(OVI_mass[in_Rbin]*rho[in_Rbin])/np.sum(OVI_mass[in_Rbin])
+
+
+        if data_type == 'z':
+            [Q1,med,Q3] = AU._calc_percentiles(z_profile_gal)
+            [Q1,med_OVI,Q3] = AU._calc_percentiles(z_OVI_gal)
+            plt.ylabel(r'$\log_{10}\left[\frac{Z}{Z_\odot}\right]$')
+            med /= AU.SolarMetallicity
+            med_OVI /= AU.SolarMetallicity
+        if data_type == 'T':
+            [Q1,med,Q3] = AU._calc_percentiles(T_profile_gal)
+            [Q1,med_OVI,Q3] = AU._calc_percentiles(T_OVI_gal)
+            plt.ylabel(r'$\log_{10}\left[\frac{{\rm Temperature}}{\rm K}\right]$')
+        if data_type == 'rho':
+            [Q1,med,Q3] = AU._calc_percentiles(rho_profile_gal)
+            [Q1,med_OVI,Q3] = AU._calc_percentiles(rho_OVI_gal)
+            plt.ylabel(r'Density [cm$^{-3}$]')
+
+        plt.plot(Rbins_min,np.log10(med),label='All Gas')
+        plt.plot(Rbins_min,np.log10(med_OVI),label='OVI Gas')
+        plt.xlabel(r'3D Radius [R$_{200}$]')
+        plt.legend()
+
+        if savename != None:
+            plt.savefig(self.fig_base+savename+".pdf")
+        else:
+            plt.savefig(self.fig_base+"{}_radprof.pdf".format(data_type))
 
 
 
@@ -476,17 +602,17 @@ class illustris_fan:
         print "Done loading galaxy properties! "
 
         print "Loading CGM properties... "
-        def load_CGM_snap(fn,load='all'):
-            data_dict = {}
-            f = h5py.File(fn,'r')
-            if load=='all':
-                for key in f['Header'].attrs:
-                    data_dict[key] = f['Header'].attrs[key]
-                for key in f['PartType0']:
-                    data_dict[key] = np.copy(f['PartType0'][key])
-            else:
-                data_dict[key] = f['Header'].attrs[key]
-            return data_dict
+        # def load_CGM_snap(fn,load='all'):
+        #     data_dict = {}
+        #     f = h5py.File(fn,'r')
+        #     if load=='all':
+        #         for key in f['Header'].attrs:
+        #             data_dict[key] = f['Header'].attrs[key]
+        #         for key in f['PartType0']:
+        #             data_dict[key] = np.copy(f['PartType0'][key])
+        #     else:
+        #         data_dict[key] = f['Header'].attrs[key]
+        #     return data_dict
 
 
         if CGMprop == 'z_with_ISM':
@@ -773,7 +899,30 @@ class illustris_fan:
 
 
 
-    def plot_grids(self,species,vmin=10.,vmax=25.):
+    def plot_grids(self,species,vmin=10.,vmax=25.,HI_custom_map=False):
+
+        if HI_custom_map:
+            # Define custom colormap
+            vmin = 10.
+            vmax = 25.
+            cut_LLS=17
+            cut_DLA=20.3
+            v_LLS = (cut_LLS-vmin)/(vmax-vmin)
+            v_DLA = (cut_DLA-vmin)/(vmax-vmin)
+
+            cdict = {
+            'red'  :  ((0., 0., 0.), (v_LLS, 0.3, 1.0),(v_DLA, 0.3, 0.3), (1., 1., 1.)),
+            'green':  ((0., 0., 0.), (v_LLS, 0.0, 1.0), (v_DLA, 0.3, 0.0), (1., 0., 0.)),
+            'blue' :  ((0., 0., 0.), (v_LLS, 1.0, 0.0), (v_DLA, 0.0, 0.0), (1., 0., 0.))
+            }
+            cdict = {
+            'red'  :  ((0., 0., 0.), (v_LLS, 0.3, 0.3),(v_DLA, 1.0, 0.3), (1., 1., 1.)),
+            'green':  ((0., 0., 0.), (v_LLS, 0.0, 0.3), (v_DLA, 1.0, 0.0), (1., 0., 0.)),
+            'blue' :  ((0., 0., 0.), (v_LLS, 1.0, 0.0), (v_DLA, 0.0, 0.0), (1., 0., 0.))
+            }
+            #generate the colormap with 1024 interpolated values
+            my_cmap = matplotlib.colors.LinearSegmentedColormap('my_colormap', cdict, 1024)
+
 
         for fn in glob.glob(self.grid_base+"s{}/*.hdf5".format(self.snapnum)):
             print "fn ",fn
@@ -782,15 +931,19 @@ class illustris_fan:
             grid_rad = f['Header'].attrs['grid_radius_pkpc']
             ngrid = f['Header'].attrs['ngrid']
             # grid = np.array(f['grids'][species])
-            for cloudy in ['ion_out_fancy_atten','UVB_sf_xrays_ext']:
+            # for cloudy in ['ion_out_fancy_atten','UVB_sf_xrays_ext']:
+            for cloudy in ['UVB_sf_xrays_ext']:
                 grid = np.array(f[cloudy][species])
 
-                img_savepath = "{}/grids/s{}/{}_{}_{}.pdf".format(self.fig_base,self.snapnum,str(int(grp_id)).zfill(5),species,cloudy)
+                img_savepath = "{}/grids/s{}/{}_{}_{}_mult.pdf".format(self.fig_base,self.snapnum,str(int(grp_id)).zfill(5),species,cloudy)
 
                 maxdist = grid_rad
 
                 plt.close('all')
-                plt.imshow(grid,origin='lower',extent=(-maxdist,maxdist,-maxdist,maxdist),vmin=vmin,vmax=vmax,cmap=plt.cm.cubehelix) #spb_jet2
+                if HI_custom_map:
+                    plt.imshow(grid,origin='lower',extent=(-maxdist,maxdist,-maxdist,maxdist),vmin=vmin,vmax=vmax,cmap=my_cmap) 
+                else: 
+                    plt.imshow(grid,origin='lower',extent=(-maxdist,maxdist,-maxdist,maxdist),vmin=vmin,vmax=vmax,cmap=plt.cm.cubehelix) 
                 bar=plt.colorbar()
                 bar_label = r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)"
                 bar.set_label(bar_label)
@@ -802,17 +955,21 @@ class illustris_fan:
 
     def load_CGM_snap(self,fn,load='all'):
         data_dict = {}
-        f = h5py.File(fn,'r')
-        if load=='all':
-            for key in f['Header'].attrs:
+        # Check that file exists:
+        if os.path.isfile(fn):
+            f = h5py.File(fn,'r')
+            if load=='all':
+                for key in f['Header'].attrs:
+                    data_dict[key] = f['Header'].attrs[key]
+                for key in f['PartType0']:
+                    data_dict[key] = np.copy(f['PartType0'][key])
+            else:
                 data_dict[key] = f['Header'].attrs[key]
-            for key in f['PartType0']:
-                data_dict[key] = np.copy(f['PartType0'][key])
+            return data_dict
         else:
-            data_dict[key] = f['Header'].attrs[key]
-        return data_dict
+            print "fn doesnt exist "
 
-    def load_CGMsnap_ids(self):
+    def load_CGM_snap_ids(self):
         grp_ids = np.zeros(0)
         i = 0
         for fn in glob.glob(self.CGMsnap_base+"s{}/*.hdf5".format(self.snapnum)):
@@ -893,6 +1050,33 @@ class illustris_fan:
 
         return new_pos
 
+
+    def load_CGM_snap(self,fn,load='all'):
+        data_dict = {}
+        f = h5py.File(fn,'r')
+        if load=='all':
+            for key in f['Header'].attrs:
+                data_dict[key] = f['Header'].attrs[key]
+            for key in f['PartType0']:
+                data_dict[key] = np.copy(f['PartType0'][key])
+        else:
+            data_dict[key] = f['Header'].attrs[key]
+        return data_dict
+
+    def _calc_radii(self,grp_data):
+        # box = grp_data['box']
+        print "Inputting box directly"
+        box = 75000.
+        grp_pos = grp_data['grp_pos']
+        pos = grp_data['POS ']
+        r = AU._pbc_dist(pos,grp_pos,boxsize=box)
+        return r
+
+    def _get_T(self,grp_data):
+        u = np.array(grp_data['U   '])#'InternalEnergy'
+        nelec = np.array(grp_data['NE  '])# "ElectronAbundance"
+        T = AU.GetTemp(u, nelec, gamma = 5.0/3.0)
+        return T
 
 if __name__ == '__main__':
     illustris_fan()

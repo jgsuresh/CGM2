@@ -16,16 +16,28 @@ def main(run=None,base=None):
     # run = "no_metal_cooling"
     # base="/n/hernquistfs1/jsuresh/Runs/{}/output/".format(run)
     # fnummax=8
-    run = "c0_fullmetalwinds"
-    base="/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(run)
-    fnummax=8
-    snapnum_arr = np.array([4])
-    group_min_mass = 10.**11.8
-    group_max_mass = 10.**16.
+    # run = "c0_fullmetalwinds"
+    # base="/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/{}/output/".format(run)
+    # run = "low_recouple_dens"
+    # base = "/n/regal/hernquist_lab/apillepich/Simulations_2014_IllustrisTNG_Runs/APTests_L25n256FP_0000_2501/Output/"
+    # run = "multi_speed"
+    # base = "/n/home01/ptorrey/Share/apillepich/L25n256/multi_speed_winds/output/"
+    # fnummax=8
+    # snapnum_arr = np.array([15])
+    # run = "multi_speed"
+    # base = "/n/home01/ptorrey/Share/apillepich/L25n256/multi_speed_winds/output/"
+    # fnummax=8
+    # snapnum_arr = np.array([15])
+    run = "ill1"
+    snapnum_arr = np.array([120])
+
+    group_min_mass = 10.**11
+    group_max_mass = 10.**18.
     # group_max_mass = 10.**12.2
     #dat_str_list = ["Masses","Coordinates","GFM_Metals","GFM_Metallicity","Velocities","Density","Volume","InternalEnergy","ElectronAbundance","Radius","NeutralHydrogenAbundance"]
     dat_str_list = ["Masses","Coordinates","GFM_Metals","GFM_Metallicity","Velocities","Density","Volume","InternalEnergy","ElectronAbundance","NeutralHydrogenAbundance","SmoothingLength"]
-    savebase = '/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/CGM_snaps/'
+    savebase = '/n/home04/jsuresh/scratch1/CGM_snaps_new/'
+    # savebase = '/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/CGM_new/data/CGM_snaps/'
 
 
     if run == "gam_25_BH":

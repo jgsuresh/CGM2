@@ -6,7 +6,7 @@ import h5py
 import matplotlib
 matplotlib.use('PDF')
 from matplotlib import rc
-#rc('text', usetex=True)
+# rc('text', usetex=True)
 rc('font', family='serif')
 import matplotlib.pyplot as plt
 import matplotlib.ticker
@@ -43,8 +43,8 @@ class full_analysis:
 
 
         # Feedback paper runs:
-        redshifts = ['2']
-        self.dat_prep(redshifts,g0_BH=1)
+        # redshifts = ['2.5']
+        # self.dat_prep(redshifts,g0_BH=1)
         # self.dat_prep(redshifts,c2_256=1)
         # self.dat_prep(redshifts,c0_sw_256=1)
         # self.dat_prep(redshifts,g50_fixv_nothermal=1)
@@ -52,12 +52,13 @@ class full_analysis:
         # self.dat_prep(redshifts,g50_fixv=1)
         # self.dat_prep(redshifts,c0_nometalwinds=1)
         # self.dat_prep(redshifts,c0_fullmetalwinds=1)
+        # self.dat_prep(redshifts,c0_sw_256=1)
 
         # Check runs:
-        # redshifts = ['2']
-        # self.dat_prep(redshifts,g0_BH=1)
+        redshifts = ['2.5']
         # self.dat_prep(redshifts,c2_256=1)
         # self.dat_prep(redshifts,c0_128=1)
+        # self.dat_prep(redshifts,g0_BH=1)
         # self.dat_prep(redshifts,c0_512=1)
         # self.dat_prep(redshifts,g0_BH=1)
         # self.dat_prep(redshifts,c0_check=1)
@@ -65,6 +66,10 @@ class full_analysis:
         # self.dat_prep(redshifts,c0_fullmetalwinds=1)
         # self.dat_prep(redshifts,c0_dumpfactor95=1)
         # self.dat_prep(redshifts,no_metal_cooling=1)
+        # self.dat_prep(redshifts,low_recouple_dens=1)
+        # self.dat_prep(redshifts,high_recouple_dens=1)
+        self.dat_prep(redshifts,multi_speed=1)
+        # self.dat_prep(redshifts,g50_fixv_nothermal=1)
 
 
 
@@ -152,37 +157,39 @@ class full_analysis:
         ##############################
         # 3D data analysis functions #
         ##############################
-        # self.phase_budget('m',savename='m_budget_ds',minimal=True)
-        # self.phase_budget('z',savename='z_budget_ds',minimal=True)
+        # self.phase_budget('m',mmin=10.**11,savename='m_budget_res',minimal=True)
+        # self.phase_budget('z',mmin=10.**11,savename='z_budget_res_recouple',minimal=True)
         # self.CGM_and_gal_metallicity(savename="massmet_newleg")
-        # self.radial_profile('T')
-        # self.radial_profile('z')
+        # self.radial_profile('T',savename='T_res')
+        # self.radial_profile('z',savename='z_res')
         # self.columndens_vs_R("O6",150.,minmass=10**11.8,maxmass=10**12.2,plot_mode=1,savename="O6_z3_galaxybinned")
 
         ##############################
         # 2D data analysis functions #
         ##############################
-        self.plot_grids("H1")
-        self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_z2_c2",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_z2_c2",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_z2_c2",show_Fumagalli=True)
-        self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_z2_c2",show_Fumagalli=True)
+        # self.plot_grids("H1")
+        # self.grid_sightlines("H1",200.,coldens_min=15.5,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_155=True,savename="rudie_155_z2_recouple",show_Fumagalli=True)
+        # self.grid_sightlines("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_172=True,savename="rudie_172_z2_recouple",show_Fumagalli=True)
+        # self.grid_sightlines("H1",200.,coldens_min=19.,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_19=True,savename="rudie_19_z2_recouple",show_Fumagalli=True)
+        # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_203=True,savename="rudie_203_z2_recouple",show_Fumagalli=True)
         # print "2"
-        # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_c2")
+        # self.grid_sightlines("H1",200.,coldens_min=20.3,minmass=10**11.8,maxmass=10**12.2,coverfrac_within_R=True,rudie_DLA=True,savename="DLA_res")
         # print "3"
         # self.grid_sightlines("H1",200.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="coldens_newfan2")
-        # self.grid_sightlines("O6",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="O6_z3_coldens")
-
-        # self.grid_sightlines("H1",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="H1_z25_coldens")
-        # self.grid_sightlines("Mg2",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="Mg2_z25_coldens")
-        # self.grid_sightlines("C3",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="C3_z25_coldens")
-        # self.grid_sightlines("C4",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="C4_z25_coldens")
-        # self.grid_sightlines("Si3",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="Si3_z25_coldens")
-        # self.grid_sightlines("Si4",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="Si4_z25_coldens")
         # self.grid_sightlines("O6",150.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="O6_z25_coldens")
 
-        # self.plot_grids("H1")
-        # self.plot_grids("C4")
+        # self.grid_sightlines("H1",300.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="H1_z25_coldens_300")
+        # self.grid_sightlines("Mg2",300.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="Mg2_z25_coldens_300")
+        # self.grid_sightlines("C3",300.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="C3_z25_coldens_300")
+        # self.grid_sightlines("C4",300.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,turner_c4=True,savename="C4_z2_multispeed")
+        # self.grid_sightlines("Si3",300.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="Si3_z25_coldens_300")
+        # self.grid_sightlines("Si4",300.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="Si4_z25_coldens_300")
+        # self.grid_sightlines("O6",300.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,savename="O6_z2_coldens_300_res")
+        self.grid_sightlines("C-1",300.,minmass=10**11.8,maxmass=10**12.2,coldens_vs_R=True,turner_c4=True,savename="C_z2_multispeed")
+
+        # self.plot_grids("H1",HI_custom_map=True)
+        # self.plot_grids("C4",vmax=15.,vmin=5.)
+        # self.plot_grids("C-1") #,vmax=17.,vmin=5.
         # self.plot_grids("Si4")
         # self.plot_grids("O6")
         # self.coverfrac_bootstrap("H1",200.,coldens_min=17.2,minmass=10**11.8,maxmass=10**12.2)
@@ -377,20 +384,22 @@ class full_analysis:
                 zw_budget_gal = f['zw_budget_gal']
                 f.close()
             else:
-                grp_ids = self.find_desired_grpids(i,minmass=mmin,maxmass=mmax)
+                [grp_ids,grp_mass] = self.find_desired_grpids(i,minmass=mmin,maxmass=mmax,return_grpmass=True)
                 gal_dict = self.get_gal_props(i,grp_ids)
                 gal_mass = gal_dict['gal_mass']
-
                 in_mbin = gal_mass > 10.**9.5
-
                 gal_mass = gal_mass[in_mbin]
+                selected_grp_ids = grp_ids[in_mbin]
+                # selected_grp_ids = grp_ids
+                # gal_mass = grp_mass/100. # clearly wrong - just for plot sake
+
                 # no radial cut implemented yet!
                 # m = np.zeros(0)
                 # z = np.zeros(0)
                 # T = np.zeros(0)
                 # rho = np.zeros(0)
                 # vol = np.zeros(0)
-                selected_grp_ids = grp_ids[in_mbin]
+                
 
                 mw_budget_gal = np.zeros([np.size(selected_grp_ids),4])
                 zw_budget_gal = np.zeros([np.size(selected_grp_ids),4])
@@ -432,7 +441,7 @@ class full_analysis:
                     vw_budget_gal[j,:] = vw_budget
 
 
-                np.savez(self.npz_base+npz_fname,gal_mass=gal_mass,mw_budget_gal=mw_budget_gal,zw_budget_gal=zw_budget_gal,vw_budget_gal=vw_budget_gal)
+                # np.savez(self.npz_base+npz_fname,gal_mass=gal_mass,mw_budget_gal=mw_budget_gal,zw_budget_gal=zw_budget_gal,vw_budget_gal=vw_budget_gal)
 
 
             # if data_type == 'v':
@@ -637,13 +646,43 @@ class full_analysis:
     # 2D data analysis functions #
     ##############################
 
-    def plot_grids(self,species,vmin=10.,vmax=25.):
+    def plot_grids(self,species,vmin=10.,vmax=25.,HI_custom_map=False):
+
+        if HI_custom_map:
+            # Define custom colormap
+            vmin = 10.
+            vmax = 25.
+            cut_LLS=17
+            cut_DLA=20.3
+            v_LLS = (cut_LLS-vmin)/(vmax-vmin)
+            v_DLA = (cut_DLA-vmin)/(vmax-vmin)
+
+            cdict = {
+            'red'  :  ((0., 0., 0.), (v_LLS, 0.3, 1.0),(v_DLA, 0.3, 0.3), (1., 1., 1.)),
+            'green':  ((0., 0., 0.), (v_LLS, 0.0, 1.0), (v_DLA, 0.3, 0.0), (1., 0., 0.)),
+            'blue' :  ((0., 0., 0.), (v_LLS, 1.0, 0.0), (v_DLA, 0.0, 0.0), (1., 0., 0.))
+            }
+            cdict = {
+            'red'  :  ((0., 0., 0.), (v_LLS, 0.3, 0.3),(v_DLA, 1.0, 0.3), (1., 1., 1.)),
+            'green':  ((0., 0., 0.), (v_LLS, 0.0, 0.3), (v_DLA, 1.0, 0.0), (1., 0., 0.)),
+            'blue' :  ((0., 0., 0.), (v_LLS, 1.0, 0.0), (v_DLA, 0.0, 0.0), (1., 0., 0.))
+            }
+            #generate the colormap with 1024 interpolated values
+            my_cmap = matplotlib.colors.LinearSegmentedColormap('my_colormap', cdict, 1024)
+
+
+        font = {'family' : 'serif',
+        'weight' : 'normal',
+        'size'   : 16,
+        }
+        plt.rc('font',**font)
 
         # for fn in glob.glob(self.grid_base+"s{}/*.hdf5".format(self.snapnum)):
         for i in xrange(len(self.run_list)):
             run = self.run_list[i]
             snapnum = self.snapnum_list[i]
-            for fn in glob.glob(self.grid_base+"{}/s{}/*.hdf5".format(run,snapnum)):
+            # for fn in glob.glob(self.grid_base+"{}/s{}/*.hdf5".format(run,snapnum)):
+            for fn in [self.grid_base+"{}/s{}/00032.hdf5".format(run,snapnum)]:
                 print "fn ",fn
                 f = h5py.File(fn,'r')
                 grp_id = f['Header'].attrs['grp_id']
@@ -651,22 +690,39 @@ class full_analysis:
                 ngrid = f['Header'].attrs['ngrid']
                 grid = np.array(f['grids'][species])
 
-                img_savepath = "{}/grids/{}/s{}/{}_{}.pdf".format(self.fig_base,run,snapnum,str(int(grp_id)).zfill(5),species)
+                img_savepath = "{}/grids/{}/s{}/{}_{}_300pkpc.pdf".format(self.fig_base,run,snapnum,str(int(grp_id)).zfill(5),species)
 
                 maxdist = grid_rad
 
+                print "grid_rad ",grid_rad
+                print "ngrid ",ngrid
+
+                # Check if there are any nans:
+                print "Grid has nans? ",np.isnan(np.sum(grid))
+                grid[np.isnan(grid)] = 0.
+                print "np.min(grid) ",np.min(grid)
+                print "np.max(grid) ",np.max(grid)
+
                 plt.close('all')
-                plt.imshow(grid,origin='lower',extent=(-maxdist,maxdist,-maxdist,maxdist),vmin=vmin,vmax=vmax,cmap=plt.cm.cubehelix) #spb_jet2
+                if HI_custom_map:
+                    plt.imshow(grid,origin='lower',extent=(-maxdist,maxdist,-maxdist,maxdist),vmin=vmin,vmax=vmax,cmap=my_cmap) 
+                else: 
+                    plt.imshow(grid,origin='lower',extent=(-maxdist,maxdist,-maxdist,maxdist),vmin=vmin,vmax=vmax,cmap=plt.cm.cubehelix) 
                 bar=plt.colorbar()
-                bar_label = r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)"
+                if species == 'H1':
+                    bar_label = r"log$_{10}$ N$_\mathrm{HI}$ (cm$^{-2}$)"
+                elif species == 'C4':
+                    bar_label = r"log$_{10}$ N$_\mathrm{CIV}$ (cm$^{-2}$)"
+                else:
+                    bar_label = r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)"
                 bar.set_label(bar_label)
-                plt.xlabel(r"y (pkpc)")
-                plt.ylabel(r"z (pkpc)")
-                plt.savefig(img_savepath)
+                plt.xlabel(r"y [proper kpc]")
+                plt.ylabel(r"z [proper kpc]")
+                plt.savefig(img_savepath, bbox_inches='tight')
                 f.close()
 
 
-    def grid_sightlines(self,species,max_R,coldens_min=0,coldens_max=1000,minmass=10**11.9,maxmass=10**12.1,savename=None,coldens_vs_R=False,coverfrac_vs_R=False,coverfrac_within_R=False,rudie_155=False,rudie_172=False,rudie_19=False,rudie_203=False,show_Fumagalli=False):
+    def grid_sightlines(self,species,max_R,coldens_min=0,coldens_max=1000,minmass=10**11.9,maxmass=10**12.1,savename=None,coldens_vs_R=False,coverfrac_vs_R=False,coverfrac_within_R=False,rudie_155=False,rudie_172=False,rudie_19=False,rudie_203=False,turner_c4=False,turner_si4=False,show_Fumagalli=False):
         # Calculates covering fraction in similar way to observers.  Gather all halos within specified mass range, and treat 
         # all corresponding sightlines together.  
 
@@ -694,6 +750,8 @@ class full_analysis:
                 grp_data = self.load_grid_data(i,grp_id)
                 # print list(grp_data.keys())
                 grid = grp_data[species]
+                # Fix for nan "holes":
+                grid[np.isnan(grid)] = -1.
                 grid_rad = grp_data['grid_radius_pkpc']
                 ngrid = grp_data['ngrid']
 
@@ -711,14 +769,30 @@ class full_analysis:
 
             if coldens_vs_R:
                 # Calculates the median column density as a function of radius
-                [Q1,med,Q3] = AU._calc_percentiles_v2(r,Rbins_min,Rbins_max,N)
+                [Q1,med,Q3] = AU._calc_percentiles_v2(r,Rbins_min,Rbins_max,N,min_percentile=32,max_percentile=68)
 
                 x = Rbins_med
                 x[0] = 0
                 x[-1] = max_R
                 print "x ",x
                 plt.plot(x,med,color=self.color_list[i],label=self.label_list[i],zorder=1)
-                # plt.fill_between(Rbins_med,Q1,Q3,color=self.color_list[i],alpha=0.3,zorder=2)
+                if self.run_list[i] == 'gam_50_fixv_nothermal':
+                    plt.fill_between(Rbins_med,Q1,Q3,color=self.color_list[i],alpha=0.3,zorder=2)
+
+                if True:
+                    thresh = 13.09
+                    R_cut = np.logical_and(r>=180.,r<=250.)
+                    N_sample = N[R_cut]
+                    # now subsample
+                    ss = np.zeros(1000)
+                    print "subsampling..."
+                    for ss_i in np.arange(1000):
+                        foo = np.random.choice(N_sample,size=11)
+                        ss[ss_i] = np.log10(np.median(10.**foo))
+                    print "ss ",ss
+                    prob = np.sum(ss >= 13.09)/np.float(np.size(ss))
+                    print "Probability of getting observed CIV value at 180-250 kpc: ", prob
+
 
             elif coverfrac_vs_R:
                 fc = np.zeros(n_Rbins)
@@ -778,17 +852,43 @@ class full_analysis:
                 plt.scatter(np.array([90.,180.]),np.array([0.03,0.01]),marker='D',color='gray',zorder=10)
 
 
+        #Turner+14, column densities vs R for SiIV and CIV:
+        if turner_si4:
+            pass
+        elif turner_c4:
+            # impact parameter: 85+-45,155+-25,215+-35,305+-55 
+            # column densities:
+            x = np.array([85,155,215,305])
+            xerr = np.array([45,25,35,55])
+            N = np.array([13.62,13.16,13.09,12.66])
+            N_ul = np.array([0.12,0.28,0.18,0.36])
+            N_ll = np.array([0.18,1.38,0.29,0.5])
+            lims = np.array([0,0,0,1])
+            # N = np.array([13.55,12.66,12.66,12.80])
+            # N_ul = np.array([0.11,0.46,0.30,0.29])
+            # N_ll = np.array([0.17,0.5,0.97,1.37])
+            # lims = np.array([0,1,0,0])
+            plt.errorbar(x,N,xerr=xerr,yerr=[N_ll,N_ul],lolims=lims,linestyle='None',color='purple',zorder=9)
             
         if coldens_vs_R:
-            plt.xlim([0.,max_R])
+            # plt.xlim([0.,max_R])
+            plt.xlim([0.,320.])
+            plt.ylim([5.,16.])
+            print "new ylim!"
             plt.xlabel('Radius [pkpc]')
-            # plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
+            if species == 'C4':
+                plt.ylabel(r"log$_{10}$ N$_\mathrm{CIV}$ (cm$^{-2}$)")
+            elif species == 'O6':
+                plt.ylabel(r"log$_{10}$ N$_\mathrm{OVI}$ (cm$^{-2}$)")
+            else:
+                plt.ylabel(r"log$_{10}$ N$_\mathrm{"+species+"}$ (cm$^{-2}$)")
             # plt.legend(prop={'size':5},ncol=2)
-            plt.ylabel(r"log$_{10}$ N$_\mathrm{OVI}$ (cm$^{-2}$)")
-            plt.xticks(np.array([0.,50.,100.,150.]))
-            lg=plt.legend(prop={'size':6.5},loc=3,handletextpad=0.1)
+            # plt.ylabel(r"log$_{10}$ N$_\mathrm{OVI}$ (cm$^{-2}$)")
+            # plt.xticks(np.array([0.,50.,100.,150.]))
+            plt.xticks(np.array([0.,100.,200.,300.]))
+            lg=plt.legend(prop={'size':6},loc=3,handletextpad=0.1)
             lg.draw_frame(False)
-            plt.title(r"$z=3$")
+            plt.title(r"$z=2.5$")
             plt.subplots_adjust(left=0.2,bottom=0.18)
             if savename != None:
                 plt.savefig(self.fig_base+savename+".pdf", bbox_inches='tight')
@@ -1085,7 +1185,7 @@ class full_analysis:
 
         return np.sort(grp_ids)
 
-    def find_desired_grpids(self,i,minmass=0,maxmass=1e20):
+    def find_desired_grpids(self,i,minmass=0,maxmass=1e20,return_grpmass=False):
         print self.snapdir_list[i],self.snapnum_list[i]
         cat = readsubfHDF5.subfind_catalog(self.snapdir_list[i],self.snapnum_list[i],subcat=False)
         grp_mass = AU.PhysicalMass(np.array(cat.Group_M_Crit200))
@@ -1096,7 +1196,43 @@ class full_analysis:
         # grp_mass = grp_mass[mass_select]
         # for j in np.arange(np.size(grp_ids)):
         #     print "grp id {} - grp mass {}".format(grp_ids[j],grp_mass[j])
-        return np.sort(grp_ids)
+        if not return_grpmass:
+            return np.sort(grp_ids)
+        else:
+            foo = np.argsort(grp_ids)
+            return [grp_ids[foo],grp_mass[foo]]
+
+
+    def get_gal_props(self,run_index,grp_ids):
+        snapdir = self.snapdir_list[run_index]
+        snapnum = self.snapnum_list[run_index]
+        cat = readsubfHDF5.subfind_catalog(snapdir,snapnum,long_ids=True)
+
+        grp_ids = np.int32(grp_ids)
+        sub_ids = cat.GroupFirstSub[grp_ids]
+        gal_mass = AU.PhysicalMass(cat.SubhaloMassType[sub_ids,4])
+        # gal_SFR = AU.PhysicalMdot(cat.SubhaloSFR[sub_ids])
+        # data_dict = {'gal_mass':gal_mass,'gal_SFR':gal_SFR}
+        data_dict = {'gal_mass':gal_mass}
+        return data_dict
+
+    def load_CGMsnap_data(self,run_index,grp_id,data_entry='all'):
+        fname = "{}{}/s{}/{}.hdf5".format(self.CGMsnap_base,self.run_list[run_index],self.snapnum_list[run_index],str(int(grp_id)).zfill(5))
+        #fname = self.CGMsnap_base + self.run_list[run_index] + str(grp_id).zfill(5) + ".hdf5"
+        # check that file exists - NOT IMPLEMENTED
+        print "fname: ",fname
+        f = h5py.File(fname,'r')
+
+        # if data_entry is 'all', return a dictionary with all data fields, otherwise return specific data field
+        if data_entry == 'all':
+            data_dict = {}
+            for key in f['Header'].attrs:
+                data_dict[key] = f['Header'].attrs[key]
+            for key in f['PartType0']:
+                data_dict[key] = f['PartType0'][key]
+            return data_dict
+        else:
+            return f['PartType0'][data_entry]
 
     def load_grid_data(self,i,grp_id):
         # assume that i is singular
@@ -1113,17 +1249,23 @@ class full_analysis:
     def _grid_to_kpc(self,r_grid,ngrid,grid_rad):
         return r_grid * (2.*grid_rad)/(ngrid)
 
-
+    def _calc_radii(self,grp_data):
+        box = grp_data['box']
+        grp_pos = grp_data['grp_pos']
+        pos = grp_data['Coordinates']
+        r = AU._pbc_dist(pos,grp_pos,boxsize=box)
+        return r
         
     # self.get_gal_props
 
 
-    def dat_prep(self,redshifts,c0_256=0,c0_512=0,c3_512=0,c4_512=0,c4_check=0,c2_256=0,c0_fw_256=0,c0_sw_256=0,c5_256=0,g0_BH=0,g10_BH=0,g20_BH=0,g25_BH=0,g30_BH=0,g40_BH=0,g25_noBH=0,g50_BH=0,g75_BH=0,g75_noBH=0,g95_BH=0,g95_noBH=0,g10_noBH=0,g20_noBH=0,g30_noBH=0,g40_noBH=0,g50_noBH=0,g10_nothermal=0,g20_nothermal=0,g30_nothermal=0,g40_nothermal=0,g50_nothermal=0,g25_fixv=0,g50_fixv=0,g25_fixv_nothermal=0,g50_fixv_nothermal=0,g25_fixv_fixeta=0,g50_fixv_fixeta=0,c0_nometalwinds=0,c0_fullmetalwinds=0,c0_dumpfactor95=0,no_metal_cooling=0):
+    def dat_prep(self,redshifts,c0_256=0,c0_512=0,c0_128=0,c3_512=0,c4_512=0,c4_check=0,c2_256=0,c0_fw_256=0,c0_sw_256=0,c5_256=0,g0_BH=0,g10_BH=0,g20_BH=0,g25_BH=0,g30_BH=0,g40_BH=0,g25_noBH=0,g50_BH=0,g75_BH=0,g75_noBH=0,g95_BH=0,g95_noBH=0,g10_noBH=0,g20_noBH=0,g30_noBH=0,g40_noBH=0,g50_noBH=0,g10_nothermal=0,g20_nothermal=0,g30_nothermal=0,g40_nothermal=0,g50_nothermal=0,g25_fixv=0,g50_fixv=0,g25_fixv_nothermal=0,g50_fixv_nothermal=0,g25_fixv_fixeta=0,g50_fixv_fixeta=0,c0_nometalwinds=0,c0_fullmetalwinds=0,c0_dumpfactor95=0,no_metal_cooling=0,low_recouple_dens=0,high_recouple_dens=0,multi_speed=0):
         mv_snapbase = "/n/hernquistfs1/Illustris/SmallBox/GFM/Production/Cosmo/" 
         sb_snapbase = "/n/hernquistfs1/spb/Cosmo/"
         js_snapbase = "/n/home04/jsuresh/runs/Cosmo5_V6/output"
         # gam_snapbase = "/n/hernquistfs1/jsuresh/Runs/"
         gam_snapbase = "/n/home04/jsuresh/data1/Projects/Feedback_and_CGM/Runs/"
+        ap_snapbase = "/n/regal/hernquist_lab/apillepich/Simulations_2014_IllustrisTNG_Runs/"
 
         bmap = brewer2mpl.get_map('Spectral','Diverging',9, reverse=True)
         cmap = bmap.mpl_colormap
@@ -1141,11 +1283,11 @@ class full_analysis:
                     self.label_list.append("Fiducial")
                     self.snapnum_list.append(60)
                 elif redshift == '2.5':
-                    self.label_list.append("Cold Winds+BHs-256 (z=2.5)")
+                    self.label_list.append("Fiducial")
                     self.snapnum_list.append(63)
                 elif redshift == '2':
-                    # self.label_list.append("Cold Winds+BHs-256 (z=2)")
-                    self.label_list.append("Fiducial")
+                    self.label_list.append(r"$256^3$")
+                    # self.label_list.append("Fiducial")
                     self.snapnum_list.append(68)
                 elif redshift == '1':
                     raise Exception('z=1 not implemented')
@@ -1160,26 +1302,63 @@ class full_analysis:
         if c0_512:
             for redshift in redshifts:
                 self.run_list.append("c0_512")
-                self.color_list.append("black")
+                #self.color_list.append(cmap(0.))
+                self.color_list.append('red')
+                self.linestyle_list.append('solid')
                 self.snapdir_list.append(mv_snapbase+"Cosmo0_V6/L25n512/output/")
                 if redshift == '4':
-                    self.label_list.append("Cold Winds+BHs (z=4)")
+                    self.label_list.append("Gamma=0+BHs (z=4)")
                     self.snapnum_list.append(54)
                 elif redshift == '3':
-                    self.label_list.append("Cold Winds+BHs (z=3)")
+                    self.label_list.append("Fiducial")
                     self.snapnum_list.append(60)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0+BHs (z=2.5)")
+                    self.snapnum_list.append(63)
                 elif redshift == '2':
-                    self.label_list.append("Cold Winds+BHs (z=2)")
+                    self.label_list.append(r"$512^3$")
+                    # self.label_list.append("Fiducial")
                     self.snapnum_list.append(68)
                 elif redshift == '1':
                     raise Exception('z=1 not implemented')
-                    self.label_list.append("Cold Winds+BHs (z=1)")
+                    self.label_list.append("Gamma=0+BHs (z=1)")
                     self.snapnum_list.append()
                 elif redshift == '0.3':
-                    self.label_list.append("Cold Winds+BHs (z=0.3)")
+                    self.label_list.append("Gamma=0+BHs (z=0.3)")
                     self.snapnum_list.append(114)
                 elif redshift == '0':
-                    self.label_list.append("Cold Winds+BHs (z=0)")
+                    self.label_list.append("Gamma=0+BHs (z=0)")
+                    self.snapnum_list.append(135)
+
+        if c0_128:
+            for redshift in redshifts:
+                self.run_list.append("c0_128")
+                #self.color_list.append(cmap(0.))
+                self.color_list.append('green')
+                self.linestyle_list.append('solid')
+                self.snapdir_list.append(mv_snapbase+"Cosmo0_V6/L25n128/output/")
+                if redshift == '4':
+                    self.label_list.append("Gamma=0+BHs (z=4)")
+                    self.snapnum_list.append(54)
+                elif redshift == '3':
+                    self.label_list.append("Fiducial")
+                    self.snapnum_list.append(60)
+                elif redshift == '2.5':
+                    self.label_list.append("Gamma=0+BHs (z=2.5)")
+                    self.snapnum_list.append(63)
+                elif redshift == '2':
+                    self.label_list.append(r"$128^3$")
+                    # self.label_list.append("Fiducial")
+                    self.snapnum_list.append(68)
+                elif redshift == '1':
+                    raise Exception('z=1 not implemented')
+                    self.label_list.append("Gamma=0+BHs (z=1)")
+                    self.snapnum_list.append()
+                elif redshift == '0.3':
+                    self.label_list.append("Gamma=0+BHs (z=0.3)")
+                    self.snapnum_list.append(114)
+                elif redshift == '0':
+                    self.label_list.append("Gamma=0+BHs (z=0)")
                     self.snapnum_list.append(135)
 
 
@@ -1293,7 +1472,7 @@ class full_analysis:
                     self.label_list.append("Strong Winds+BHs (z=4)")
                     self.snapnum_list.append(54)
                 elif redshift == '3':
-                    self.label_list.append("Higher Mass-Loading")
+                    self.label_list.append("Higher Mass-loading")
                     self.snapnum_list.append(60)
                 elif redshift == '2':
                     self.label_list.append("Higher Mass-loading")
@@ -1336,11 +1515,11 @@ class full_analysis:
                     self.label_list.append("Fiducial")
                     self.snapnum_list.append(60)
                 elif redshift == '2.5':
-                    self.label_list.append("Gamma=0+BHs (z=2.5)")
+                    self.label_list.append("Fiducial")
                     self.snapnum_list.append(63)
                 elif redshift == '2':
-                    # self.label_list.append("Gamma=0+BHs (z=2)")
-                    self.label_list.append("Fiducial")
+                    self.label_list.append(r"$256^3$")
+                    # self.label_list.append("Fiducial")
                     self.snapnum_list.append(68)
                 elif redshift == '1':
                     raise Exception('z=1 not implemented')
@@ -1483,7 +1662,7 @@ class full_analysis:
                     self.label_list.append("Fixed-E Hot Winds")
                     self.snapnum_list.append(3)
                 elif redshift == '2.5':
-                    self.label_list.append("Gamma=0.5 + BHs (z=2.5)")
+                    self.label_list.append("Fixed-E Hot Winds")
                     self.snapnum_list.append(4)
                 elif redshift == '2':
                     # self.label_list.append("Gamma=0.5 + BHs (z=2)")
@@ -1689,7 +1868,7 @@ class full_analysis:
                     self.label_list.append("Fixed-v Hot Winds")
                     self.snapnum_list.append(3)
                 elif redshift == '2.5':
-                    self.label_list.append("Gamma=0.5-fixv (z=2.5)")
+                    self.label_list.append("Fixed-v Hot Winds")
                     self.snapnum_list.append(4)
                 elif redshift == '2':
                     # self.label_list.append("Gamma=0.5-fixv (z=2)")
@@ -1841,6 +2020,39 @@ class full_analysis:
                 elif redshift == '2':
                     self.label_list.append("No Metal Cooling")
                     self.snapnum_list.append(5)
+
+        if low_recouple_dens:
+            for redshift in redshifts:
+                self.run_list.append("low_recouple_dens")
+                self.color_list.append("magenta")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append("/n/regal/hernquist_lab/apillepich/Simulations_2014_IllustrisTNG_Runs/APTests_L25n256FP_0000_2501/Output/")
+                if redshift == '2':
+                    self.label_list.append("Low Recoupling Density")
+                    self.snapnum_list.append(17)
+
+        if high_recouple_dens:
+            for redshift in redshifts:
+                self.run_list.append("high_recouple_dens")
+                self.color_list.append("cyan")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append("/n/regal/hernquist_lab/apillepich/Simulations_2014_IllustrisTNG_Runs/APTests_L25n256FP_0000_2502/Output/")
+                if redshift == '2':
+                    self.label_list.append("High Recoupling Density")
+                    self.snapnum_list.append(17)
+
+        if multi_speed:
+            for redshift in redshifts:
+                self.run_list.append("multi_speed")
+                self.color_list.append("red")
+                self.linestyle_list.append("solid")
+                self.snapdir_list.append("/n/home01/ptorrey/Share/apillepich/L25n256/multi_speed_winds/output/")
+                if redshift == '2.5':
+                    self.label_list.append("Multi-speed")
+                    self.snapnum_list.append(15)
+                if redshift == '2':
+                    self.label_list.append("Multi-speed")
+                    self.snapnum_list.append(17)
 
         self.ndat = len(self.run_list)
 

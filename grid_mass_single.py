@@ -28,21 +28,21 @@ class grid_mass:
         self.box = 75000
         self.redshift = 0.2
         self.hubble = 0.7
+        fn = "/n/home04/jsuresh/scratch1/Cloudy_test/cutout/CGM_snap/02774_full300.hdf5"
         # fn = "/n/home04/jsuresh/scratch1/Cloudy_test/cutout/02774.hdf5"
-        fn = "/n/ghernquist/ptorrey/Illustris/GroupParsedSnapshots/Illustris-1/snapshot_120/subfolder_027/group_2774.hdf5"
+        # fn = "/n/ghernquist/ptorrey/Illustris/GroupParsedSnapshots/Illustris-1/snapshot_120/subfolder_027/group_2774.hdf5"
         
-        self.grid_radius_pkpc = 200
-        self.elem_list = ["H","C","C","C","N","N","N","N","O","O","O","O","O","O","Ne","Mg","Mg","Si","Si","Si","Fe"]
-        self.ion_list = [1,2,3,4,2,3,4,5,3,4,5,6,7,8,8,2,10,3,4,12,2]
-        # self.elem_list = ["C"]
-        # self.ion_list = [4]
+        self.grid_radius_pkpc = 300
+        # self.elem_list = ["H","C","C","C","N","N","N","N","O","O","O","O","O","O","Ne","Mg","Mg","Si","Si","Si","Fe"]
+        # self.ion_list = [1,2,3,4,2,3,4,5,3,4,5,6,7,8,8,2,10,3,4,12,2]
+        self.elem_list = ["H","C","O"]
+        self.ion_list = [1,4,6]
         # cloudy_dir
         # self.cloudy_type = "ion_out_fancy_atten"
         self.cloudy_type = "UVB_sf_xrays_ext"
-        self.SFR = 10. # Msun/yr
+        self.SFR = 100. # Msun/yr
         # self.beta = 10.**-4.
-        self.loadbase = '/n/home04/jsuresh/scratch1/Cloudy_test/cutout/'
-        self.savebase = '/n/home04/jsuresh/scratch1/Cloudy_test/cutout/grids/'
+        self.savebase = '/n/home04/jsuresh/scratch1/Cloudy_test/cutout/grids/full_cutout/'
 
         # Other miscellaneous stuff
         self.grid_radius = AU.CodePosition(self.grid_radius_pkpc,self.redshift,hubble=self.hubble)
@@ -54,18 +54,18 @@ class grid_mass:
         self.n_species = len(self.elem_list)
 
         self.grid = np.zeros([self.n_species,self.ngrid,self.ngrid])
-        # f = h5py.File(fn,'r')
-        # self.grp_pos = f['Header'].attrs['grp_pos']
-        # f.close()
+        f = h5py.File(fn,'r')
+        self.grp_pos = f['Header'].attrs['grp_pos']
+        f.close()
         [m,pos,metals,rho,u,nelec,hsml,T,neut_frac] = self.load_CGM_file(fn,use_block_name=False)
         
 
-        # pos_cent = self._fix_pos(self.grp_pos,pos,self.box)
-        # print "pos_cent: ",pos_cent
+        pos_cent = self._fix_pos(self.grp_pos,pos,self.box)
+        print "pos_cent: ",pos_cent
         self.calc_grid(m,pos_cent,metals,rho,hsml,T,neut_frac,kernel_type='SPH')
 
         # savename = self.savebase + self.cloudy_type + "_beta{}.hdf5".format(self.beta)
-        savename = self.savebase + "g{}_".format(2774)+self.cloudy_type + "_interp_SFR{}_highT.hdf5".format(self.SFR)
+        savename = self.savebase + "g{}_".format(2774)+self.cloudy_type + "_interp_SFR{}.hdf5".format(self.SFR)
         print "Saving group file now to {}".format(savename)
         f=h5py.File(savename,'w-')
         grp = f.create_group("Header")
@@ -163,7 +163,7 @@ class grid_mass:
         rho_phys = AU.PhysicalDensity(rho,self.redshift,hubble=self.hubble)
         rho_Hatoms = rho_phys*(metals[:,0]/AU.ProtonMass)
         rho_cut = np.logical_and(np.log10(rho_Hatoms) >= -7.,np.log10(rho_Hatoms) <= 4.)
-        if True:
+        if False:
             low_dens = rho_Hatoms < 10.**-3
             T[low_dens] *= 10.**0.5
         T_cut = np.logical_and(np.log10(T) >= 3.,np.log10(T) <= 8.6)
