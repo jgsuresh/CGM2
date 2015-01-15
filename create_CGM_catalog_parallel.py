@@ -24,15 +24,17 @@ import cold_gas
 class illustris_CGM_extract:
     def __init__(self,snapnum):
         run = "ill1"
-        self.snapnum = snapnum#103
-        print "snapnum ",snapnum
-        self.snapnum = 135
+        self.snapnum = np.int32(snapnum)
         if self.snapnum == 135: self.redshift = 0.
+        elif self.snapnum == 127: self.redshift = 0.1
+        elif self.snapnum == 120: self.redshift = 0.2
         elif self.snapnum == 103: self.redshift = 0.5
         elif self.snapnum == 85: self.redshift = 1.
         elif self.snapnum == 68: self.redshift = 2.
         elif self.snapnum == 60: self.redshift = 3.
         elif self.snapnum == 54: self.redshift = 4.
+
+        print "self.redshift ",self.redshift
 
         self.hubble = 0.7
         # self.snapnum_arr = np.array([135,68,127,120,103,85,60,54])])
@@ -65,9 +67,11 @@ class illustris_CGM_extract:
             self.GroupOffset,self.HaloOffset,self.FileNum,self.FileTypeNumbers,self.multiple]\
             = self.setup_tables(self.snapnum,verbose=verbose)
         
-            gm = AU.PhysicalMass(self.Group_M_Crit200)
-            self.grnr_arr = np.arange(np.size(gm))
-            self.grnr_arr = self.grnr_arr[np.logical_and(gm > group_min_mass,gm < group_max_mass)]
+            self.gm = AU.PhysicalMass(self.Group_M_Crit200)
+            self.grnr_arr = np.arange(np.size(self.gm))
+            mass_cut = np.logical_and(self.gm > group_min_mass,self.gm < group_max_mass)
+            self.grnr_arr = self.grnr_arr[mass_cut]
+            self.gm = self.gm[mass_cut]
         else: 
             self.Group_M_Crit200 = None
             self.SubhaloLenType = None
@@ -117,7 +121,7 @@ class illustris_CGM_extract:
             rank_to_work_on_this_grp = (i % (size-1))+1
             if (rank == rank_to_work_on_this_grp):
                 print "Projecting i / task:", i, rank
-                # print "On group {} of {}".format(i+1,n_grp)
+                print "On group {} of {}".format(i+1,n_grp)
                 ts = time.time()
                 grnr = self.grnr_arr[i]
                 data_dict = self.read_data(grnr,verbose=verbose)
@@ -485,6 +489,10 @@ class illustris_CGM_extract:
 
         f=h5py.File(filepath,'a')
 
+        head = f.create_group("Header")
+        head.create_dataset("grp_id",data=self.grnr_arr)
+        head.create_dataset("grp_mass",data=self.gm)
+
         p_grp = f.create_group("Gas")
         p_grp.create_dataset("phase_mass",data=self.phase_mass)
         p_grp.create_dataset("phase_metallicity",data=self.phase_metallicity)
@@ -508,6 +516,6 @@ class illustris_CGM_extract:
 
 
 if __name__ == '__main__':
-    # for arg in sys.argv:
-    #     print arg
+    for arg in sys.argv:
+        print arg
     illustris_CGM_extract(arg)
