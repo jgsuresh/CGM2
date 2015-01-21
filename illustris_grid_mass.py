@@ -44,7 +44,7 @@ class grid_mass:
 
         # Modify temperatures of low-density CGM?
         self.modify_temp = False
-        self.tempfac_arr = np.array([1,3.,10.])
+        self.tempfac_arr = np.array([1]) #np.array([1,3.,10.])
         self.n_tempfac = len(self.tempfac_arr)
         
         # Multiple sources of radiation, or only use central galaxy?
@@ -54,10 +54,10 @@ class grid_mass:
         if self.modify_temp and self.multiple_sources:
             raise NotImplementedError
 
-        self.loadbase = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
-        self.savebase = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
-        # self.loadbase = '/n/home04/jsuresh/scratch1/QCGM2/data/CGM_snaps/'
-        # self.savebase = '/n/home04/jsuresh/scratch1/QCGM2/data/grids/'
+        # self.loadbase = '/n/home04/jsuresh/scratch1/AREPOfest/data/CGM_snaps/'
+        # self.savebase = '/n/home04/jsuresh/scratch1/AREPOfest/data/grids/'
+        self.loadbase = '/n/home04/jsuresh/scratch1/Test/ill1/'
+        self.savebase = '/n/home04/jsuresh/scratch1/Test/ill1/grids/'
         
 
 
